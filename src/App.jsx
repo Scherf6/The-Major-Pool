@@ -835,7 +835,7 @@ function Leaderboard({ entries, isLocked, loading }) {
           {/* Column headers */}
           <div style={{
             display: "grid",
-            gridTemplateColumns: "44px 1fr 60px repeat(6, 1fr)",
+            gridTemplateColumns: "44px minmax(160px, 2fr) 60px repeat(6, 1fr)",
             borderBottom: `2px solid ${B.green}`,
             background: "#f0ebe0",
           }}>
@@ -861,7 +861,7 @@ function Leaderboard({ entries, isLocked, loading }) {
                 <div onClick={() => setExpanded(isExpanded ? null : i)}
                   style={{
                     display: "grid",
-                    gridTemplateColumns: "44px 1fr 60px repeat(6, 1fr)",
+                    gridTemplateColumns: "44px minmax(160px, 2fr) 60px repeat(6, 1fr)",
                     borderBottom: `1px solid ${B.border}`,
                     background: i % 2 === 0 ? B.rowEven : B.rowOdd,
                     cursor: "pointer",
@@ -1285,17 +1285,36 @@ export default function App() {
 
   const speakHelloFriends = useCallback(() => {
     try {
-      const utterance = new SpeechSynthesisUtterance("Hello, friends.");
-      utterance.rate = 0.75;
-      utterance.pitch = 0.85;
-      utterance.volume = 1;
       const voices = speechSynthesis.getVoices();
-      const preferred = voices.find(v =>
-        v.name.includes("Daniel") || v.name.includes("James") ||
-        v.name.includes("Google UK English Male") || v.name.includes("Male")
-      ) || voices.find(v => v.lang.startsWith("en")) || voices[0];
-      if (preferred) utterance.voice = preferred;
-      speechSynthesis.speak(utterance);
+      // Prefer natural/premium voices, then deep male voices
+      const preferred = voices.find(v => v.name.includes("Natural") && v.lang.startsWith("en"))
+        || voices.find(v => v.name.includes("Premium") && v.lang.startsWith("en"))
+        || voices.find(v => v.name.includes("Daniel"))
+        || voices.find(v => v.name.includes("Aaron"))
+        || voices.find(v => v.name.includes("Google UK English Male"))
+        || voices.find(v => v.name.includes("Alex"))
+        || voices.find(v => v.name === "Samantha")
+        || voices.find(v => v.lang.startsWith("en-") && v.name.includes("Male"))
+        || voices.find(v => v.lang.startsWith("en"))
+        || voices[0];
+
+      // "Hello" with a trailing pause
+      const hello = new SpeechSynthesisUtterance("Hello,");
+      hello.rate = 0.65;
+      hello.pitch = 0.8;
+      hello.volume = 1;
+      if (preferred) hello.voice = preferred;
+
+      // "friends." — slightly warmer
+      const friends = new SpeechSynthesisUtterance("friends.");
+      friends.rate = 0.6;
+      friends.pitch = 0.75;
+      friends.volume = 1;
+      if (preferred) friends.voice = preferred;
+
+      speechSynthesis.speak(hello);
+      // Small delay between words for natural cadence
+      setTimeout(() => speechSynthesis.speak(friends), 900);
     } catch {}
   }, []);
 
