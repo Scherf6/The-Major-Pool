@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 /*─────────────────────────────────────────────
   CONFIG
 ─────────────────────────────────────────────*/
-const MODE = "valero"; // "masters" or "valero"
+const MODE = "masters"; // "masters" or "valero"
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzGzrcdc-V90CmcOHVejftmFmTAb9TEUL3iSzePe6bZjkQJZQjaYP_B2HZlUqRzk7as_g/exec";
 
 const TOURNAMENTS = {
@@ -851,7 +851,7 @@ function Leaderboard({ entries, isLocked, loading }) {
   );
 }
 
-function MastersMenu() {
+function MastersExperience() {
   const sandwiches = [
     ["Egg Salad", "1.50"], ["Pimento Cheese", "1.50"], ["Bar-B-Que", "2.50"],
     ["Masters Club", "2.50"], ["Chicken Breast", "2.50"], ["Ham & Cheese on Rye", "1.50"],
@@ -867,109 +867,165 @@ function MastersMenu() {
   ];
 
   const MenuSection = ({ title, items }) => (
-    <div style={{ marginBottom: 20 }}>
+    <div style={{ marginBottom: 16 }}>
       <h4 style={{
-        fontFamily: "'Playfair Display',Georgia,serif", fontSize: 18,
+        fontFamily: "'Playfair Display',Georgia,serif", fontSize: 16,
         fontStyle: "italic", color: C.dark, textAlign: "center",
-        borderBottom: `1px solid #999`, paddingBottom: 6, marginBottom: 8,
+        borderBottom: "1px solid #999", paddingBottom: 5, marginBottom: 6,
       }}>{title}</h4>
       {items.map(([name, price], i) => (
         <div key={i} style={{
-          display: "flex", justifyContent: "space-between", padding: "3px 0",
-          fontFamily: "Georgia,serif", fontSize: 14, color: "#333",
+          display: "flex", justifyContent: "space-between", padding: "2px 0",
+          fontFamily: "Georgia,serif", fontSize: 13, color: "#333",
         }}>
-          <span>{name}</span>
-          <span>{price}</span>
+          <span>{name}</span><span>{price}</span>
         </div>
       ))}
     </div>
   );
 
   return (
-    <div style={{ background: "#fff", padding: "48px 24px", borderTop: `3px solid ${C.green}` }}>
-      <div style={{ maxWidth: 400, margin: "0 auto" }}>
-        <h3 style={{
-          fontFamily: "'Playfair Display',Georgia,serif", fontSize: 28,
-          color: C.green, textAlign: "center", margin: "0 0 4px",
-        }}>🥪 The Concessions Menu</h3>
-        <p style={{
-          fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 14,
-          color: "#8b7355", textAlign: "center", margin: "0 0 24px",
-          letterSpacing: "0.1em", textTransform: "uppercase",
-        }}>Augusta National — a tradition unlike any other</p>
-        <div style={{
-          background: "#fff", border: `2px solid ${C.dark}`, borderRadius: 4,
-          padding: "24px 28px", boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
-        }}>
-          <MenuSection title="Sandwiches" items={sandwiches} />
-          <MenuSection title="Beverages" items={beverages} />
-          <MenuSection title="Snacks" items={snacks} />
-        </div>
-        <p style={{
-          fontFamily: "Georgia,serif", fontSize: 12, color: "#999",
-          textAlign: "center", marginTop: 12, fontStyle: "italic",
-        }}>Make these at home for your watch party. Yes, the prices are real.</p>
-      </div>
-    </div>
-  );
-}
-
-function AzaleaRecipe() {
-  return (
     <div style={{
-      background: `linear-gradient(170deg, ${C.cream}, #f0ebe0)`,
-      padding: "48px 24px", borderTop: `3px solid ${C.green}`,
+      position: "relative", overflow: "hidden",
+      borderTop: `4px solid ${C.yellow}`,
+      background: `linear-gradient(135deg, ${C.dark} 0%, ${C.green} 50%, #004d35 100%)`,
+      padding: "56px 24px",
     }}>
-      <div style={{ maxWidth: 500, margin: "0 auto", textAlign: "center" }}>
+      {/* Decorative azalea/nature pattern overlay */}
+      <div style={{
+        position: "absolute", top: 0, left: 0, right: 0, bottom: 0,
+        opacity: 0.06, pointerEvents: "none",
+        backgroundImage: `
+          radial-gradient(circle at 15% 25%, #e84393 1px, transparent 1px),
+          radial-gradient(circle at 85% 15%, #e84393 1.5px, transparent 1.5px),
+          radial-gradient(circle at 45% 75%, #c2185b 1px, transparent 1px),
+          radial-gradient(circle at 75% 85%, #e84393 2px, transparent 2px),
+          radial-gradient(circle at 25% 60%, #c2185b 1.5px, transparent 1.5px),
+          radial-gradient(circle at 60% 30%, #e91e63 1px, transparent 1px),
+          radial-gradient(circle at 90% 55%, #e84393 1px, transparent 1px),
+          radial-gradient(circle at 10% 90%, #c2185b 2px, transparent 2px),
+          radial-gradient(circle at 50% 10%, #e91e63 1.5px, transparent 1.5px),
+          radial-gradient(circle at 35% 45%, #e84393 1px, transparent 1px)
+        `,
+        backgroundSize: "200px 200px",
+      }} />
+      {/* Pine needle texture */}
+      <div style={{
+        position: "absolute", top: 0, left: 0, right: 0, bottom: 0,
+        opacity: 0.03, pointerEvents: "none",
+        background: `repeating-linear-gradient(
+          45deg, transparent, transparent 10px,
+          rgba(255,255,255,0.1) 10px, rgba(255,255,255,0.1) 11px
+        )`,
+      }} />
+
+      <div style={{ position: "relative", zIndex: 1, maxWidth: 900, margin: "0 auto" }}>
         <h3 style={{
-          fontFamily: "'Playfair Display',Georgia,serif", fontSize: 28,
-          color: C.green, margin: "0 0 4px",
-        }}>🌺 The Azalea Cocktail</h3>
+          fontFamily: "'Playfair Display',Georgia,serif", fontSize: 32,
+          color: C.yellow, textAlign: "center", margin: "0 0 4px",
+        }}>The Masters at Home</h3>
         <p style={{
-          fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 14,
-          color: "#8b7355", letterSpacing: "0.1em", textTransform: "uppercase",
-          margin: "0 0 24px",
-        }}>The signature drink of the tournament</p>
+          fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 15,
+          color: "#a8d5a8", textAlign: "center", margin: "0 0 32px",
+          letterSpacing: "0.15em", textTransform: "uppercase",
+        }}>Your watch party essentials</p>
+
         <div style={{
-          background: "#fff", borderRadius: 16, padding: "28px 24px",
-          boxShadow: "0 4px 16px rgba(0,0,0,0.06)",
-          border: `1px solid ${C.sand}`,
+          display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24,
         }}>
-          <p style={{
-            fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 18,
-            color: C.dark, fontStyle: "italic", lineHeight: 1.6, margin: "0 0 20px",
-          }}>
-            It's not the Masters-at-home until you've made an Azalea.
-          </p>
-          <div style={{ display: "flex", flexDirection: "column", gap: 10, textAlign: "left" }}>
-            {[
-              ["🥃", "1¼ oz Vodka"],
-              ["🍋", "5 oz Lemonade"],
-              ["🍒", "½ oz Grenadine"],
-              ["🧊", "Plenty of ice"],
-              ["🍊", "Garnish with cherry & orange slice"],
-            ].map(([icon, text], i) => (
-              <div key={i} style={{
-                display: "flex", alignItems: "center", gap: 12,
-                padding: "8px 14px", borderRadius: 8,
-                background: i % 2 === 0 ? `${C.green}08` : "transparent",
-              }}>
-                <span style={{ fontSize: 22 }}>{icon}</span>
-                <span style={{ fontFamily: "Georgia,serif", fontSize: 15, color: "#333" }}>{text}</span>
-              </div>
-            ))}
-          </div>
+          {/* LEFT: Concessions Menu */}
           <div style={{
-            marginTop: 20, padding: "14px 16px", borderRadius: 10,
-            background: `${C.green}10`, border: `1px solid ${C.green}25`,
+            background: "rgba(255,255,255,0.97)", borderRadius: 4, overflow: "hidden",
+            border: `2px solid ${C.dark}`,
+            boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
           }}>
-            <p style={{
-              fontFamily: "Georgia,serif", fontSize: 13, color: C.dark,
-              margin: 0, lineHeight: 1.5,
+            <div style={{
+              background: C.dark, padding: "10px 20px", textAlign: "center",
             }}>
-              <strong>Directions:</strong> Pour vodka, lemonade, and grenadine over ice in a tall glass.
-              Stir gently. Garnish with a cherry and orange slice. Sip slowly while watching Amen Corner. 🌸
-            </p>
+              <h4 style={{
+                fontFamily: "'Playfair Display',Georgia,serif", fontSize: 18,
+                color: C.yellow, margin: 0, letterSpacing: "0.05em",
+              }}>🥪 Concessions</h4>
+            </div>
+            <div style={{ padding: "20px 24px" }}>
+              <MenuSection title="Sandwiches" items={sandwiches} />
+              <MenuSection title="Beverages" items={beverages} />
+              <MenuSection title="Snacks" items={snacks} />
+            </div>
+            <div style={{
+              padding: "10px 20px", background: "#fafaf7",
+              borderTop: `1px solid ${C.sand}`,
+            }}>
+              <p style={{
+                fontFamily: "Georgia,serif", fontSize: 11, color: "#999",
+                textAlign: "center", fontStyle: "italic", margin: 0,
+              }}>Yes, these are the real Augusta National prices.</p>
+            </div>
+          </div>
+
+          {/* RIGHT: Azalea Cocktail */}
+          <div style={{
+            background: "rgba(255,255,255,0.97)", borderRadius: 4, overflow: "hidden",
+            border: `2px solid ${C.dark}`,
+            boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
+            display: "flex", flexDirection: "column",
+          }}>
+            <div style={{
+              background: C.dark, padding: "10px 20px", textAlign: "center",
+            }}>
+              <h4 style={{
+                fontFamily: "'Playfair Display',Georgia,serif", fontSize: 18,
+                color: C.yellow, margin: 0, letterSpacing: "0.05em",
+              }}>🌺 The Azalea</h4>
+            </div>
+            <div style={{ padding: "24px 24px", flex: 1 }}>
+              <p style={{
+                fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 17,
+                color: C.dark, fontStyle: "italic", lineHeight: 1.5,
+                margin: "0 0 20px", textAlign: "center",
+              }}>
+                The signature cocktail of Augusta National
+              </p>
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {[
+                  ["🥃", "1¼ oz Vodka"],
+                  ["🍋", "5 oz Lemonade"],
+                  ["🍒", "½ oz Grenadine"],
+                  ["🧊", "Plenty of ice"],
+                  ["🍊", "Cherry & orange slice"],
+                ].map(([icon, text], i) => (
+                  <div key={i} style={{
+                    display: "flex", alignItems: "center", gap: 10,
+                    padding: "7px 12px", borderRadius: 6,
+                    background: i % 2 === 0 ? `${C.green}08` : "transparent",
+                  }}>
+                    <span style={{ fontSize: 20 }}>{icon}</span>
+                    <span style={{ fontFamily: "Georgia,serif", fontSize: 14, color: "#333" }}>{text}</span>
+                  </div>
+                ))}
+              </div>
+              <div style={{
+                marginTop: 18, padding: "12px 14px", borderRadius: 8,
+                background: `${C.green}08`, border: `1px solid ${C.green}20`,
+              }}>
+                <p style={{
+                  fontFamily: "Georgia,serif", fontSize: 12, color: C.dark,
+                  margin: 0, lineHeight: 1.5,
+                }}>
+                  <strong>Mix it:</strong> Pour vodka, lemonade & grenadine over ice.
+                  Stir gently. Garnish. Sip while watching Amen Corner. 🌸
+                </p>
+              </div>
+            </div>
+            <div style={{
+              padding: "10px 20px", background: "#fafaf7",
+              borderTop: `1px solid ${C.sand}`,
+            }}>
+              <p style={{
+                fontFamily: "Georgia,serif", fontSize: 11, color: "#999",
+                textAlign: "center", fontStyle: "italic", margin: 0,
+              }}>It's not the Masters until you've made one.</p>
+            </div>
           </div>
         </div>
       </div>
@@ -1094,8 +1150,7 @@ export default function App() {
       {view === "home" && (
         <>
           <Hero onStart={() => setView("picks")} setView={setView} />
-          <MastersMenu />
-          <AzaleaRecipe />
+          <MastersExperience />
         </>
       )}
       {view === "picks" && <PicksFlow onComplete={handleComplete} isLocked={isLocked}
