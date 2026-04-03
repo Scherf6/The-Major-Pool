@@ -1266,44 +1266,83 @@ function MastersExperience() {
 }
 
 function TournamentLive() {
+  const [golfers, setGolfers] = useState([]);
+  const [tourneyStatus, setTourneyStatus] = useState("");
+  const [round, setRound] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [lastUpdated, setLastUpdated] = useState("");
+  const [error, setError] = useState("");
+
+  const fetchScores = useCallback(async () => {
+    try {
+      const res = await fetch(`${SCRIPT_URL}?mode=scores`);
+      const data = await res.json();
+      if (data.success) {
+        setGolfers(data.golfers || []);
+        setTourneyStatus(data.status || "");
+        setRound(data.round || 0);
+        setLastUpdated(new Date().toLocaleTimeString());
+        setError("");
+      } else {
+        setError(data.error || "Failed to load scores");
+      }
+    } catch (e) {
+      setError("Couldn't reach scoring server");
+    }
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    fetchScores();
+    const id = setInterval(fetchScores, 60000);
+    return () => clearInterval(id);
+  }, [fetchScores]);
+
   return (
     <div style={{ minHeight: "100vh", background: C.cream, padding: "24px 12px" }}>
       <div style={{ maxWidth: 900, margin: "0 auto" }}>
-        <div style={{ textAlign: "center", marginBottom: 20 }}>
+        <div style={{ textAlign: "center", marginBottom: 16 }}>
           <h2 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 28, color: C.green, margin: "0 0 4px" }}>
             ⛳ Live Tournament</h2>
           <p style={{ fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 14, color: "#8b7355",
             letterSpacing: "0.08em", textTransform: "uppercase" }}>{T.year} {T.name} — Augusta National</p>
+          {tourneyStatus && (
+            <p style={{ fontFamily: "Georgia,serif", fontSize: 12, color: C.green, marginTop: 4 }}>
+              {tourneyStatus}{round > 0 ? ` · Round ${round}` : ""}</p>
+          )}
         </div>
 
-        {/* Watch Live Section */}
+        {/* Watch Live Banner */}
         <div style={{
           background: `linear-gradient(135deg, ${C.green}, ${C.dark})`,
-          borderRadius: 12, padding: "24px 20px", marginBottom: 20, textAlign: "center",
+          borderRadius: 12, padding: "18px 20px", marginBottom: 16, textAlign: "center",
         }}>
-          <h3 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 22,
-            color: C.yellow, margin: "0 0 12px" }}>📺 Watch Live</h3>
-          <p style={{ fontFamily: "Georgia,serif", fontSize: 13, color: "#c4d9c4", margin: "0 0 16px" }}>
-            Free streaming available on Masters.com (US only)</p>
-          <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
+          <h3 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 18,
+            color: C.yellow, margin: "0 0 10px" }}>📺 Watch Live</h3>
+          <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" }}>
             <a href="https://www.masters.com/en_US/live/index.html" target="_blank" rel="noopener" style={{
-              padding: "10px 20px", borderRadius: 8, background: C.yellow, color: C.dark,
-              fontFamily: "'Playfair Display',Georgia,serif", fontSize: 15, fontWeight: 700,
-              textDecoration: "none", boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
-            }}>▶ Masters.com Live</a>
+              padding: "8px 18px", borderRadius: 8, background: C.yellow, color: C.dark,
+              fontFamily: "'Playfair Display',Georgia,serif", fontSize: 14, fontWeight: 700,
+              textDecoration: "none",
+            }}>▶ Masters.com</a>
             <a href="https://www.youtube.com/@themasters/streams" target="_blank" rel="noopener" style={{
-              padding: "10px 20px", borderRadius: 8, background: "rgba(255,255,255,0.15)",
+              padding: "8px 18px", borderRadius: 8, background: "rgba(255,255,255,0.15)",
               border: "1px solid rgba(255,255,255,0.3)", color: "#fff",
-              fontFamily: "Georgia,serif", fontSize: 14, textDecoration: "none",
-            }}>📹 YouTube Streams</a>
+              fontFamily: "Georgia,serif", fontSize: 13, textDecoration: "none",
+            }}>📹 YouTube</a>
+            <a href="https://www.espn.com/watch/" target="_blank" rel="noopener" style={{
+              padding: "8px 18px", borderRadius: 8, background: "rgba(255,255,255,0.15)",
+              border: "1px solid rgba(255,255,255,0.3)", color: "#fff",
+              fontFamily: "Georgia,serif", fontSize: 13, textDecoration: "none",
+            }}>ESPN+</a>
           </div>
         </div>
 
-        {/* Masters.com embed attempt */}
+        {/* Live Leaderboard */}
         <div style={{
           background: "#fff", borderRadius: 12, overflow: "hidden",
           boxShadow: "0 4px 16px rgba(0,0,0,0.08)", border: `1px solid ${C.sand}`,
-          marginBottom: 20,
+          marginBottom: 16,
         }}>
           <div style={{
             background: C.green, padding: "10px 16px",
@@ -1311,39 +1350,100 @@ function TournamentLive() {
           }}>
             <span style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 16,
               fontWeight: 700, color: C.yellow }}>Masters Leaderboard</span>
-            <a href="https://www.masters.com/en_US/scores/index.html"
-              target="_blank" rel="noopener" style={{
-                fontFamily: "Georgia,serif", fontSize: 12, color: "#c4d9c4",
-                textDecoration: "none",
-              }}>Open on Masters.com ↗</a>
+            <span style={{ fontFamily: "Georgia,serif", fontSize: 11, color: "#c4d9c4" }}>
+              {lastUpdated ? `Updated ${lastUpdated}` : "Loading..."}
+            </span>
           </div>
-          <iframe
-            src="https://www.masters.com/en_US/scores/index.html"
-            style={{ width: "100%", height: 600, border: "none", background: "#fff" }}
-            title="Masters Leaderboard"
-          />
+
+          {loading ? (
+            <div style={{ padding: 40, textAlign: "center" }}>
+              <p style={{ fontFamily: "Georgia,serif", fontSize: 14, color: "#999" }}>⏳ Loading scores...</p>
+            </div>
+          ) : error ? (
+            <div style={{ padding: 30, textAlign: "center" }}>
+              <p style={{ fontFamily: "Georgia,serif", fontSize: 14, color: "#999" }}>{error}</p>
+              <p style={{ fontFamily: "Georgia,serif", fontSize: 12, color: "#bbb", marginTop: 6 }}>
+                Scores will appear once the tournament starts Thursday.</p>
+            </div>
+          ) : (
+            <div style={{ overflowX: "auto" }}>
+              {/* Header */}
+              <div style={{
+                display: "grid", gridTemplateColumns: "50px 1fr 60px 60px 60px",
+                background: "#f0ebe0", borderBottom: `2px solid ${C.green}`,
+                minWidth: 500,
+              }}>
+                {["POS", "PLAYER", "SCORE", "TODAY", "THRU"].map(h => (
+                  <div key={h} style={{
+                    padding: "8px 6px", textAlign: "center",
+                    fontFamily: "Georgia,serif", fontSize: 10, fontWeight: 700,
+                    color: C.green, letterSpacing: "0.08em",
+                  }}>{h}</div>
+                ))}
+              </div>
+              {/* Rows */}
+              {golfers.slice(0, 40).map((g, i) => (
+                <div key={g.id || i} style={{
+                  display: "grid", gridTemplateColumns: "50px 1fr 60px 60px 60px",
+                  borderBottom: `1px solid ${C.sand}`,
+                  background: i % 2 === 0 ? "#fafaf5" : "#fff",
+                  minWidth: 500,
+                  opacity: g.isCut ? 0.5 : 1,
+                }}>
+                  <div style={{ padding: "8px 6px", textAlign: "center",
+                    fontFamily: "'Playfair Display',Georgia,serif", fontSize: 14, fontWeight: 700,
+                    color: i < 3 ? C.green : "#8b7355",
+                  }}>{g.position || i + 1}</div>
+                  <div style={{ padding: "8px 6px",
+                    fontFamily: "Georgia,serif", fontSize: 13, color: "#333",
+                    fontWeight: i < 5 ? 600 : 400,
+                  }}>
+                    {g.name}
+                    {g.isCut && <span style={{ fontSize: 10, color: "#c62828", marginLeft: 6 }}>CUT</span>}
+                  </div>
+                  <div style={{ padding: "8px 6px", textAlign: "center",
+                    fontFamily: "'Playfair Display',Georgia,serif", fontSize: 15, fontWeight: 700,
+                    color: g.scoreValue < 0 ? "#c62828" : g.scoreValue > 0 ? C.green : "#333",
+                  }}>{g.score}</div>
+                  <div style={{ padding: "8px 6px", textAlign: "center",
+                    fontFamily: "Georgia,serif", fontSize: 13,
+                    color: g.today && g.today.startsWith("-") ? "#c62828" : "#8b7355",
+                  }}>{g.today || "—"}</div>
+                  <div style={{ padding: "8px 6px", textAlign: "center",
+                    fontFamily: "Georgia,serif", fontSize: 12, color: "#8b7355",
+                  }}>{g.thru || "—"}</div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
-        {/* Quick links grid */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
+        {/* Quick links */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
           {[
             ["🏌️", "Masters.com", "Official Site", "https://www.masters.com"],
-            ["📊", "ESPN", "Full Coverage", "https://www.espn.com/golf/leaderboard/_/tournamentId/" + T.espnId],
-            ["📺", "Amen Corner", "Live Stream", "https://www.masters.com/en_US/live/index.html"],
-            ["🗺️", "Course Map", "Augusta National", "https://www.masters.com/en_US/course/index.html"],
-            ["📱", "Masters App", "Every Shot", "https://apps.apple.com/app/the-masters-tournament/id309025938"],
-            ["📻", "SiriusXM", "Radio Coverage", "https://www.siriusxm.com/sports/golf"],
+            ["📊", "ESPN", "Coverage", "https://www.espn.com/golf/leaderboard/_/tournamentId/" + T.espnId],
+            ["🗺️", "Course Map", "Augusta", "https://www.masters.com/en_US/course/index.html"],
           ].map(([icon, title, sub, url], i) => (
             <a key={i} href={url} target="_blank" rel="noopener" style={{
-              background: "#fff", borderRadius: 10, padding: "14px",
+              background: "#fff", borderRadius: 10, padding: "12px",
               textAlign: "center", textDecoration: "none",
               border: `1px solid ${C.sand}`, boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
             }}>
-              <div style={{ fontSize: 22, marginBottom: 4 }}>{icon}</div>
-              <div style={{ fontFamily: "Georgia,serif", fontSize: 13, color: C.green, fontWeight: 600 }}>{title}</div>
+              <div style={{ fontSize: 20, marginBottom: 3 }}>{icon}</div>
+              <div style={{ fontFamily: "Georgia,serif", fontSize: 12, color: C.green, fontWeight: 600 }}>{title}</div>
               <div style={{ fontFamily: "Georgia,serif", fontSize: 10, color: "#8b7355" }}>{sub}</div>
             </a>
           ))}
+        </div>
+
+        {/* Refresh button */}
+        <div style={{ textAlign: "center", marginTop: 14 }}>
+          <button onClick={() => { setLoading(true); fetchScores(); }} style={{
+            background: "none", border: `1px solid ${C.sand}`, borderRadius: 20,
+            padding: "6px 16px", fontFamily: "Georgia,serif", fontSize: 12,
+            color: C.green, cursor: "pointer",
+          }}>🔄 Refresh Scores</button>
         </div>
       </div>
     </div>
