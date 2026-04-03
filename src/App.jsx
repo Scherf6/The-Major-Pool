@@ -781,31 +781,31 @@ function Confirmation({ entry, onLeaderboard, onEdit }) {
 function Leaderboard({ entries, isLocked, loading }) {
   const [expanded, setExpanded] = useState(null);
 
-  // Board colors matching the Augusta scoreboard
+  // Board colors — clean white like masters.com
   const B = {
-    board: "#1a5632",
-    boardDark: "#143f26",
-    border: "#0d2e1a",
-    text: "#f5f0e0",
-    yellow: "#f2c94c",
-    red: "#e74c3c",
-    green: "#2ecc71",
+    bg: "#f5f1e8",
+    board: "#ffffff",
+    headerBg: C.green,
+    border: "#d4cdb8",
+    text: "#1a1a1a",
+    yellow: C.yellow,
+    red: "#c62828",
+    green: C.green,
     white: "#fff",
-    rowEven: "rgba(255,255,255,0.04)",
-    rowOdd: "transparent",
+    muted: "#8b7355",
+    rowEven: "#fafaf5",
+    rowOdd: "#ffffff",
   };
 
   return (
-    <div style={{ minHeight: "100vh", background: B.boardDark, padding: "24px 12px" }}>
+    <div style={{ minHeight: "100vh", background: B.bg, padding: "24px 12px" }}>
       <div style={{ maxWidth: 860, margin: "0 auto" }}>
 
         {/* Classic "LEADERS" header */}
         <div style={{
-          textAlign: "center", marginBottom: 4,
-          padding: "18px 20px 14px",
-          background: B.board,
-          border: `3px solid ${B.border}`,
-          borderBottom: "none",
+          textAlign: "center", marginBottom: 0,
+          padding: "20px 20px 16px",
+          background: B.headerBg,
           borderRadius: "8px 8px 0 0",
         }}>
           <h2 style={{
@@ -815,7 +815,7 @@ function Leaderboard({ entries, isLocked, loading }) {
             margin: 0, textShadow: "2px 2px 4px rgba(0,0,0,0.3)",
           }}>LEADERS</h2>
           <p style={{
-            fontFamily: "Georgia,serif", fontSize: 12, color: "#a8d5a8",
+            fontFamily: "Georgia,serif", fontSize: 12, color: "#c4d9c4",
             letterSpacing: "0.2em", textTransform: "uppercase", marginTop: 4,
           }}>{T.year} {T.name} · {entries.length} {entries.length === 1 ? "entry" : "entries"}</p>
           {!isLocked && (
@@ -827,25 +827,27 @@ function Leaderboard({ entries, isLocked, loading }) {
         {/* Scoreboard */}
         <div style={{
           background: B.board,
-          border: `3px solid ${B.border}`,
-          borderTop: `2px solid rgba(255,255,255,0.1)`,
+          border: `1px solid ${B.border}`,
           borderRadius: "0 0 8px 8px",
           overflow: "hidden",
-          boxShadow: "0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)",
+          boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
         }}>
           {/* Column headers */}
           <div style={{
             display: "grid",
             gridTemplateColumns: "44px 1fr 60px repeat(6, 1fr)",
-            borderBottom: `2px solid ${B.border}`,
-            background: "rgba(0,0,0,0.15)",
+            borderBottom: `2px solid ${B.green}`,
+            background: "#f0ebe0",
           }}>
-            {["POS", "TEAM", "TOTAL", "PICK 1", "PICK 2", "PICK 3", "PICK 4", "PICK 5", "PICK 6"].map((h, i) => (
-              <div key={h} style={{
+            {["POS", "TEAM", "TOTAL",
+              ...(isLocked ? ["PICK 1", "PICK 2", "PICK 3", "PICK 4", "PICK 5", "PICK 6"]
+                           : ["", "", "", "", "", ""])
+            ].map((h, i) => (
+              <div key={h+i} style={{
                 padding: "8px 4px", textAlign: "center",
                 fontFamily: "Georgia,serif", fontSize: 9,
                 fontWeight: 700, letterSpacing: "0.1em",
-                color: B.yellow, textTransform: "uppercase",
+                color: B.green, textTransform: "uppercase",
                 borderRight: i < 8 ? `1px solid ${B.border}` : "none",
               }}>{h}</div>
             ))}
@@ -865,7 +867,7 @@ function Leaderboard({ entries, isLocked, loading }) {
                     cursor: "pointer",
                     transition: "background 0.15s",
                   }}
-                  onMouseEnter={ev => ev.currentTarget.style.background = "rgba(255,255,255,0.08)"}
+                  onMouseEnter={ev => ev.currentTarget.style.background = "#f0ebe0"}
                   onMouseLeave={ev => ev.currentTarget.style.background = i % 2 === 0 ? B.rowEven : B.rowOdd}
                 >
                   {/* Position */}
@@ -873,7 +875,7 @@ function Leaderboard({ entries, isLocked, loading }) {
                     padding: "10px 4px", textAlign: "center",
                     fontFamily: "'Playfair Display',Georgia,serif",
                     fontSize: 16, fontWeight: 700,
-                    color: i === 0 ? B.yellow : i < 3 ? B.green : B.text,
+                    color: i === 0 ? B.green : i < 3 ? B.green : B.muted,
                     borderRight: `1px solid ${B.border}`,
                   }}>{i + 1}</div>
 
@@ -885,13 +887,13 @@ function Leaderboard({ entries, isLocked, loading }) {
                   }}>
                     <div style={{
                       fontFamily: "Georgia,serif", fontSize: 14, fontWeight: 700,
-                      color: B.white, textTransform: "uppercase",
+                      color: B.text, textTransform: "uppercase",
                       letterSpacing: "0.04em",
                       whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
                     }}>{e.name}</div>
                     <div style={{
                       fontFamily: "Georgia,serif", fontSize: 10,
-                      color: "rgba(255,255,255,0.5)", marginTop: 1,
+                      color: B.muted, marginTop: 1,
                     }}>{e.fullName || ""}</div>
                   </div>
 
@@ -901,14 +903,14 @@ function Leaderboard({ entries, isLocked, loading }) {
                     fontFamily: "'Playfair Display',Georgia,serif",
                     fontSize: 18, fontWeight: 900,
                     color: isLocked
-                      ? (e.totalScore < 0 ? B.red : e.totalScore > 0 ? B.green : B.white)
-                      : "rgba(255,255,255,0.3)",
+                      ? (e.totalScore < 0 ? B.red : e.totalScore > 0 ? B.green : B.text)
+                      : B.muted,
                     borderRight: `1px solid ${B.border}`,
                   }}>
                     {isLocked ? (e.totalScore != null ? (e.totalScore < 0 ? e.totalScore : e.totalScore > 0 ? `+${e.totalScore}` : "E") : "—") : "—"}
                   </div>
 
-                  {/* 6 golfer picks */}
+                  {/* 6 golfer picks — hidden until locked */}
                   {(e.picks || []).concat(Array(6).fill("")).slice(0, 6).map((p, j) => {
                     const lastName = p ? p.split(" ").pop() : "";
                     return (
@@ -918,38 +920,49 @@ function Leaderboard({ entries, isLocked, loading }) {
                         display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
                       }}>
                         <span style={{
-                          fontFamily: "Georgia,serif", fontSize: 10,
-                          color: B.text, textTransform: "uppercase",
+                          fontFamily: "Georgia,serif", fontSize: isLocked ? 10 : 14,
+                          color: isLocked ? B.green : B.border,
+                          textTransform: "uppercase",
                           letterSpacing: "0.02em",
                           whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
                           maxWidth: "100%",
-                        }}>{lastName}</span>
+                        }}>{isLocked ? lastName : "🔒"}</span>
                       </div>
                     );
                   })}
                 </div>
 
-                {/* Expanded detail row */}
+                {/* Expanded detail row — only after lock */}
                 {isExpanded && (
                   <div style={{
                     padding: "10px 16px",
-                    background: "rgba(0,0,0,0.2)",
+                    background: "#f0ebe0",
                     borderBottom: `1px solid ${B.border}`,
                   }}>
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-                      {(e.picks || []).map((p, j) => (
-                        <span key={j} style={{
-                          fontFamily: "Georgia,serif", fontSize: 11,
-                          padding: "3px 8px", borderRadius: 4,
-                          background: "rgba(255,255,255,0.1)",
-                          color: B.text, border: `1px solid rgba(255,255,255,0.15)`,
-                        }}>{p}</span>
-                      ))}
-                    </div>
-                    <p style={{
-                      fontFamily: "Georgia,serif", fontSize: 11, color: "rgba(255,255,255,0.4)",
-                      marginTop: 6,
-                    }}>Predicted winner: {e.winScore} · Best 4 of 6 scores count</p>
+                    {isLocked ? (
+                      <>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                          {(e.picks || []).map((p, j) => (
+                            <span key={j} style={{
+                              fontFamily: "Georgia,serif", fontSize: 11,
+                              padding: "3px 8px", borderRadius: 4,
+                              background: B.white,
+                              color: B.green, border: `1px solid ${B.border}`,
+                              fontWeight: 600,
+                            }}>{p}</span>
+                          ))}
+                        </div>
+                        <p style={{
+                          fontFamily: "Georgia,serif", fontSize: 11, color: B.muted,
+                          marginTop: 6,
+                        }}>Predicted winner: {e.winScore} · Best 4 of 6 scores count</p>
+                      </>
+                    ) : (
+                      <p style={{
+                        fontFamily: "Georgia,serif", fontSize: 12, color: B.green,
+                        margin: 0, textAlign: "center", fontWeight: 600,
+                      }}>🔒 Picks are hidden until the tournament starts</p>
+                    )}
                   </div>
                 )}
               </div>
@@ -958,7 +971,7 @@ function Leaderboard({ entries, isLocked, loading }) {
 
           {entries.length === 0 && (
             <div style={{ padding: 40, textAlign: "center" }}>
-              <p style={{ fontFamily: "Georgia,serif", fontSize: 14, color: "rgba(255,255,255,0.5)" }}>
+              <p style={{ fontFamily: "Georgia,serif", fontSize: 14, color: B.muted }}>
                 {loading ? "⏳ Loading entries..." : "No entries yet — be the first!"}</p>
             </div>
           )}
@@ -966,10 +979,10 @@ function Leaderboard({ entries, isLocked, loading }) {
 
         {/* Footer */}
         <div style={{ marginTop: 14, textAlign: "center" }}>
-          <p style={{ fontFamily: "Georgia,serif", fontSize: 11, color: "#5a8a5a" }}>
+          <p style={{ fontFamily: "Georgia,serif", fontSize: 11, color: B.muted }}>
             📡 <a href={`https://www.espn.com/golf/leaderboard/_/tournamentId/${T.espnId}`}
-              target="_blank" rel="noopener" style={{ color: "#7ab87a" }}>ESPN Leaderboard</a>
-            {" · "}Tap a row to see full picks
+              target="_blank" rel="noopener" style={{ color: B.green }}>ESPN Leaderboard</a>
+            {" · "}{isLocked ? "Tap a row to see full picks" : "🔒 Picks hidden until first tee"}
           </p>
         </div>
       </div>
@@ -1227,23 +1240,21 @@ export default function App() {
   };
 
   const [showGreeting, setShowGreeting] = useState(true);
+  const [greetingTapped, setGreetingTapped] = useState(false);
 
   // Synthesize a gentle E major piano arpeggio
   const playMastersChime = useCallback(() => {
     try {
       const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      // E major arpeggio: E4, G#4, B4, E5, B4, G#4
       const notes = [329.63, 415.30, 493.88, 659.25, 493.88, 415.30, 329.63];
       notes.forEach((freq, i) => {
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
         const filter = ctx.createBiquadFilter();
-        // Soft piano-like tone
         osc.type = "sine";
         osc.frequency.value = freq;
         filter.type = "lowpass";
         filter.frequency.value = 2000;
-        // Gentle envelope
         const t = ctx.currentTime + i * 0.45;
         gain.gain.setValueAtTime(0, t);
         gain.gain.linearRampToValueAtTime(0.15, t + 0.05);
@@ -1254,12 +1265,11 @@ export default function App() {
         osc.start(t);
         osc.stop(t + 1.4);
       });
-      // Add a warm pad underneath
       const pad = ctx.createOscillator();
       const padGain = ctx.createGain();
       const padFilter = ctx.createBiquadFilter();
       pad.type = "sine";
-      pad.frequency.value = 164.81; // E3
+      pad.frequency.value = 164.81;
       padFilter.type = "lowpass";
       padFilter.frequency.value = 800;
       padGain.gain.setValueAtTime(0, ctx.currentTime);
@@ -1273,14 +1283,12 @@ export default function App() {
     } catch {}
   }, []);
 
-  // Jim Nantz TTS greeting
   const speakHelloFriends = useCallback(() => {
     try {
       const utterance = new SpeechSynthesisUtterance("Hello, friends.");
       utterance.rate = 0.75;
       utterance.pitch = 0.85;
       utterance.volume = 1;
-      // Try to pick a deep male voice
       const voices = speechSynthesis.getVoices();
       const preferred = voices.find(v =>
         v.name.includes("Daniel") || v.name.includes("James") ||
@@ -1291,23 +1299,19 @@ export default function App() {
     } catch {}
   }, []);
 
-  // Play audio when greeting shows
-  useEffect(() => {
-    if (showGreeting) {
-      // Voices may load async
-      const trySpeak = () => {
-        speakHelloFriends();
-        playMastersChime();
-      };
-      if (speechSynthesis.getVoices().length > 0) {
-        setTimeout(trySpeak, 600);
-      } else {
-        speechSynthesis.onvoiceschanged = () => setTimeout(trySpeak, 600);
-      }
-      const t = setTimeout(() => setShowGreeting(false), 5000);
-      return () => clearTimeout(t);
+  // Load voices early
+  useEffect(() => { speechSynthesis.getVoices(); }, []);
+
+  const handleGreetingTap = useCallback(() => {
+    if (!greetingTapped) {
+      setGreetingTapped(true);
+      speakHelloFriends();
+      playMastersChime();
+      setTimeout(() => setShowGreeting(false), 4000);
+    } else {
+      setShowGreeting(false);
     }
-  }, [showGreeting]);
+  }, [greetingTapped, speakHelloFriends, playMastersChime]);
 
   return (
     <div style={{ fontFamily: "Georgia,serif", background: C.cream, minHeight: "100vh" }}>
@@ -1322,11 +1326,12 @@ export default function App() {
 
       {/* Jim Nantz Greeting Overlay */}
       {showGreeting && (
-        <div onClick={() => setShowGreeting(false)} style={{
+        <div onClick={handleGreetingTap} style={{
           position: "fixed", top: 0, left: 0, right: 0, bottom: 0, zIndex: 9999,
           background: "rgba(0,40,20,0.93)", backdropFilter: "blur(10px)",
           display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-          cursor: "pointer", animation: "greetFade 5s ease-in-out forwards",
+          cursor: "pointer",
+          ...(greetingTapped ? { animation: "greetFade 4s ease-in-out 0.5s forwards" } : {}),
         }}>
           <div style={{ fontSize: 64, marginBottom: 20 }}>⛳</div>
           <p style={{
@@ -1349,10 +1354,10 @@ export default function App() {
                 padding: "8px 20px", borderRadius: 20,
                 background: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.2)",
                 color: C.yellow, fontFamily: "Georgia,serif", fontSize: 13,
-                textDecoration: "none", transition: "all 0.2s",
+                textDecoration: "none",
               }}>🎵 Play the Masters Theme</a>
-            <p style={{ fontFamily: "Georgia,serif", fontSize: 11, color: "#5a8a5a" }}>
-              tap anywhere to continue</p>
+            <p style={{ fontFamily: "Georgia,serif", fontSize: 13, color: C.yellow, marginTop: 6 }}>
+              {greetingTapped ? "entering Augusta..." : "👆 tap anywhere to enter"}</p>
           </div>
         </div>
       )}
