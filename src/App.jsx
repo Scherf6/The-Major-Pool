@@ -1072,17 +1072,46 @@ function MastersExperience() {
     ["Cookie", "1.00"], ["Ice Cream Bar", "2.00"],
   ];
 
+  const schedule = [
+    { day: "MON 4/6", events: [["On the Range", "12–2 PM", "Masters.com"]] },
+    { day: "TUE 4/7", events: [["On the Range", "9–11 AM", "Masters.com"], ["Practice Round", "12–2 PM", "ESPN App"]] },
+    { day: "WED 4/8", events: [["Par 3 Contest", "12–4 PM", "ESPN"]] },
+    { day: "THU 4/9", events: [
+      ["Honorary Starters", "7:30 AM", "Masters.com"],
+      ["Featured Groups", "9:15 AM", "Masters.com"],
+      ["Amen Corner", "10:45 AM", "Masters.com"],
+      ["Round 1", "1–3 PM", "Prime Video"],
+      ["Round 1", "3–7:30 PM", "ESPN"],
+    ]},
+    { day: "FRI 4/10", events: [
+      ["Featured Groups", "9:15 AM", "Masters.com"],
+      ["Amen Corner", "10:45 AM", "Masters.com"],
+      ["Round 2", "1–3 PM", "Prime Video"],
+      ["Round 2", "3–7:30 PM", "ESPN"],
+    ]},
+    { day: "SAT 4/11", events: [
+      ["Featured Groups", "10:15 AM", "Masters.com"],
+      ["Round 3", "12–2 PM", "Paramount+"],
+      ["Round 3", "2–7 PM", "CBS"],
+    ]},
+    { day: "SUN 4/12", events: [
+      ["Featured Groups", "10:15 AM", "Masters.com"],
+      ["Final Round", "12–2 PM", "Paramount+"],
+      ["Final Round", "2–7 PM", "CBS"],
+    ]},
+  ];
+
   const MenuSection = ({ title, items }) => (
-    <div style={{ marginBottom: 16 }}>
+    <div style={{ marginBottom: 14 }}>
       <h4 style={{
-        fontFamily: "'Playfair Display',Georgia,serif", fontSize: 16,
+        fontFamily: "'Playfair Display',Georgia,serif", fontSize: 15,
         fontStyle: "italic", color: C.dark, textAlign: "center",
-        borderBottom: "1px solid #999", paddingBottom: 5, marginBottom: 6,
+        borderBottom: "1px solid #999", paddingBottom: 4, marginBottom: 5,
       }}>{title}</h4>
       {items.map(([name, price], i) => (
         <div key={i} style={{
           display: "flex", justifyContent: "space-between", padding: "2px 0",
-          fontFamily: "Georgia,serif", fontSize: 13, color: "#333",
+          fontFamily: "Georgia,serif", fontSize: 12, color: "#333",
         }}>
           <span>{name}</span><span>{price}</span>
         </div>
@@ -1095,9 +1124,9 @@ function MastersExperience() {
       position: "relative", overflow: "hidden",
       borderTop: `4px solid ${C.yellow}`,
       background: `linear-gradient(135deg, ${C.dark} 0%, ${C.green} 50%, #004d35 100%)`,
-      padding: "56px 24px",
+      padding: "48px 16px",
     }}>
-      {/* Decorative azalea/nature pattern overlay */}
+      {/* Azalea pattern */}
       <div style={{
         position: "absolute", top: 0, left: 0, right: 0, bottom: 0,
         opacity: 0.06, pointerEvents: "none",
@@ -1106,93 +1135,98 @@ function MastersExperience() {
           radial-gradient(circle at 85% 15%, #e84393 1.5px, transparent 1.5px),
           radial-gradient(circle at 45% 75%, #c2185b 1px, transparent 1px),
           radial-gradient(circle at 75% 85%, #e84393 2px, transparent 2px),
-          radial-gradient(circle at 25% 60%, #c2185b 1.5px, transparent 1.5px),
-          radial-gradient(circle at 60% 30%, #e91e63 1px, transparent 1px),
-          radial-gradient(circle at 90% 55%, #e84393 1px, transparent 1px),
-          radial-gradient(circle at 10% 90%, #c2185b 2px, transparent 2px),
-          radial-gradient(circle at 50% 10%, #e91e63 1.5px, transparent 1.5px),
-          radial-gradient(circle at 35% 45%, #e84393 1px, transparent 1px)
+          radial-gradient(circle at 25% 60%, #c2185b 1.5px, transparent 1.5px)
         `,
         backgroundSize: "200px 200px",
       }} />
-      {/* Pine needle texture */}
-      <div style={{
-        position: "absolute", top: 0, left: 0, right: 0, bottom: 0,
-        opacity: 0.03, pointerEvents: "none",
-        background: `repeating-linear-gradient(
-          45deg, transparent, transparent 10px,
-          rgba(255,255,255,0.1) 10px, rgba(255,255,255,0.1) 11px
-        )`,
-      }} />
 
-      <div style={{ position: "relative", zIndex: 1, maxWidth: 900, margin: "0 auto" }}>
+      <div style={{ position: "relative", zIndex: 1, maxWidth: 1100, margin: "0 auto" }}>
         <h3 style={{
-          fontFamily: "'Playfair Display',Georgia,serif", fontSize: 32,
+          fontFamily: "'Playfair Display',Georgia,serif", fontSize: 30,
           color: C.yellow, textAlign: "center", margin: "0 0 4px",
         }}>The Masters at Home</h3>
         <p style={{
-          fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 15,
-          color: "#a8d5a8", textAlign: "center", margin: "0 0 32px",
+          fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 14,
+          color: "#a8d5a8", textAlign: "center", margin: "0 0 28px",
           letterSpacing: "0.15em", textTransform: "uppercase",
-        }}>Your watch party essentials</p>
+        }}>Watch party essentials</p>
 
         <div style={{
-          display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24,
+          display: "grid", gridTemplateColumns: "1fr 1.2fr 1fr", gap: 16,
         }}>
-          {/* LEFT: Concessions Menu */}
+          {/* LEFT: Menu */}
           <div style={{
             background: "rgba(255,255,255,0.97)", borderRadius: 4, overflow: "hidden",
-            border: `2px solid ${C.dark}`,
-            boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
+            border: `2px solid ${C.dark}`, boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
           }}>
-            <div style={{
-              background: C.dark, padding: "10px 20px", textAlign: "center",
-            }}>
-              <h4 style={{
-                fontFamily: "'Playfair Display',Georgia,serif", fontSize: 18,
-                color: C.yellow, margin: 0, letterSpacing: "0.05em",
-              }}>🥪 Concessions</h4>
+            <div style={{ background: C.dark, padding: "8px 16px", textAlign: "center" }}>
+              <h4 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 15,
+                color: C.yellow, margin: 0 }}>🥪 Concessions</h4>
             </div>
-            <div style={{ padding: "20px 24px" }}>
+            <div style={{ padding: "14px 18px" }}>
               <MenuSection title="Sandwiches" items={sandwiches} />
               <MenuSection title="Beverages" items={beverages} />
               <MenuSection title="Snacks" items={snacks} />
             </div>
-            <div style={{
-              padding: "10px 20px", background: "#fafaf7",
-              borderTop: `1px solid ${C.sand}`,
-            }}>
-              <p style={{
-                fontFamily: "Georgia,serif", fontSize: 11, color: "#999",
-                textAlign: "center", fontStyle: "italic", margin: 0,
-              }}>Yes, these are the real Augusta National prices.</p>
+            <div style={{ padding: "6px 16px", background: "#fafaf7", borderTop: `1px solid ${C.sand}` }}>
+              <p style={{ fontFamily: "Georgia,serif", fontSize: 10, color: "#999",
+                textAlign: "center", fontStyle: "italic", margin: 0 }}>Real Augusta prices.</p>
             </div>
           </div>
 
-          {/* RIGHT: Azalea Cocktail */}
+          {/* CENTER: Schedule */}
           <div style={{
             background: "rgba(255,255,255,0.97)", borderRadius: 4, overflow: "hidden",
-            border: `2px solid ${C.dark}`,
-            boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
+            border: `2px solid ${C.dark}`, boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
+          }}>
+            <div style={{ background: C.dark, padding: "8px 16px", textAlign: "center" }}>
+              <h4 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 15,
+                color: C.yellow, margin: 0 }}>📅 Tournament Schedule</h4>
+            </div>
+            <div style={{ padding: "12px 14px", maxHeight: 480, overflowY: "auto" }}>
+              {schedule.map((day, di) => (
+                <div key={di} style={{ marginBottom: 12 }}>
+                  <div style={{
+                    fontFamily: "'Playfair Display',Georgia,serif", fontSize: 13,
+                    fontWeight: 700, color: C.green, marginBottom: 4,
+                    borderBottom: `1px solid ${C.sand}`, paddingBottom: 3,
+                  }}>{day.day}</div>
+                  {day.events.map(([name, time, channel], ei) => (
+                    <div key={ei} style={{
+                      display: "flex", justifyContent: "space-between", alignItems: "center",
+                      padding: "3px 0", gap: 4,
+                    }}>
+                      <span style={{ fontFamily: "Georgia,serif", fontSize: 11, color: "#333", flex: 1 }}>{name}</span>
+                      <span style={{ fontFamily: "Georgia,serif", fontSize: 10, color: "#8b7355", whiteSpace: "nowrap" }}>{time}</span>
+                      <span style={{
+                        fontFamily: "Georgia,serif", fontSize: 9, color: C.green,
+                        background: `${C.green}10`, padding: "1px 5px", borderRadius: 4,
+                        fontWeight: 600, whiteSpace: "nowrap",
+                      }}>{channel}</span>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* RIGHT: Azalea */}
+          <div style={{
+            background: "rgba(255,255,255,0.97)", borderRadius: 4, overflow: "hidden",
+            border: `2px solid ${C.dark}`, boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
             display: "flex", flexDirection: "column",
           }}>
-            <div style={{
-              background: C.dark, padding: "10px 20px", textAlign: "center",
-            }}>
-              <h4 style={{
-                fontFamily: "'Playfair Display',Georgia,serif", fontSize: 18,
-                color: C.yellow, margin: 0, letterSpacing: "0.05em",
-              }}>🌺 The Azalea</h4>
+            <div style={{ background: C.dark, padding: "8px 16px", textAlign: "center" }}>
+              <h4 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 15,
+                color: C.yellow, margin: 0 }}>🌺 The Azalea</h4>
             </div>
-            <div style={{ padding: "24px 24px", flex: 1 }}>
+            <div style={{ padding: "18px 18px", flex: 1 }}>
               <p style={{
-                fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 17,
+                fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 15,
                 color: C.dark, fontStyle: "italic", lineHeight: 1.5,
-                margin: "0 0 20px", textAlign: "center",
-              }}>
-                The signature cocktail of Augusta National
-              </p>
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                margin: "0 0 14px", textAlign: "center",
+              }}>The signature cocktail</p>
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                 {[
                   ["🥃", "1¼ oz Vodka"],
                   ["🍋", "5 oz Lemonade"],
@@ -1201,36 +1235,28 @@ function MastersExperience() {
                   ["🍊", "Cherry & orange slice"],
                 ].map(([icon, text], i) => (
                   <div key={i} style={{
-                    display: "flex", alignItems: "center", gap: 10,
-                    padding: "7px 12px", borderRadius: 6,
+                    display: "flex", alignItems: "center", gap: 8,
+                    padding: "5px 10px", borderRadius: 6,
                     background: i % 2 === 0 ? `${C.green}08` : "transparent",
                   }}>
-                    <span style={{ fontSize: 20 }}>{icon}</span>
-                    <span style={{ fontFamily: "Georgia,serif", fontSize: 14, color: "#333" }}>{text}</span>
+                    <span style={{ fontSize: 18 }}>{icon}</span>
+                    <span style={{ fontFamily: "Georgia,serif", fontSize: 13, color: "#333" }}>{text}</span>
                   </div>
                 ))}
               </div>
               <div style={{
-                marginTop: 18, padding: "12px 14px", borderRadius: 8,
+                marginTop: 14, padding: "10px 12px", borderRadius: 6,
                 background: `${C.green}08`, border: `1px solid ${C.green}20`,
               }}>
-                <p style={{
-                  fontFamily: "Georgia,serif", fontSize: 12, color: C.dark,
-                  margin: 0, lineHeight: 1.5,
-                }}>
-                  <strong>Mix it:</strong> Pour vodka, lemonade & grenadine over ice.
-                  Stir gently. Garnish. Sip while watching Amen Corner. 🌸
+                <p style={{ fontFamily: "Georgia,serif", fontSize: 11, color: C.dark,
+                  margin: 0, lineHeight: 1.4 }}>
+                  <strong>Mix:</strong> Pour over ice, stir, garnish. Sip while watching Amen Corner. 🌸
                 </p>
               </div>
             </div>
-            <div style={{
-              padding: "10px 20px", background: "#fafaf7",
-              borderTop: `1px solid ${C.sand}`,
-            }}>
-              <p style={{
-                fontFamily: "Georgia,serif", fontSize: 11, color: "#999",
-                textAlign: "center", fontStyle: "italic", margin: 0,
-              }}>It's not the Masters until you've made one.</p>
+            <div style={{ padding: "6px 16px", background: "#fafaf7", borderTop: `1px solid ${C.sand}` }}>
+              <p style={{ fontFamily: "Georgia,serif", fontSize: 10, color: "#999",
+                textAlign: "center", fontStyle: "italic", margin: 0 }}>It's not the Masters without one.</p>
             </div>
           </div>
         </div>
@@ -1250,7 +1276,30 @@ function TournamentLive() {
             letterSpacing: "0.08em", textTransform: "uppercase" }}>{T.year} {T.name} — Augusta National</p>
         </div>
 
-        {/* ESPN Leaderboard Embed */}
+        {/* Watch Live Section */}
+        <div style={{
+          background: `linear-gradient(135deg, ${C.green}, ${C.dark})`,
+          borderRadius: 12, padding: "24px 20px", marginBottom: 20, textAlign: "center",
+        }}>
+          <h3 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 22,
+            color: C.yellow, margin: "0 0 12px" }}>📺 Watch Live</h3>
+          <p style={{ fontFamily: "Georgia,serif", fontSize: 13, color: "#c4d9c4", margin: "0 0 16px" }}>
+            Free streaming available on Masters.com (US only)</p>
+          <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
+            <a href="https://www.masters.com/en_US/live/index.html" target="_blank" rel="noopener" style={{
+              padding: "10px 20px", borderRadius: 8, background: C.yellow, color: C.dark,
+              fontFamily: "'Playfair Display',Georgia,serif", fontSize: 15, fontWeight: 700,
+              textDecoration: "none", boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
+            }}>▶ Masters.com Live</a>
+            <a href="https://www.youtube.com/@themasters/streams" target="_blank" rel="noopener" style={{
+              padding: "10px 20px", borderRadius: 8, background: "rgba(255,255,255,0.15)",
+              border: "1px solid rgba(255,255,255,0.3)", color: "#fff",
+              fontFamily: "Georgia,serif", fontSize: 14, textDecoration: "none",
+            }}>📹 YouTube Streams</a>
+          </div>
+        </div>
+
+        {/* Masters.com embed attempt */}
         <div style={{
           background: "#fff", borderRadius: 12, overflow: "hidden",
           boxShadow: "0 4px 16px rgba(0,0,0,0.08)", border: `1px solid ${C.sand}`,
@@ -1262,70 +1311,39 @@ function TournamentLive() {
           }}>
             <span style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 16,
               fontWeight: 700, color: C.yellow }}>Masters Leaderboard</span>
-            <a href={`https://www.espn.com/golf/leaderboard/_/tournamentId/${T.espnId}`}
+            <a href="https://www.masters.com/en_US/scores/index.html"
               target="_blank" rel="noopener" style={{
                 fontFamily: "Georgia,serif", fontSize: 12, color: "#c4d9c4",
                 textDecoration: "none",
-              }}>Open on ESPN ↗</a>
+              }}>Open on Masters.com ↗</a>
           </div>
           <iframe
-            src={`https://www.espn.com/golf/leaderboard/_/tournamentId/${T.espnId}`}
-            style={{
-              width: "100%", height: 600, border: "none",
-              background: "#fff",
-            }}
+            src="https://www.masters.com/en_US/scores/index.html"
+            style={{ width: "100%", height: 600, border: "none", background: "#fff" }}
             title="Masters Leaderboard"
           />
         </div>
 
-        {/* Quick links */}
-        <div style={{
-          display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12,
-        }}>
-          <a href="https://www.masters.com/en_US/scores/index.html" target="_blank" rel="noopener"
-            style={{
-              background: "#fff", borderRadius: 10, padding: "16px",
+        {/* Quick links grid */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
+          {[
+            ["🏌️", "Masters.com", "Official Site", "https://www.masters.com"],
+            ["📊", "ESPN", "Full Coverage", "https://www.espn.com/golf/leaderboard/_/tournamentId/" + T.espnId],
+            ["📺", "Amen Corner", "Live Stream", "https://www.masters.com/en_US/live/index.html"],
+            ["🗺️", "Course Map", "Augusta National", "https://www.masters.com/en_US/course/index.html"],
+            ["📱", "Masters App", "Every Shot", "https://apps.apple.com/app/the-masters-tournament/id309025938"],
+            ["📻", "SiriusXM", "Radio Coverage", "https://www.siriusxm.com/sports/golf"],
+          ].map(([icon, title, sub, url], i) => (
+            <a key={i} href={url} target="_blank" rel="noopener" style={{
+              background: "#fff", borderRadius: 10, padding: "14px",
               textAlign: "center", textDecoration: "none",
-              border: `1px solid ${C.sand}`,
-              boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+              border: `1px solid ${C.sand}`, boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
             }}>
-            <div style={{ fontSize: 24, marginBottom: 6 }}>🏌️</div>
-            <div style={{ fontFamily: "Georgia,serif", fontSize: 14, color: C.green, fontWeight: 600 }}>Masters.com</div>
-            <div style={{ fontFamily: "Georgia,serif", fontSize: 11, color: "#8b7355" }}>Official Leaderboard</div>
-          </a>
-          <a href="https://www.espn.com/golf/leaderboard" target="_blank" rel="noopener"
-            style={{
-              background: "#fff", borderRadius: 10, padding: "16px",
-              textAlign: "center", textDecoration: "none",
-              border: `1px solid ${C.sand}`,
-              boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
-            }}>
-            <div style={{ fontSize: 24, marginBottom: 6 }}>📊</div>
-            <div style={{ fontFamily: "Georgia,serif", fontSize: 14, color: C.green, fontWeight: 600 }}>ESPN</div>
-            <div style={{ fontFamily: "Georgia,serif", fontSize: 11, color: "#8b7355" }}>Full Coverage</div>
-          </a>
-          <a href="https://www.youtube.com/results?search_query=masters+2026+live" target="_blank" rel="noopener"
-            style={{
-              background: "#fff", borderRadius: 10, padding: "16px",
-              textAlign: "center", textDecoration: "none",
-              border: `1px solid ${C.sand}`,
-              boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
-            }}>
-            <div style={{ fontSize: 24, marginBottom: 6 }}>📺</div>
-            <div style={{ fontFamily: "Georgia,serif", fontSize: 14, color: C.green, fontWeight: 600 }}>Watch Live</div>
-            <div style={{ fontFamily: "Georgia,serif", fontSize: 11, color: "#8b7355" }}>Featured Groups</div>
-          </a>
-          <a href="https://www.masters.com/en_US/course/index.html" target="_blank" rel="noopener"
-            style={{
-              background: "#fff", borderRadius: 10, padding: "16px",
-              textAlign: "center", textDecoration: "none",
-              border: `1px solid ${C.sand}`,
-              boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
-            }}>
-            <div style={{ fontSize: 24, marginBottom: 6 }}>🗺️</div>
-            <div style={{ fontFamily: "Georgia,serif", fontSize: 14, color: C.green, fontWeight: 600 }}>Course Map</div>
-            <div style={{ fontFamily: "Georgia,serif", fontSize: 11, color: "#8b7355" }}>Augusta National</div>
-          </a>
+              <div style={{ fontSize: 22, marginBottom: 4 }}>{icon}</div>
+              <div style={{ fontFamily: "Georgia,serif", fontSize: 13, color: C.green, fontWeight: 600 }}>{title}</div>
+              <div style={{ fontFamily: "Georgia,serif", fontSize: 10, color: "#8b7355" }}>{sub}</div>
+            </a>
+          ))}
         </div>
       </div>
     </div>
