@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 /*─────────────────────────────────────────────
   CONFIG
@@ -779,72 +779,198 @@ function Confirmation({ entry, onLeaderboard, onEdit }) {
 }
 
 function Leaderboard({ entries, isLocked, loading }) {
+  const [expanded, setExpanded] = useState(null);
+
+  // Board colors matching the Augusta scoreboard
+  const B = {
+    board: "#1a5632",
+    boardDark: "#143f26",
+    border: "#0d2e1a",
+    text: "#f5f0e0",
+    yellow: "#f2c94c",
+    red: "#e74c3c",
+    green: "#2ecc71",
+    white: "#fff",
+    rowEven: "rgba(255,255,255,0.04)",
+    rowOdd: "transparent",
+  };
+
   return (
-    <div style={{ minHeight: "100vh", background: C.cream, padding: "28px 16px" }}>
-      <div style={{ maxWidth: 800, margin: "0 auto" }}>
-        <div style={{ textAlign: "center", marginBottom: 24 }}>
-          <h2 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 28, color: C.green, margin: "0 0 4px" }}>
-            Pool Leaderboard</h2>
-          <p style={{ fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 14, color: "#8b7355",
-            letterSpacing: "0.08em", textTransform: "uppercase" }}>{T.year} {T.name}</p>
-          <p style={{ fontFamily: "Georgia,serif", fontSize: 13, color: "#999", marginTop: 4 }}>
-            {entries.length} {entries.length === 1 ? "entry" : "entries"}</p>
+    <div style={{ minHeight: "100vh", background: B.boardDark, padding: "24px 12px" }}>
+      <div style={{ maxWidth: 860, margin: "0 auto" }}>
+
+        {/* Classic "LEADERS" header */}
+        <div style={{
+          textAlign: "center", marginBottom: 4,
+          padding: "18px 20px 14px",
+          background: B.board,
+          border: `3px solid ${B.border}`,
+          borderBottom: "none",
+          borderRadius: "8px 8px 0 0",
+        }}>
+          <h2 style={{
+            fontFamily: "'Playfair Display',Georgia,serif",
+            fontSize: 36, fontWeight: 900, color: B.yellow,
+            letterSpacing: "0.15em", textTransform: "uppercase",
+            margin: 0, textShadow: "2px 2px 4px rgba(0,0,0,0.3)",
+          }}>LEADERS</h2>
+          <p style={{
+            fontFamily: "Georgia,serif", fontSize: 12, color: "#a8d5a8",
+            letterSpacing: "0.2em", textTransform: "uppercase", marginTop: 4,
+          }}>{T.year} {T.name} · {entries.length} {entries.length === 1 ? "entry" : "entries"}</p>
           {!isLocked && (
-            <div style={{ marginTop: 14, padding: "10px 18px", borderRadius: 10,
-              background: `${C.yellow}20`, border: `2px solid ${C.yellow}`, display: "inline-block" }}>
-              <p style={{ fontFamily: "Georgia,serif", fontSize: 13, color: C.dark, margin: 0 }}>
-                ⏳ <strong>Scores go live once the tournament starts.</strong></p>
-            </div>
+            <p style={{ fontFamily: "Georgia,serif", fontSize: 12, color: B.yellow, marginTop: 8 }}>
+              ⏳ Scores go live when the tournament starts</p>
           )}
         </div>
-        <div style={{ background: "#fff", borderRadius: 12, overflow: "hidden",
-          boxShadow: "0 3px 16px rgba(0,0,0,0.06)", border: `1px solid ${C.sand}` }}>
+
+        {/* Scoreboard */}
+        <div style={{
+          background: B.board,
+          border: `3px solid ${B.border}`,
+          borderTop: `2px solid rgba(255,255,255,0.1)`,
+          borderRadius: "0 0 8px 8px",
+          overflow: "hidden",
+          boxShadow: "0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)",
+        }}>
+          {/* Column headers */}
           <div style={{
-            background: `linear-gradient(135deg, ${C.green}, ${C.dark})`,
-            padding: "10px 16px", display: "grid",
-            gridTemplateColumns: "40px 1fr 60px 1fr", gap: 8, alignItems: "center",
+            display: "grid",
+            gridTemplateColumns: "44px 1fr 60px repeat(6, 1fr)",
+            borderBottom: `2px solid ${B.border}`,
+            background: "rgba(0,0,0,0.15)",
           }}>
-            {["POS","TEAM","SCORE","GOLFERS"].map(h => (
-              <span key={h} style={{ fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 10,
-                letterSpacing: "0.12em", color: C.yellow, fontWeight: 600 }}>{h}</span>
+            {["POS", "TEAM", "TOTAL", "PICK 1", "PICK 2", "PICK 3", "PICK 4", "PICK 5", "PICK 6"].map((h, i) => (
+              <div key={h} style={{
+                padding: "8px 4px", textAlign: "center",
+                fontFamily: "Georgia,serif", fontSize: 9,
+                fontWeight: 700, letterSpacing: "0.1em",
+                color: B.yellow, textTransform: "uppercase",
+                borderRight: i < 8 ? `1px solid ${B.border}` : "none",
+              }}>{h}</div>
             ))}
           </div>
-          {entries.map((e, i) => (
-            <div key={i} style={{
-              padding: "10px 16px", display: "grid",
-              gridTemplateColumns: "40px 1fr 60px 1fr", gap: 8, alignItems: "center",
-              borderBottom: i < entries.length - 1 ? `1px solid ${C.sand}` : "none",
-              background: i % 2 === 0 ? "#fafaf7" : "#fff",
-            }}>
-              <span style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 16, fontWeight: 700,
-                color: i < 3 ? C.green : "#999" }}>{i + 1}</span>
-              <div>
-                <span style={{ fontFamily: "Georgia,serif", fontSize: 13, color: "#333" }}>{e.name}</span>
-                {e.fullName && <div style={{ fontFamily: "Georgia,serif", fontSize: 10, color: "#999" }}>{e.fullName}</div>}
-                <span style={{ fontFamily: "Georgia,serif", fontSize: 10, color: "#aaa", marginLeft: e.fullName ? 0 : 5 }}>({e.winScore})</span>
+
+          {/* Rows */}
+          {entries.map((e, i) => {
+            const isExpanded = expanded === i;
+            return (
+              <div key={i}>
+                <div onClick={() => setExpanded(isExpanded ? null : i)}
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "44px 1fr 60px repeat(6, 1fr)",
+                    borderBottom: `1px solid ${B.border}`,
+                    background: i % 2 === 0 ? B.rowEven : B.rowOdd,
+                    cursor: "pointer",
+                    transition: "background 0.15s",
+                  }}
+                  onMouseEnter={ev => ev.currentTarget.style.background = "rgba(255,255,255,0.08)"}
+                  onMouseLeave={ev => ev.currentTarget.style.background = i % 2 === 0 ? B.rowEven : B.rowOdd}
+                >
+                  {/* Position */}
+                  <div style={{
+                    padding: "10px 4px", textAlign: "center",
+                    fontFamily: "'Playfair Display',Georgia,serif",
+                    fontSize: 16, fontWeight: 700,
+                    color: i === 0 ? B.yellow : i < 3 ? B.green : B.text,
+                    borderRight: `1px solid ${B.border}`,
+                  }}>{i + 1}</div>
+
+                  {/* Team name */}
+                  <div style={{
+                    padding: "8px 10px",
+                    borderRight: `1px solid ${B.border}`,
+                    overflow: "hidden",
+                  }}>
+                    <div style={{
+                      fontFamily: "Georgia,serif", fontSize: 14, fontWeight: 700,
+                      color: B.white, textTransform: "uppercase",
+                      letterSpacing: "0.04em",
+                      whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
+                    }}>{e.name}</div>
+                    <div style={{
+                      fontFamily: "Georgia,serif", fontSize: 10,
+                      color: "rgba(255,255,255,0.5)", marginTop: 1,
+                    }}>{e.fullName || ""}</div>
+                  </div>
+
+                  {/* Total score */}
+                  <div style={{
+                    padding: "10px 4px", textAlign: "center",
+                    fontFamily: "'Playfair Display',Georgia,serif",
+                    fontSize: 18, fontWeight: 900,
+                    color: isLocked
+                      ? (e.totalScore < 0 ? B.red : e.totalScore > 0 ? B.green : B.white)
+                      : "rgba(255,255,255,0.3)",
+                    borderRight: `1px solid ${B.border}`,
+                  }}>
+                    {isLocked ? (e.totalScore != null ? (e.totalScore < 0 ? e.totalScore : e.totalScore > 0 ? `+${e.totalScore}` : "E") : "—") : "—"}
+                  </div>
+
+                  {/* 6 golfer picks */}
+                  {(e.picks || []).concat(Array(6).fill("")).slice(0, 6).map((p, j) => {
+                    const lastName = p ? p.split(" ").pop() : "";
+                    return (
+                      <div key={j} style={{
+                        padding: "8px 3px", textAlign: "center",
+                        borderRight: j < 5 ? `1px solid ${B.border}` : "none",
+                        display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+                      }}>
+                        <span style={{
+                          fontFamily: "Georgia,serif", fontSize: 10,
+                          color: B.text, textTransform: "uppercase",
+                          letterSpacing: "0.02em",
+                          whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
+                          maxWidth: "100%",
+                        }}>{lastName}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Expanded detail row */}
+                {isExpanded && (
+                  <div style={{
+                    padding: "10px 16px",
+                    background: "rgba(0,0,0,0.2)",
+                    borderBottom: `1px solid ${B.border}`,
+                  }}>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                      {(e.picks || []).map((p, j) => (
+                        <span key={j} style={{
+                          fontFamily: "Georgia,serif", fontSize: 11,
+                          padding: "3px 8px", borderRadius: 4,
+                          background: "rgba(255,255,255,0.1)",
+                          color: B.text, border: `1px solid rgba(255,255,255,0.15)`,
+                        }}>{p}</span>
+                      ))}
+                    </div>
+                    <p style={{
+                      fontFamily: "Georgia,serif", fontSize: 11, color: "rgba(255,255,255,0.4)",
+                      marginTop: 6,
+                    }}>Predicted winner: {e.winScore} · Best 4 of 6 scores count</p>
+                  </div>
+                )}
               </div>
-              <span style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 16, fontWeight: 700,
-                color: "#ccc" }}>—</span>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
-                {e.picks.map((p, j) => (
-                  <span key={j} style={{ fontFamily: "Georgia,serif", fontSize: 10,
-                    padding: "1px 6px", borderRadius: 6, background: C.cream, color: "#8b7355",
-                    border: `1px solid ${C.sand}` }}>{p}</span>
-                ))}
-              </div>
-            </div>
-          ))}
+            );
+          })}
+
           {entries.length === 0 && (
-            <div style={{ padding: 36, textAlign: "center" }}>
-              <p style={{ fontFamily: "Georgia,serif", fontSize: 14, color: "#999" }}>
+            <div style={{ padding: 40, textAlign: "center" }}>
+              <p style={{ fontFamily: "Georgia,serif", fontSize: 14, color: "rgba(255,255,255,0.5)" }}>
                 {loading ? "⏳ Loading entries..." : "No entries yet — be the first!"}</p>
             </div>
           )}
         </div>
-        <div style={{ marginTop: 14, textAlign: "center", fontSize: 11, fontFamily: "Georgia,serif", color: "#999" }}>
-          📡 <a href={`https://www.espn.com/golf/leaderboard/_/tournamentId/${T.espnId}`}
-            target="_blank" rel="noopener" style={{ color: C.green }}>ESPN Leaderboard</a>
-          {MODE === "valero" && " · 🧪 Test mode"}
+
+        {/* Footer */}
+        <div style={{ marginTop: 14, textAlign: "center" }}>
+          <p style={{ fontFamily: "Georgia,serif", fontSize: 11, color: "#5a8a5a" }}>
+            📡 <a href={`https://www.espn.com/golf/leaderboard/_/tournamentId/${T.espnId}`}
+              target="_blank" rel="noopener" style={{ color: "#7ab87a" }}>ESPN Leaderboard</a>
+            {" · "}Tap a row to see full picks
+          </p>
         </div>
       </div>
     </div>
@@ -1102,10 +1228,83 @@ export default function App() {
 
   const [showGreeting, setShowGreeting] = useState(true);
 
-  // Auto-dismiss greeting after 3 seconds
+  // Synthesize a gentle E major piano arpeggio
+  const playMastersChime = useCallback(() => {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      // E major arpeggio: E4, G#4, B4, E5, B4, G#4
+      const notes = [329.63, 415.30, 493.88, 659.25, 493.88, 415.30, 329.63];
+      notes.forEach((freq, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        const filter = ctx.createBiquadFilter();
+        // Soft piano-like tone
+        osc.type = "sine";
+        osc.frequency.value = freq;
+        filter.type = "lowpass";
+        filter.frequency.value = 2000;
+        // Gentle envelope
+        const t = ctx.currentTime + i * 0.45;
+        gain.gain.setValueAtTime(0, t);
+        gain.gain.linearRampToValueAtTime(0.15, t + 0.05);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 1.2);
+        osc.connect(filter);
+        filter.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(t);
+        osc.stop(t + 1.4);
+      });
+      // Add a warm pad underneath
+      const pad = ctx.createOscillator();
+      const padGain = ctx.createGain();
+      const padFilter = ctx.createBiquadFilter();
+      pad.type = "sine";
+      pad.frequency.value = 164.81; // E3
+      padFilter.type = "lowpass";
+      padFilter.frequency.value = 800;
+      padGain.gain.setValueAtTime(0, ctx.currentTime);
+      padGain.gain.linearRampToValueAtTime(0.08, ctx.currentTime + 0.3);
+      padGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 4);
+      pad.connect(padFilter);
+      padFilter.connect(padGain);
+      padGain.connect(ctx.destination);
+      pad.start(ctx.currentTime);
+      pad.stop(ctx.currentTime + 4.5);
+    } catch {}
+  }, []);
+
+  // Jim Nantz TTS greeting
+  const speakHelloFriends = useCallback(() => {
+    try {
+      const utterance = new SpeechSynthesisUtterance("Hello, friends.");
+      utterance.rate = 0.75;
+      utterance.pitch = 0.85;
+      utterance.volume = 1;
+      // Try to pick a deep male voice
+      const voices = speechSynthesis.getVoices();
+      const preferred = voices.find(v =>
+        v.name.includes("Daniel") || v.name.includes("James") ||
+        v.name.includes("Google UK English Male") || v.name.includes("Male")
+      ) || voices.find(v => v.lang.startsWith("en")) || voices[0];
+      if (preferred) utterance.voice = preferred;
+      speechSynthesis.speak(utterance);
+    } catch {}
+  }, []);
+
+  // Play audio when greeting shows
   useEffect(() => {
     if (showGreeting) {
-      const t = setTimeout(() => setShowGreeting(false), 3500);
+      // Voices may load async
+      const trySpeak = () => {
+        speakHelloFriends();
+        playMastersChime();
+      };
+      if (speechSynthesis.getVoices().length > 0) {
+        setTimeout(trySpeak, 600);
+      } else {
+        speechSynthesis.onvoiceschanged = () => setTimeout(trySpeak, 600);
+      }
+      const t = setTimeout(() => setShowGreeting(false), 5000);
       return () => clearTimeout(t);
     }
   }, [showGreeting]);
@@ -1118,31 +1317,43 @@ export default function App() {
         button:hover { opacity: 0.93; }
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-thumb { background: ${C.sand}; border-radius: 4px; }
-        @keyframes greetFade { 0% { opacity: 0; transform: scale(0.9); } 20% { opacity: 1; transform: scale(1); } 80% { opacity: 1; } 100% { opacity: 0; transform: scale(1.02); } }
+        @keyframes greetFade { 0% { opacity: 0; transform: scale(0.9); } 15% { opacity: 1; transform: scale(1); } 80% { opacity: 1; } 100% { opacity: 0; transform: scale(1.02); } }
       `}</style>
 
       {/* Jim Nantz Greeting Overlay */}
       {showGreeting && (
         <div onClick={() => setShowGreeting(false)} style={{
           position: "fixed", top: 0, left: 0, right: 0, bottom: 0, zIndex: 9999,
-          background: "rgba(0,40,20,0.92)", backdropFilter: "blur(8px)",
+          background: "rgba(0,40,20,0.93)", backdropFilter: "blur(10px)",
           display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-          cursor: "pointer", animation: "greetFade 3.5s ease-in-out forwards",
+          cursor: "pointer", animation: "greetFade 5s ease-in-out forwards",
         }}>
-          <div style={{ fontSize: 60, marginBottom: 16 }}>⛳</div>
+          <div style={{ fontSize: 64, marginBottom: 20 }}>⛳</div>
           <p style={{
             fontFamily: "'Playfair Display',Georgia,serif",
-            fontSize: 42, fontWeight: 700, color: C.yellow,
+            fontSize: 48, fontWeight: 700, color: C.yellow,
             textAlign: "center", lineHeight: 1.2,
             textShadow: "0 2px 20px rgba(0,0,0,0.3)",
           }}>Hello, Friends.</p>
           <p style={{
             fontFamily: "'Cormorant Garamond',Georgia,serif",
-            fontSize: 18, color: "#a8d5a8", marginTop: 10,
+            fontSize: 20, color: "#a8d5a8", marginTop: 12,
             letterSpacing: "0.15em", textTransform: "uppercase",
           }}>Welcome to the Masters Pool</p>
-          <p style={{ fontFamily: "Georgia,serif", fontSize: 12, color: "#5a8a5a", marginTop: 20 }}>
-            tap anywhere to continue</p>
+          <div style={{
+            marginTop: 28, display: "flex", flexDirection: "column", alignItems: "center", gap: 8,
+          }}>
+            <a href="https://www.youtube.com/watch?v=G97AdMLbfr4" target="_blank" rel="noopener"
+              onClick={e => e.stopPropagation()}
+              style={{
+                padding: "8px 20px", borderRadius: 20,
+                background: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.2)",
+                color: C.yellow, fontFamily: "Georgia,serif", fontSize: 13,
+                textDecoration: "none", transition: "all 0.2s",
+              }}>🎵 Play the Masters Theme</a>
+            <p style={{ fontFamily: "Georgia,serif", fontSize: 11, color: "#5a8a5a" }}>
+              tap anywhere to continue</p>
+          </div>
         </div>
       )}
 
