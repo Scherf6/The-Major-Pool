@@ -236,15 +236,15 @@ function Nav({ view, setView, isLocked, remaining }) {
         {isLocked ? "🔒 LOCKED" : `⏱ ${remaining}`}
       </div>
       <div style={{ display: "flex", gap: 3 }}>
-        {["home","picks","leaderboard"].map(id => (
+        {["home","picks","leaderboard","tournament"].map(id => (
           <button key={id} onClick={() => setView(id)} style={{
-            padding: "6px 12px", border: "none", borderRadius: 6,
+            padding: "6px 10px", border: "none", borderRadius: 6,
             background: view === id ? C.yellow : "transparent",
             color: view === id ? C.dark : "#fff",
             fontFamily: "'Cormorant Garamond',Georgia,serif",
-            fontSize: 13, fontWeight: view === id ? 700 : 400,
-            cursor: "pointer", textTransform: "capitalize",
-          }}>{id === "picks" ? "My Picks" : id}</button>
+            fontSize: 12, fontWeight: view === id ? 700 : 400,
+            cursor: "pointer",
+          }}>{id === "picks" ? "My Picks" : id === "tournament" ? "⛳ Live" : id.charAt(0).toUpperCase() + id.slice(1)}</button>
         ))}
       </div>
     </nav>
@@ -310,7 +310,7 @@ function Hero({ onStart, setView }) {
           fontSize: 20, fontWeight: 700, cursor: "pointer",
           boxShadow: "0 4px 20px rgba(242,201,76,0.4)",
         }}>Enter the Pool ⛳</button>
-        <div style={{ display: "flex", gap: 16, marginTop: 18, justifyContent: "center" }}>
+        <div style={{ display: "flex", gap: 16, marginTop: 18, justifyContent: "center", flexWrap: "wrap" }}>
           <button onClick={() => setView("leaderboard")} style={{
             background: "none", border: "none", color: C.yellow,
             fontFamily: "Georgia,serif", fontSize: 15, cursor: "pointer",
@@ -321,6 +321,11 @@ function Hero({ onStart, setView }) {
             fontFamily: "Georgia,serif", fontSize: 15, cursor: "pointer",
             textDecoration: "underline", textUnderlineOffset: 3,
           }}>🏌️ My Picks</button>
+          <button onClick={() => setView("tournament")} style={{
+            background: "none", border: "none", color: C.yellow,
+            fontFamily: "Georgia,serif", fontSize: 15, cursor: "pointer",
+            textDecoration: "underline", textUnderlineOffset: 3,
+          }}>⛳ Live Tournament</button>
         </div>
       </div>
     </div>
@@ -341,6 +346,8 @@ function PicksFlow({ onComplete, isLocked, existingEntry, allEntries }) {
   const [submitting, setSubmitting] = useState(false);
   const [submitMsg, setSubmitMsg] = useState("");
   const [nameError, setNameError] = useState("");
+  const [lookupMode, setLookupMode] = useState(false);
+  const [lookupMsg, setLookupMsg] = useState("");
 
   const tierKeys = Object.keys(TIERS);
   const totalNeeded = tierKeys.reduce((s, k) => s + TIERS[k].pick, 0);
@@ -482,34 +489,97 @@ function PicksFlow({ onComplete, isLocked, existingEntry, allEntries }) {
         {step === 1 && (
           <div style={{ background: "#fff", borderRadius: 12, padding: 28,
             boxShadow: "0 2px 12px rgba(0,0,0,0.06)", border: `1px solid ${C.sand}` }}>
-            <label style={{ fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 11,
-              letterSpacing: "0.14em", textTransform: "uppercase", color: "#8b7355" }}>Your Name</label>
-            <div style={{ display: "flex", gap: 8, marginTop: 5 }}>
-              <input type="text" value={firstName} onChange={e => setFirstName(e.target.value)}
-                placeholder="First" style={{ flex: 1, padding: "12px", borderRadius: 8,
-                  border: `2px solid ${C.sand}`, fontSize: 15, fontFamily: "Georgia,serif",
-                  outline: "none", boxSizing: "border-box" }} />
-              <input type="text" value={lastName} onChange={e => setLastName(e.target.value)}
-                placeholder="Last" style={{ flex: 1, padding: "12px", borderRadius: 8,
-                  border: `2px solid ${C.sand}`, fontSize: 15, fontFamily: "Georgia,serif",
-                  outline: "none", boxSizing: "border-box" }} />
-            </div>
-            <label style={{ fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 11,
-              letterSpacing: "0.14em", textTransform: "uppercase", color: "#8b7355", display: "block", marginTop: 14 }}>Email</label>
-            <p style={{ fontFamily: "Georgia,serif", fontSize: 12, color: "#999", margin: "3px 0 7px" }}>
-              Used to log back in and edit picks</p>
-            <input type="email" value={email} onChange={e => setEmail(e.target.value)}
-              placeholder="your@email.com"
-              style={{ width: "100%", padding: "12px", borderRadius: 8,
-                border: `2px solid ${C.sand}`, fontSize: 15, fontFamily: "Georgia,serif",
-                outline: "none", boxSizing: "border-box" }} />
-            <button onClick={() => email.includes("@") && firstName.trim() && lastName.trim() && setStep(2)}
-              disabled={!email.includes("@") || !firstName.trim() || !lastName.trim()}
-              style={{ width: "100%", padding: 12, border: "none", borderRadius: 8,
-                background: (email.includes("@") && firstName.trim() && lastName.trim()) ? C.green : "#ccc",
-                color: "#fff", fontFamily: "'Playfair Display',Georgia,serif",
-                fontSize: 16, fontWeight: 600, cursor: (email.includes("@") && firstName.trim() && lastName.trim()) ? "pointer" : "default",
-                marginTop: 16 }}>Continue</button>
+
+            {!lookupMode ? (
+              <>
+                <label style={{ fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 11,
+                  letterSpacing: "0.14em", textTransform: "uppercase", color: "#8b7355" }}>Your Name</label>
+                <div style={{ display: "flex", gap: 8, marginTop: 5 }}>
+                  <input type="text" value={firstName} onChange={e => setFirstName(e.target.value)}
+                    placeholder="First" style={{ flex: 1, padding: "12px", borderRadius: 8,
+                      border: `2px solid ${C.sand}`, fontSize: 15, fontFamily: "Georgia,serif",
+                      outline: "none", boxSizing: "border-box" }} />
+                  <input type="text" value={lastName} onChange={e => setLastName(e.target.value)}
+                    placeholder="Last" style={{ flex: 1, padding: "12px", borderRadius: 8,
+                      border: `2px solid ${C.sand}`, fontSize: 15, fontFamily: "Georgia,serif",
+                      outline: "none", boxSizing: "border-box" }} />
+                </div>
+                <label style={{ fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 11,
+                  letterSpacing: "0.14em", textTransform: "uppercase", color: "#8b7355", display: "block", marginTop: 14 }}>Email</label>
+                <p style={{ fontFamily: "Georgia,serif", fontSize: 12, color: "#999", margin: "3px 0 7px" }}>
+                  Used to log back in and edit picks</p>
+                <input type="email" value={email} onChange={e => setEmail(e.target.value)}
+                  placeholder="your@email.com"
+                  style={{ width: "100%", padding: "12px", borderRadius: 8,
+                    border: `2px solid ${C.sand}`, fontSize: 15, fontFamily: "Georgia,serif",
+                    outline: "none", boxSizing: "border-box" }} />
+                <button onClick={() => email.includes("@") && firstName.trim() && lastName.trim() && setStep(2)}
+                  disabled={!email.includes("@") || !firstName.trim() || !lastName.trim()}
+                  style={{ width: "100%", padding: 12, border: "none", borderRadius: 8,
+                    background: (email.includes("@") && firstName.trim() && lastName.trim()) ? C.green : "#ccc",
+                    color: "#fff", fontFamily: "'Playfair Display',Georgia,serif",
+                    fontSize: 16, fontWeight: 600, cursor: (email.includes("@") && firstName.trim() && lastName.trim()) ? "pointer" : "default",
+                    marginTop: 16 }}>Continue</button>
+
+                <div style={{ textAlign: "center", marginTop: 16, paddingTop: 16, borderTop: `1px solid ${C.sand}` }}>
+                  <button onClick={() => setLookupMode(true)} style={{
+                    background: "none", border: "none", color: C.green,
+                    fontFamily: "Georgia,serif", fontSize: 13, cursor: "pointer",
+                    textDecoration: "underline", textUnderlineOffset: 3,
+                  }}>Already signed up? Edit your picks →</button>
+                </div>
+              </>
+            ) : (
+              <>
+                <h3 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 18,
+                  color: C.green, margin: "0 0 12px" }}>Welcome Back</h3>
+                <p style={{ fontFamily: "Georgia,serif", fontSize: 13, color: "#8b7355", margin: "0 0 12px" }}>
+                  Enter the email you signed up with to view and edit your picks.</p>
+                <input type="email" value={email} onChange={e => { setEmail(e.target.value); setLookupMsg(""); }}
+                  placeholder="your@email.com"
+                  style={{ width: "100%", padding: "12px", borderRadius: 8,
+                    border: `2px solid ${C.sand}`, fontSize: 15, fontFamily: "Georgia,serif",
+                    outline: "none", boxSizing: "border-box" }} />
+                {lookupMsg && (
+                  <p style={{ fontFamily: "Georgia,serif", fontSize: 12, marginTop: 6,
+                    color: lookupMsg.includes("✅") ? C.green : "#c62828" }}>{lookupMsg}</p>
+                )}
+                <button onClick={async () => {
+                  if (!email.includes("@")) return;
+                  setLookupMsg("Looking up...");
+                  try {
+                    const res = await fetch(`${SCRIPT_URL}?email=${encodeURIComponent(email)}`);
+                    const data = await res.json();
+                    if (data.userEntry) {
+                      const ue = data.userEntry;
+                      setFirstName(ue.firstName || "");
+                      setLastName(ue.lastName || "");
+                      setTeamName(ue.teamName || "");
+                      setWinScore(ue.winningScore || -12);
+                      setLookupMsg("✅ Found your entry! Loading...");
+                      setTimeout(() => setStep(2), 800);
+                    } else {
+                      setLookupMsg("No entry found for that email. Try signing up below.");
+                    }
+                  } catch {
+                    setLookupMsg("Couldn't reach the server. Try again.");
+                  }
+                }} disabled={!email.includes("@")}
+                  style={{ width: "100%", padding: 12, border: "none", borderRadius: 8,
+                    background: email.includes("@") ? C.green : "#ccc",
+                    color: "#fff", fontFamily: "'Playfair Display',Georgia,serif",
+                    fontSize: 16, fontWeight: 600, cursor: email.includes("@") ? "pointer" : "default",
+                    marginTop: 12 }}>Look Up My Entry</button>
+
+                <div style={{ textAlign: "center", marginTop: 14 }}>
+                  <button onClick={() => { setLookupMode(false); setLookupMsg(""); }} style={{
+                    background: "none", border: "none", color: C.green,
+                    fontFamily: "Georgia,serif", fontSize: 13, cursor: "pointer",
+                    textDecoration: "underline", textUnderlineOffset: 3,
+                  }}>← New entry instead</button>
+                </div>
+              </>
+            )}
           </div>
         )}
 
@@ -825,12 +895,9 @@ function Leaderboard({ entries, isLocked, loading }) {
         </div>
 
         {/* Scoreboard */}
-        <div style={{
-          background: B.board,
+        <div className="pool-board" style={{ background: B.board, borderRadius: "0 0 8px 8px",
+          overflow: "hidden", boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
           border: `1px solid ${B.border}`,
-          borderRadius: "0 0 8px 8px",
-          overflow: "hidden",
-          boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
         }}>
           {/* Column headers */}
           <div style={{
@@ -1172,6 +1239,99 @@ function MastersExperience() {
   );
 }
 
+function TournamentLive() {
+  return (
+    <div style={{ minHeight: "100vh", background: C.cream, padding: "24px 12px" }}>
+      <div style={{ maxWidth: 900, margin: "0 auto" }}>
+        <div style={{ textAlign: "center", marginBottom: 20 }}>
+          <h2 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 28, color: C.green, margin: "0 0 4px" }}>
+            ⛳ Live Tournament</h2>
+          <p style={{ fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 14, color: "#8b7355",
+            letterSpacing: "0.08em", textTransform: "uppercase" }}>{T.year} {T.name} — Augusta National</p>
+        </div>
+
+        {/* ESPN Leaderboard Embed */}
+        <div style={{
+          background: "#fff", borderRadius: 12, overflow: "hidden",
+          boxShadow: "0 4px 16px rgba(0,0,0,0.08)", border: `1px solid ${C.sand}`,
+          marginBottom: 20,
+        }}>
+          <div style={{
+            background: C.green, padding: "10px 16px",
+            display: "flex", justifyContent: "space-between", alignItems: "center",
+          }}>
+            <span style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 16,
+              fontWeight: 700, color: C.yellow }}>Masters Leaderboard</span>
+            <a href={`https://www.espn.com/golf/leaderboard/_/tournamentId/${T.espnId}`}
+              target="_blank" rel="noopener" style={{
+                fontFamily: "Georgia,serif", fontSize: 12, color: "#c4d9c4",
+                textDecoration: "none",
+              }}>Open on ESPN ↗</a>
+          </div>
+          <iframe
+            src={`https://www.espn.com/golf/leaderboard/_/tournamentId/${T.espnId}`}
+            style={{
+              width: "100%", height: 600, border: "none",
+              background: "#fff",
+            }}
+            title="Masters Leaderboard"
+          />
+        </div>
+
+        {/* Quick links */}
+        <div style={{
+          display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12,
+        }}>
+          <a href="https://www.masters.com/en_US/scores/index.html" target="_blank" rel="noopener"
+            style={{
+              background: "#fff", borderRadius: 10, padding: "16px",
+              textAlign: "center", textDecoration: "none",
+              border: `1px solid ${C.sand}`,
+              boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+            }}>
+            <div style={{ fontSize: 24, marginBottom: 6 }}>🏌️</div>
+            <div style={{ fontFamily: "Georgia,serif", fontSize: 14, color: C.green, fontWeight: 600 }}>Masters.com</div>
+            <div style={{ fontFamily: "Georgia,serif", fontSize: 11, color: "#8b7355" }}>Official Leaderboard</div>
+          </a>
+          <a href="https://www.espn.com/golf/leaderboard" target="_blank" rel="noopener"
+            style={{
+              background: "#fff", borderRadius: 10, padding: "16px",
+              textAlign: "center", textDecoration: "none",
+              border: `1px solid ${C.sand}`,
+              boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+            }}>
+            <div style={{ fontSize: 24, marginBottom: 6 }}>📊</div>
+            <div style={{ fontFamily: "Georgia,serif", fontSize: 14, color: C.green, fontWeight: 600 }}>ESPN</div>
+            <div style={{ fontFamily: "Georgia,serif", fontSize: 11, color: "#8b7355" }}>Full Coverage</div>
+          </a>
+          <a href="https://www.youtube.com/results?search_query=masters+2026+live" target="_blank" rel="noopener"
+            style={{
+              background: "#fff", borderRadius: 10, padding: "16px",
+              textAlign: "center", textDecoration: "none",
+              border: `1px solid ${C.sand}`,
+              boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+            }}>
+            <div style={{ fontSize: 24, marginBottom: 6 }}>📺</div>
+            <div style={{ fontFamily: "Georgia,serif", fontSize: 14, color: C.green, fontWeight: 600 }}>Watch Live</div>
+            <div style={{ fontFamily: "Georgia,serif", fontSize: 11, color: "#8b7355" }}>Featured Groups</div>
+          </a>
+          <a href="https://www.masters.com/en_US/course/index.html" target="_blank" rel="noopener"
+            style={{
+              background: "#fff", borderRadius: 10, padding: "16px",
+              textAlign: "center", textDecoration: "none",
+              border: `1px solid ${C.sand}`,
+              boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+            }}>
+            <div style={{ fontSize: 24, marginBottom: 6 }}>🗺️</div>
+            <div style={{ fontFamily: "Georgia,serif", fontSize: 14, color: C.green, fontWeight: 600 }}>Course Map</div>
+            <div style={{ fontFamily: "Georgia,serif", fontSize: 11, color: "#8b7355" }}>Augusta National</div>
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /*─────────────────────────────────────────────
   APP
 ─────────────────────────────────────────────*/
@@ -1311,6 +1471,10 @@ export default function App() {
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-thumb { background: ${C.sand}; border-radius: 4px; }
         @keyframes greetFade { 0% { opacity: 0; transform: scale(0.9); } 15% { opacity: 1; transform: scale(1); } 80% { opacity: 1; } 100% { opacity: 0; transform: scale(1.02); } }
+        @media (max-width: 700px) {
+          .pool-board { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+          .pool-board > div { min-width: 700px; }
+        }
       `}</style>
 
       {/* Jim Nantz Greeting Overlay */}
@@ -1364,6 +1528,7 @@ export default function App() {
       {view === "confirmed" && entry && <Confirmation entry={entry}
         onLeaderboard={() => setView("leaderboard")} onEdit={() => setView("picks")} />}
       {view === "leaderboard" && <Leaderboard entries={entries} isLocked={isLocked} loading={loadingEntries} />}
+      {view === "tournament" && <TournamentLive />}
       <footer style={{
         background: C.dark, padding: "18px 16px", textAlign: "center",
         borderTop: `3px solid ${C.green}`,
