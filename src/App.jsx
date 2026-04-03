@@ -1153,7 +1153,7 @@ function MastersExperience() {
 
         <div style={{
           display: "grid", gridTemplateColumns: "1fr 1.2fr 1fr", gap: 16,
-        }}>
+        }} className="masters-panels">
           {/* LEFT: Menu */}
           <div style={{
             background: "rgba(255,255,255,0.97)", borderRadius: 4, overflow: "hidden",
@@ -1592,6 +1592,7 @@ export default function App() {
         @media (max-width: 700px) {
           .pool-board { overflow-x: auto; -webkit-overflow-scrolling: touch; }
           .pool-board > div { min-width: 700px; }
+          .masters-panels { grid-template-columns: 1fr !important; }
         }
       `}</style>
 
@@ -1658,4 +1659,4 @@ export default function App() {
       </footer>
     </div>
   );
-}
+                     }
