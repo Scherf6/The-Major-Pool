@@ -18,7 +18,7 @@ const TOURNAMENTS = {
     name: "Valero Texas Open", year: 2026,
     tagline: "Test Pool — Validating Scoring Before Masters Week",
     espnId: "401811940",
-    lockTime: "2026-04-03T07:29:00-05:00",
+    lockTime: "2026-04-05T07:29:00-05:00",
     par: 72,
   },
 };
