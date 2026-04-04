@@ -356,6 +356,38 @@ function PicksFlow({ onComplete, isLocked, existingEntry, allEntries }) {
   const [teamName, setTeamName] = useState(existingEntry?.teamName || "");
   const [winScore, setWinScore] = useState(existingEntry?.winScore ?? -12);
   const [picks, setPicks] = useState({});
+
+  const loadPicksFromNames = (pickNames) => {
+    if (!pickNames || pickNames.length === 0) return;
+    const newPicks = {};
+    const tierKeys = Object.keys(TIERS);
+    pickNames.forEach(name => {
+      if (!name) return;
+      const nameLower = name.toString().toLowerCase().trim();
+      for (const tier of tierKeys) {
+        const found = TIERS[tier].golfers.find(g => g.name.toLowerCase() === nameLower);
+        if (found) {
+          if (TIERS[tier].pick === 1) {
+            newPicks[tier] = found;
+          } else {
+            if (!newPicks[tier]) newPicks[tier] = [];
+            if (newPicks[tier].length < TIERS[tier].pick) {
+              newPicks[tier].push(found);
+            }
+          }
+          break;
+        }
+      }
+    });
+    setPicks(newPicks);
+  };
+
+  // Pre-load picks from existing entry
+  useEffect(() => {
+    if (existingEntry?.picks && Object.keys(picks).length === 0) {
+      loadPicksFromNames(existingEntry.picks);
+    }
+  }, [existingEntry]);
   const [genNames, setGenNames] = useState([]);
   const [nameIdeas, setNameIdeas] = useState("");
   const [generating, setGenerating] = useState(false);
@@ -364,6 +396,7 @@ function PicksFlow({ onComplete, isLocked, existingEntry, allEntries }) {
   const [nameError, setNameError] = useState("");
   const [lookupMode, setLookupMode] = useState(false);
   const [lookupMsg, setLookupMsg] = useState("");
+  const [originalTeamName, setOriginalTeamName] = useState(existingEntry?.teamName || "");
 
   const tierKeys = Object.keys(TIERS);
   const totalNeeded = tierKeys.reduce((s, k) => s + TIERS[k].pick, 0);
@@ -601,7 +634,9 @@ function PicksFlow({ onComplete, isLocked, existingEntry, allEntries }) {
                       setFirstName(ue.firstName || "");
                       setLastName(ue.lastName || "");
                       setTeamName(ue.teamName || "");
+                      setOriginalTeamName(ue.teamName || "");
                       setWinScore(ue.winningScore || -12);
+                      if (ue.picks) loadPicksFromNames(ue.picks);
                       setLookupMsg("✅ Found your entry! Loading...");
                       setTimeout(() => setStep(2), 800);
                     } else {
@@ -697,7 +732,16 @@ function PicksFlow({ onComplete, isLocked, existingEntry, allEntries }) {
               }}>Back</button>
               <button onClick={() => {
                 if (!teamName) return;
-                const taken = allEntries.some(e => e.name.toLowerCase() === teamName.toLowerCase() && e.email !== email);
+                const taken = allEntries.some(e => {
+                  if (e.name.toLowerCase() !== teamName.toLowerCase()) return false;
+                  // Allow if it's the user's own entry
+                  if (e.email === email) return false;
+                  if (existingEntry && e.name.toLowerCase() === existingEntry.teamName?.toLowerCase()) return false;
+                  if (originalTeamName && teamName.toLowerCase() === originalTeamName.toLowerCase()) return false;
+                  // Check masked email pattern: first char + "***@" + domain
+                  if (email && e.email === email.charAt(0) + "***@" + email.split("@")[1]) return false;
+                  return true;
+                });
                 if (taken) { setNameError("That team name is already taken — pick another!"); return; }
                 setStep(3);
               }} disabled={!teamName}
@@ -2084,7 +2128,7 @@ export default function App() {
         </>
       )}
       {view === "picks" && <PicksFlow onComplete={handleComplete} isLocked={isLocked}
-        existingEntry={entry ? { email: entry.email, teamName: entry.teamName, winScore: entry.winScore, firstName: entry.firstName, lastName: entry.lastName } : null}
+        existingEntry={entry ? { email: entry.email, teamName: entry.teamName, winScore: entry.winScore, firstName: entry.firstName, lastName: entry.lastName, picks: entry.picks } : null}
         allEntries={scoredEntries.length > 0 ? scoredEntries : entries} />}
       {view === "confirmed" && entry && <Confirmation entry={entry}
         onLeaderboard={() => setView("leaderboard")} onEdit={() => setView("picks")} />}
@@ -2101,4 +2145,4 @@ export default function App() {
       </footer>
     </div>
   );
-      }
+              }
