@@ -654,16 +654,20 @@ function PicksFlow({ onComplete, isLocked, existingEntry, allEntries }) {
                   try {
                     const res = await fetch(`${SCRIPT_URL}?email=${encodeURIComponent(email)}`);
                     const data = await res.json();
-                    if (data.userEntry) {
-                      const ue = data.userEntry;
+                    const allUserEntries = data.userEntries || (data.userEntry ? [data.userEntry] : []);
+                    if (allUserEntries.length > 0) {
+                      const ue = allUserEntries[0]; // Load first entry by default
                       setFirstName(ue.firstName || "");
                       setLastName(ue.lastName || "");
                       setTeamName(ue.teamName || "");
                       setOriginalTeamName(ue.teamName || "");
                       setWinScore(ue.winningScore || -12);
                       if (ue.picks) loadPicksFromNames(ue.picks);
-                      setLookupMsg("✅ Found your entry! Loading...");
-                      setTimeout(() => setStep(2), 800);
+                      const msg = allUserEntries.length === 1
+                        ? "✅ Found your entry! Edit it or create a 2nd entry with a new team name."
+                        : `✅ Found ${allUserEntries.length} entries! Loading your first one.`;
+                      setLookupMsg(msg);
+                      setTimeout(() => setStep(2), 1000);
                     } else {
                       setLookupMsg("No entry found for that email. Try signing up below.");
                     }
@@ -2380,4 +2384,4 @@ export default function App() {
       </footer>
     </div>
   );
-}
+        }
