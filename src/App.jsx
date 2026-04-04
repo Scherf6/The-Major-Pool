@@ -1272,9 +1272,10 @@ function Leaderboard({ entries, isLocked, loading }) {
 
 function MastersExperience() {
   const sandwiches = [
-    ["Egg Salad", "1.50"], ["Pimento Cheese", "1.50"], ["Bar-B-Que", "2.50"],
-    ["Masters Club", "2.50"], ["Chicken Breast", "2.50"], ["Ham & Cheese on Rye", "1.50"],
-    ["Tuna Salad", "1.50"], ["Turkey", "1.50"],
+    ["Egg Salad", "1.50", "https://pizzazzerie.com/recipes/masters-egg-salad/"],
+    ["Pimento Cheese", "1.50", "https://golf.com/lifestyle/food/how-make-augusta-nationals-famous-pimento-cheese-sandwich/"],
+    ["Bar-B-Que", "2.50"], ["Masters Club", "2.50"], ["Chicken Breast", "2.50"],
+    ["Ham & Cheese on Rye", "1.50"], ["Tuna Salad", "1.50"], ["Turkey", "1.50"],
   ];
   const beverages = [
     ["Soft Drinks", "1.00"], ["Bottled Water", "1.50"], ["Iced Tea", "1.50"],
@@ -1284,6 +1285,15 @@ function MastersExperience() {
     ["Candy", "1.00"], ["Chips / Crackers", "1.00"], ["Peanuts", "1.00"],
     ["Cookie", "1.00"], ["Ice Cream Bar", "2.00"],
   ];
+
+  const channelUrls = {
+    "Masters.com": "https://www.masters.com/en_US/live/index.html",
+    "ESPN": "https://www.espn.com/watch/",
+    "ESPN App": "https://www.espn.com/watch/",
+    "Prime Video": "https://www.amazon.com/gp/video/offers",
+    "Paramount+": "https://www.paramountplus.com",
+    "CBS": "https://www.cbs.com",
+  };
 
   const schedule = [
     { day: "MON 4/6", events: [["On the Range", "12–2 PM", "Masters.com"]] },
@@ -1321,12 +1331,17 @@ function MastersExperience() {
         fontStyle: "italic", color: C.dark, textAlign: "center",
         borderBottom: "1px solid #999", paddingBottom: 4, marginBottom: 5,
       }}>{title}</h4>
-      {items.map(([name, price], i) => (
+      {items.map(([name, price, url], i) => (
         <div key={i} style={{
           display: "flex", justifyContent: "space-between", padding: "2px 0",
           fontFamily: "Georgia,serif", fontSize: 14, color: "#333",
         }}>
-          <span>{name}</span><span>{price}</span>
+          {url ? (
+            <a href={url} target="_blank" rel="noopener" style={{
+              color: C.green, textDecoration: "underline", textUnderlineOffset: 2,
+            }}>{name} 📖</a>
+          ) : <span>{name}</span>}
+          <span>{price}</span>
         </div>
       ))}
     </div>
@@ -1411,11 +1426,11 @@ function MastersExperience() {
                     }}>
                       <span style={{ fontFamily: "Georgia,serif", fontSize: 15, color: "#333", flex: 1 }}>{name}</span>
                       <span style={{ fontFamily: "Georgia,serif", fontSize: 12, color: "#8b7355", whiteSpace: "nowrap" }}>{time}</span>
-                      <span style={{
+                      <a href={channelUrls[channel] || "#"} target="_blank" rel="noopener" style={{
                         fontFamily: "Georgia,serif", fontSize: 11, color: C.green,
                         background: `${C.green}10`, padding: "1px 5px", borderRadius: 4,
-                        fontWeight: 600, whiteSpace: "nowrap",
-                      }}>{channel}</span>
+                        fontWeight: 600, whiteSpace: "nowrap", textDecoration: "none",
+                      }}>{channel} ↗</a>
                     </div>
                   ))}
                 </div>
