@@ -1047,7 +1047,15 @@ function Leaderboard({ entries, isLocked, loading }) {
                     fontSize: 18, fontWeight: 700,
                     color: i < 3 ? B.green : B.muted,
                     borderRight: `1px solid ${B.border}`,
-                  }}>{i === 0 ? "🧥" : i === 1 ? "🥈" : i === 2 ? "🥉" : i + 1}</div>
+                  }}>
+                    {i === 0 ? (
+                      <span title="Green Jacket" style={{
+                        display: "inline-block", width: 28, height: 28, lineHeight: "28px",
+                        borderRadius: "50%", background: B.green, color: B.yellow,
+                        fontSize: 14, fontWeight: 900, textAlign: "center",
+                      }}>1</span>
+                    ) : i === 1 ? "🥈" : i === 2 ? "🥉" : i + 1}
+                  </div>
 
                   {/* Team name + person */}
                   <div style={{
@@ -1236,7 +1244,7 @@ function Leaderboard({ entries, isLocked, loading }) {
                     marginBottom: 2,
                   }}>
                     <span style={{ fontFamily: "Georgia,serif", fontSize: 12, color: "#fff" }}>
-                      {i === 0 ? "🧥" : `${i+1}.`} {e.name}
+                      {i === 0 ? "🏆 " : `${i+1}. `}{e.name}
                       <span style={{ color: "#888", marginLeft: 6, fontSize: 10 }}>
                         ({(e.golferScores || []).filter(g => g.found).length}/6 matched)
                       </span>
@@ -2086,4 +2094,4 @@ export default function App() {
       </footer>
     </div>
   );
-                      }
+                                           }
