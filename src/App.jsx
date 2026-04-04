@@ -2275,101 +2275,44 @@ export default function App() {
                   }}>Will your name be next on the wall?</p>
                 </div>
 
-                {/* 2026 Jacket on wooden hanger */}
-                <div style={{ flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center" }}>
-                  <svg width="220" height="240" viewBox="0 0 220 240">
-                    {/* Closet rod */}
-                    <rect x="0" y="0" width="220" height="8" rx="4" fill="#8B6914"/>
-                    <rect x="0" y="1" width="220" height="3" rx="2" fill="#A07818" opacity="0.6"/>
-                    
-                    {/* Hook */}
-                    <path d="M110,8 L110,18" stroke="#888" strokeWidth="2"/>
-                    <path d="M107,5 C107,-1 113,-1 113,5" stroke="#999" strokeWidth="2" fill="none"/>
-                    
-                    {/* Wooden hanger */}
-                    <path d="M35,42 Q72,22 110,22 Q148,22 185,42" stroke="#8B5E14" strokeWidth="9" fill="none" strokeLinecap="round"/>
-                    <path d="M35,42 Q72,22 110,22 Q148,22 185,42" stroke="#A07818" strokeWidth="5" fill="none" strokeLinecap="round"/>
-                    <path d="M39,40 Q72,24 110,24 Q148,24 181,40" stroke="#C49A28" strokeWidth="1.5" fill="none" strokeLinecap="round" opacity="0.5"/>
-                    
-                    {/* Name tag */}
-                    <rect x="82" y="28" width="56" height="20" rx="2" fill="#f5f0e0" stroke="#d4c9a8" strokeWidth="1"/>
-                    <text x="110" y="42" textAnchor="middle" fontFamily="Georgia,serif" fontSize="11" fontWeight="700" fill="#333">2026</text>
-                    
-                    {/* Left sleeve hanging */}
-                    <path d="M35,42 L15,60 L5,155 L10,158 L32,158 L40,72 Z" 
-                      fill="url(#scGreen)" stroke="rgba(0,0,0,0.1)" strokeWidth="0.5"/>
-                    <path d="M15,60 L24,66 L32,158 L18,156" fill="rgba(0,0,0,0.06)"/>
-                    
-                    {/* Right sleeve hanging */}
-                    <path d="M185,42 L205,60 L215,155 L210,158 L188,158 L180,72 Z" 
-                      fill="url(#scGreen)" stroke="rgba(0,0,0,0.1)" strokeWidth="0.5"/>
-                    <path d="M205,60 L196,66 L188,158 L202,156" fill="rgba(0,0,0,0.06)"/>
-                    
-                    {/* Jacket body - left half - wide and boxy */}
-                    <path d="M35,42 L40,58 L38,185 L95,185 L95,58 Z" 
-                      fill="url(#scGreen)" stroke="rgba(0,0,0,0.1)" strokeWidth="0.5"/>
-                    {/* Jacket body - right half */}
-                    <path d="M185,42 L180,58 L182,185 L125,185 L125,58 Z" 
-                      fill="url(#scGreen)" stroke="rgba(0,0,0,0.1)" strokeWidth="0.5"/>
-                    
-                    {/* Bottom hem - straight across, sport coat length */}
-                    <line x1="38" y1="185" x2="95" y2="185" stroke="rgba(0,0,0,0.1)" strokeWidth="1"/>
-                    <line x1="125" y1="185" x2="182" y2="185" stroke="rgba(0,0,0,0.1)" strokeWidth="1"/>
-                    
-                    {/* Center vent slit */}
-                    <line x1="95" y1="165" x2="95" y2="185" stroke="rgba(0,0,0,0.06)" strokeWidth="1"/>
-                    <line x1="125" y1="165" x2="125" y2="185" stroke="rgba(0,0,0,0.06)" strokeWidth="1"/>
-                    
-                    {/* Inner lining visible (jacket open) */}
-                    <path d="M95,55 L110,38 L125,55 L125,185 L95,185 Z" fill="#1a3a2a"/>
-                    
-                    {/* Left lapel - notch style */}
-                    <path d="M95,55 L110,38 L108,85 L85,92 L80,55 Z" fill="url(#scGreenLt)" stroke="rgba(0,0,0,0.06)" strokeWidth="0.5"/>
-                    {/* Lapel notch */}
-                    <path d="M85,92 L80,86 L75,55" stroke="rgba(0,0,0,0.08)" strokeWidth="0.5" fill="none"/>
-                    
-                    {/* Right lapel - notch style */}
-                    <path d="M125,55 L110,38 L112,85 L135,92 L140,55 Z" fill="url(#scGreenLt)" stroke="rgba(0,0,0,0.06)" strokeWidth="0.5"/>
-                    {/* Lapel notch */}
-                    <path d="M135,92 L140,86 L145,55" stroke="rgba(0,0,0,0.08)" strokeWidth="0.5" fill="none"/>
-                    
-                    {/* Buttons */}
-                    <circle cx="125" cy="108" r="3" fill="#c4a335" stroke="#a08520" strokeWidth="0.5"/>
-                    <circle cx="125" cy="135" r="3" fill="#c4a335" stroke="#a08520" strokeWidth="0.5"/>
-                    
-                    {/* Breast pocket - welt style */}
-                    <path d="M130,100 L158,100" stroke="rgba(0,0,0,0.12)" strokeWidth="1.5" strokeLinecap="round"/>
-                    
-                    {/* Left flap pocket */}
-                    <path d="M48,148 L88,148" stroke="rgba(0,0,0,0.1)" strokeWidth="1.5" strokeLinecap="round"/>
-                    <rect x="48" y="148" width="40" height="3" rx="1" fill="rgba(0,0,0,0.04)"/>
-                    
-                    {/* Right flap pocket */}
-                    <path d="M132,148 L172,148" stroke="rgba(0,0,0,0.1)" strokeWidth="1.5" strokeLinecap="round"/>
-                    <rect x="132" y="148" width="40" height="3" rx="1" fill="rgba(0,0,0,0.04)"/>
-                    
-                    {/* Augusta patch on left chest */}
-                    <rect x="52" y="105" width="36" height="40" rx="3" fill="rgba(0,0,0,0.18)" stroke="#c4a335" strokeWidth="0.8"/>
-                    <text x="70" y="122" textAnchor="middle" fontFamily="'Playfair Display',Georgia,serif" fontSize="13" fontWeight="900" fill="#c4a335">2026</text>
-                    <text x="70" y="133" textAnchor="middle" fontFamily="Georgia,serif" fontSize="5" fill="#a8d5a8" letterSpacing="1">MASTERS</text>
-                    <text x="70" y="140" textAnchor="middle" fontFamily="Georgia,serif" fontSize="4.5" fill="#a8d5a8" letterSpacing="0.8">CHAMPION</text>
-                    
-                    <defs>
-                      <linearGradient id="scGreen" x1="0" y1="0" x2="0.8" y2="1">
-                        <stop offset="0%" stopColor="#1a6b44"/>
-                        <stop offset="50%" stopColor="#006747"/>
-                        <stop offset="100%" stopColor="#005238"/>
-                      </linearGradient>
-                      <linearGradient id="scGreenLt" x1="0" y1="0" x2="1" y2="1">
-                        <stop offset="0%" stopColor="#1f7a50"/>
-                        <stop offset="100%" stopColor="#006747"/>
-                      </linearGradient>
-                    </defs>
-                  </svg>
-                  <p style={{
-                    fontFamily: "Georgia,serif", fontSize: 13, color: C.yellow,
-                    fontStyle: "italic", marginTop: -8, opacity: 0.8,
-                  }}>awaiting its owner...</p>
+                {/* 2026 — awaiting champion */}
+                <div style={{ flexShrink: 0, width: 200 }}>
+                  <div style={{
+                    background: `linear-gradient(135deg, ${C.green}, #004d35)`,
+                    borderRadius: 16, padding: "28px 20px",
+                    border: `2px solid ${C.yellow}`,
+                    boxShadow: `0 0 30px rgba(242,201,76,0.15), 0 8px 32px rgba(0,0,0,0.3)`,
+                    textAlign: "center",
+                  }}>
+                    <div style={{
+                      fontFamily: "'Playfair Display',Georgia,serif",
+                      fontSize: 42, fontWeight: 900, color: C.yellow,
+                      textShadow: "0 2px 8px rgba(0,0,0,0.3)",
+                    }}>2026</div>
+                    <div style={{
+                      width: 40, height: 2, background: C.yellow, margin: "10px auto",
+                      borderRadius: 1, opacity: 0.5,
+                    }} />
+                    <div style={{
+                      fontFamily: "'Cormorant Garamond',Georgia,serif",
+                      fontSize: 12, color: "#a8d5a8", letterSpacing: "0.2em",
+                      textTransform: "uppercase", marginBottom: 16,
+                    }}>Masters Champion</div>
+                    <div style={{
+                      fontFamily: "'Playfair Display',Georgia,serif",
+                      fontSize: 32, color: C.yellow, opacity: 0.4,
+                    }}>?</div>
+                    <div style={{
+                      marginTop: 16, padding: "8px 14px", borderRadius: 8,
+                      background: "rgba(0,0,0,0.2)", border: "1px solid rgba(255,255,255,0.1)",
+                      display: "inline-block",
+                    }}>
+                      <span style={{
+                        fontFamily: "Georgia,serif", fontSize: 11,
+                        color: C.yellow, fontStyle: "italic",
+                      }}>awaiting its owner</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -2394,4 +2337,4 @@ export default function App() {
       </footer>
     </div>
   );
-                }
+      }
