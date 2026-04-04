@@ -513,20 +513,49 @@ function PicksFlow({ onComplete, isLocked, existingEntry, allEntries }) {
   const handleSubmit = async () => {
     setSubmitting(true); setSubmitMsg("");
     const pickNames = getPickNames();
+    if (pickNames.length < 6) {
+      setSubmitMsg("⚠️ Please pick all 6 golfers before submitting");
+      setSubmitting(false);
+      return;
+    }
     const fullName = `${firstName.trim()} ${lastName.trim()}`;
+    const payload = {
+      action: "submit", email, teamName, firstName: firstName.trim(),
+      lastName: lastName.trim(), fullName,
+      picks: pickNames, winningScore: winScore,
+    };
     try {
+      // POST to Apps Script
       await fetch(SCRIPT_URL, {
         method: "POST", mode: "no-cors",
         headers: { "Content-Type": "text/plain" },
-        body: JSON.stringify({
-          action: "submit", email, teamName, firstName: firstName.trim(),
-          lastName: lastName.trim(), fullName,
-          picks: pickNames, winningScore: winScore,
-        }),
+        body: JSON.stringify(payload),
       });
-      setSubmitMsg("✅ Saved to Google Sheet!");
+      setSubmitMsg("✅ Submitting...");
+      
+      // Retry POST after 1 second for reliability
+      setTimeout(() => {
+        fetch(SCRIPT_URL, {
+          method: "POST", mode: "no-cors",
+          headers: { "Content-Type": "text/plain" },
+          body: JSON.stringify(payload),
+        }).catch(() => {});
+      }, 1000);
+      
+      // Verify it saved after 3 seconds
+      setTimeout(async () => {
+        try {
+          const check = await fetch(`${SCRIPT_URL}?email=${encodeURIComponent(email)}`);
+          const checkData = await check.json();
+          if (checkData.userEntry && checkData.userEntry.teamName === teamName) {
+            setSubmitMsg("✅ Entry saved!");
+          } else {
+            setSubmitMsg("⚠️ Verifying... check leaderboard in a moment");
+          }
+        } catch {}
+      }, 3000);
     } catch (e) {
-      setSubmitMsg("⚠️ Sheet POST may have failed — entry saved locally");
+      setSubmitMsg("⚠️ Connection issue — try again");
     }
     try {
       const raw = localStorage.getItem("pool-entries");
@@ -1934,14 +1963,38 @@ export default function App() {
     }
   }, [entries, espnGolfers, isLocked]);
 
+  // Refetch entries when switching to leaderboard
+  useEffect(() => {
+    if (view === "leaderboard") {
+      (async () => {
+        try {
+          const res = await fetch(SCRIPT_URL);
+          const data = await res.json();
+          if (data.success && data.entries) {
+            setEntries(data.entries.map(e => ({
+              name: e.teamName, email: e.email, picks: e.picks, winScore: e.winningScore, fullName: e.fullName || "",
+            })));
+          }
+        } catch {}
+      })();
+    }
+  }, [view]);
+
   const handleComplete = (data) => {
     setEntry(data);
+    // Match against masked email format from the sheet
+    const maskedEmail = data.email ? data.email.charAt(0) + "***@" + data.email.split("@")[1] : "";
     setEntries(prev => {
-      const idx = prev.findIndex(e => e.name === data.teamName || e.email === data.email);
+      const idx = prev.findIndex(e =>
+        e.name === data.teamName ||
+        e.email === data.email ||
+        e.email === maskedEmail
+      );
       const ne = { name: data.teamName, email: data.email, picks: data.picks, winScore: data.winScore, fullName: data.fullName };
       if (idx >= 0) { const u = [...prev]; u[idx] = ne; return u; }
       return [...prev, ne];
     });
+    // Refetch from sheet quickly to get ground truth
     setTimeout(async () => {
       try {
         const res = await fetch(SCRIPT_URL);
@@ -1952,7 +2005,7 @@ export default function App() {
           })));
         }
       } catch {}
-    }, 3000);
+    }, 4000);
     setView("confirmed");
   };
 
@@ -2337,4 +2390,4 @@ export default function App() {
       </footer>
     </div>
   );
-      }
+}
