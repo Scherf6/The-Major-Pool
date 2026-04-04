@@ -2277,75 +2277,82 @@ export default function App() {
 
                 {/* 2026 Jacket on wooden hanger */}
                 <div style={{ flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center" }}>
-                  <svg width="200" height="280" viewBox="0 0 200 280">
+                  <svg width="220" height="300" viewBox="0 0 220 300">
                     {/* Closet rod */}
-                    <rect x="0" y="0" width="200" height="8" rx="4" fill="#8B6914"/>
-                    <rect x="0" y="1" width="200" height="3" rx="2" fill="#A07818" opacity="0.6"/>
+                    <rect x="0" y="0" width="220" height="8" rx="4" fill="#8B6914"/>
+                    <rect x="0" y="1" width="220" height="3" rx="2" fill="#A07818" opacity="0.6"/>
                     
-                    {/* Hanger - wooden */}
-                    <path d="M100,8 L100,22" stroke="#5C4010" strokeWidth="3"/>
-                    {/* Hanger hook */}
-                    <path d="M100,8 C100,4 100,4 100,4" stroke="#888" strokeWidth="2"/>
-                    <path d="M97,5 C97,0 103,0 103,5" stroke="#999" strokeWidth="2" fill="none"/>
-                    {/* Wooden hanger body */}
-                    <path d="M45,35 Q70,22 100,22 Q130,22 155,35" stroke="#8B5E14" strokeWidth="8" fill="none" strokeLinecap="round"/>
-                    <path d="M45,35 Q70,22 100,22 Q130,22 155,35" stroke="#A07818" strokeWidth="5" fill="none" strokeLinecap="round"/>
-                    <path d="M48,33 Q70,23 100,23 Q130,23 152,33" stroke="#C49A28" strokeWidth="1.5" fill="none" strokeLinecap="round" opacity="0.5"/>
+                    {/* Hook */}
+                    <path d="M110,8 L110,18" stroke="#888" strokeWidth="2"/>
+                    <path d="M107,5 C107,-1 113,-1 113,5" stroke="#999" strokeWidth="2" fill="none"/>
+                    
+                    {/* Wooden hanger */}
+                    <path d="M40,38 Q75,20 110,20 Q145,20 180,38" stroke="#8B5E14" strokeWidth="9" fill="none" strokeLinecap="round"/>
+                    <path d="M40,38 Q75,20 110,20 Q145,20 180,38" stroke="#A07818" strokeWidth="5" fill="none" strokeLinecap="round"/>
+                    <path d="M44,36 Q75,22 110,22 Q145,22 176,36" stroke="#C49A28" strokeWidth="1.5" fill="none" strokeLinecap="round" opacity="0.5"/>
                     
                     {/* Name tag */}
-                    <rect x="72" y="28" width="56" height="22" rx="2" fill="#f5f0e0" stroke="#d4c9a8" strokeWidth="1"/>
-                    <text x="100" y="43" textAnchor="middle" fontFamily="Georgia,serif" fontSize="11" fontWeight="700" fill="#333">2026</text>
+                    <rect x="82" y="26" width="56" height="22" rx="2" fill="#f5f0e0" stroke="#d4c9a8" strokeWidth="1"/>
+                    <text x="110" y="41" textAnchor="middle" fontFamily="Georgia,serif" fontSize="11" fontWeight="700" fill="#333">2026</text>
                     
-                    {/* Jacket body - left side */}
-                    <path d="M45,35 L28,55 L22,240 Q22,255 35,258 L88,258 L88,65 Z" 
-                      fill="url(#jacketGreen)" stroke="rgba(0,0,0,0.15)" strokeWidth="0.5"/>
-                    {/* Jacket body - right side */}
-                    <path d="M155,35 L172,55 L178,240 Q178,255 165,258 L112,258 L112,65 Z" 
-                      fill="url(#jacketGreen)" stroke="rgba(0,0,0,0.15)" strokeWidth="0.5"/>
+                    {/* Left arm hanging down */}
+                    <path d="M40,38 L18,65 L8,180 L12,185 L30,185 L38,80 Z" 
+                      fill="url(#jGreen)" stroke="rgba(0,0,0,0.12)" strokeWidth="0.5"/>
+                    {/* Left arm fold shadow */}
+                    <path d="M18,65 L25,70 L30,185 L22,183" fill="rgba(0,0,0,0.08)"/>
                     
-                    {/* Left lapel */}
-                    <path d="M88,50 L100,30 L100,90 L92,95 Z" fill="url(#jacketDark)" stroke="rgba(0,0,0,0.1)" strokeWidth="0.5"/>
-                    {/* Right lapel */}
-                    <path d="M112,50 L100,30 L100,90 L108,95 Z" fill="url(#jacketDark)" stroke="rgba(0,0,0,0.1)" strokeWidth="0.5"/>
-                    {/* Center seam */}
-                    <line x1="100" y1="90" x2="100" y2="258" stroke="rgba(0,0,0,0.08)" strokeWidth="1"/>
+                    {/* Right arm hanging down */}
+                    <path d="M180,38 L202,65 L212,180 L208,185 L190,185 L182,80 Z" 
+                      fill="url(#jGreen)" stroke="rgba(0,0,0,0.12)" strokeWidth="0.5"/>
+                    {/* Right arm fold shadow */}
+                    <path d="M202,65 L195,70 L190,185 L198,183" fill="rgba(0,0,0,0.08)"/>
                     
-                    {/* Buttons */}
-                    <circle cx="100" cy="110" r="3.5" fill="#c4a335" stroke="#a08520" strokeWidth="0.5"/>
-                    <circle cx="100" cy="140" r="3.5" fill="#c4a335" stroke="#a08520" strokeWidth="0.5"/>
-                    <circle cx="100" cy="170" r="3.5" fill="#c4a335" stroke="#a08520" strokeWidth="0.5"/>
+                    {/* Jacket body - left */}
+                    <path d="M40,38 L38,55 L32,260 Q32,272 42,272 L95,272 L95,55 Z" 
+                      fill="url(#jGreen)" stroke="rgba(0,0,0,0.1)" strokeWidth="0.5"/>
+                    {/* Jacket body - right */}
+                    <path d="M180,38 L182,55 L188,260 Q188,272 178,272 L125,272 L125,55 Z" 
+                      fill="url(#jGreen)" stroke="rgba(0,0,0,0.1)" strokeWidth="0.5"/>
                     
-                    {/* Breast pocket */}
-                    <path d="M108,105 L130,105 L130,107" stroke="rgba(0,0,0,0.1)" strokeWidth="1" fill="none"/>
+                    {/* Inner lining visible (jacket open) */}
+                    <path d="M95,55 L110,35 L125,55 L125,272 L95,272 Z" fill="#1a3a2a"/>
+                    {/* Inner label */}
+                    <rect x="98" y="62" width="24" height="14" rx="1" fill="#f5f0d0" opacity="0.4"/>
                     
-                    {/* Augusta National patch */}
-                    <rect x="60" y="150" width="34" height="44" rx="3" fill="rgba(0,0,0,0.2)" stroke="#c4a335" strokeWidth="0.8"/>
-                    <text x="77" y="168" textAnchor="middle" fontFamily="'Playfair Display',Georgia,serif" fontSize="12" fontWeight="900" fill="#c4a335">2026</text>
-                    <text x="77" y="180" textAnchor="middle" fontFamily="Georgia,serif" fontSize="5" fill="#a8d5a8" letterSpacing="1">MASTERS</text>
-                    <text x="77" y="188" textAnchor="middle" fontFamily="Georgia,serif" fontSize="4.5" fill="#a8d5a8" letterSpacing="0.8">CHAMPION</text>
+                    {/* Left lapel - folded open */}
+                    <path d="M95,55 L110,35 L105,95 L82,100 L75,58 Z" fill="url(#jGreenLight)" stroke="rgba(0,0,0,0.08)" strokeWidth="0.5"/>
+                    {/* Right lapel - folded open */}
+                    <path d="M125,55 L110,35 L115,95 L138,100 L145,58 Z" fill="url(#jGreenLight)" stroke="rgba(0,0,0,0.08)" strokeWidth="0.5"/>
                     
-                    {/* Fabric texture lines */}
-                    <line x1="40" y1="80" x2="85" y2="75" stroke="rgba(255,255,255,0.03)" strokeWidth="0.5"/>
-                    <line x1="115" y1="75" x2="165" y2="80" stroke="rgba(255,255,255,0.03)" strokeWidth="0.5"/>
-                    <line x1="35" y1="120" x2="85" y2="115" stroke="rgba(255,255,255,0.02)" strokeWidth="0.5"/>
-                    <line x1="115" y1="115" x2="170" y2="120" stroke="rgba(255,255,255,0.02)" strokeWidth="0.5"/>
-
+                    {/* Buttons - on right panel */}
+                    <circle cx="125" cy="120" r="3" fill="#c4a335" stroke="#a08520" strokeWidth="0.5"/>
+                    <circle cx="125" cy="150" r="3" fill="#c4a335" stroke="#a08520" strokeWidth="0.5"/>
+                    <circle cx="125" cy="180" r="3" fill="#c4a335" stroke="#a08520" strokeWidth="0.5"/>
+                    
+                    {/* Breast pocket on right */}
+                    <path d="M130,108 L155,108 L155,110" stroke="rgba(0,0,0,0.1)" strokeWidth="1" fill="none"/>
+                    
+                    {/* Patch - centered on left chest */}
+                    <rect x="52" y="135" width="38" height="48" rx="3" fill="rgba(0,0,0,0.2)" stroke="#c4a335" strokeWidth="0.8"/>
+                    <text x="71" y="156" textAnchor="middle" fontFamily="'Playfair Display',Georgia,serif" fontSize="14" fontWeight="900" fill="#c4a335">2026</text>
+                    <text x="71" y="168" textAnchor="middle" fontFamily="Georgia,serif" fontSize="5.5" fill="#a8d5a8" letterSpacing="1">MASTERS</text>
+                    <text x="71" y="176" textAnchor="middle" fontFamily="Georgia,serif" fontSize="5" fill="#a8d5a8" letterSpacing="0.8">CHAMPION</text>
+                    
                     <defs>
-                      <linearGradient id="jacketGreen" x1="0" y1="0" x2="1" y2="1">
+                      <linearGradient id="jGreen" x1="0" y1="0" x2="1" y2="1">
                         <stop offset="0%" stopColor="#1a6b44"/>
-                        <stop offset="30%" stopColor="#006747"/>
-                        <stop offset="70%" stopColor="#005538"/>
-                        <stop offset="100%" stopColor="#004028"/>
+                        <stop offset="40%" stopColor="#006747"/>
+                        <stop offset="100%" stopColor="#004d35"/>
                       </linearGradient>
-                      <linearGradient id="jacketDark" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#004d35"/>
-                        <stop offset="100%" stopColor="#003825"/>
+                      <linearGradient id="jGreenLight" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stopColor="#1f7a50"/>
+                        <stop offset="100%" stopColor="#006747"/>
                       </linearGradient>
                     </defs>
                   </svg>
                   <p style={{
                     fontFamily: "Georgia,serif", fontSize: 13, color: C.yellow,
-                    fontStyle: "italic", marginTop: -4, opacity: 0.8,
+                    fontStyle: "italic", marginTop: -8, opacity: 0.8,
                   }}>awaiting its owner...</p>
                 </div>
               </div>
