@@ -851,32 +851,21 @@ function Confirmation({ entry, onLeaderboard, onEdit }) {
 function Leaderboard({ entries, isLocked, loading }) {
   const [expanded, setExpanded] = useState(null);
 
-  // Board colors — clean white like masters.com
   const B = {
-    bg: "#f5f1e8",
-    board: "#ffffff",
-    headerBg: C.green,
-    border: "#d4cdb8",
-    text: "#1a1a1a",
-    yellow: C.yellow,
-    red: "#c62828",
-    green: C.green,
-    white: "#fff",
-    muted: "#8b7355",
-    rowEven: "#fafaf5",
-    rowOdd: "#ffffff",
+    bg: "#f5f1e8", board: "#ffffff", headerBg: C.green,
+    border: "#d4cdb8", text: "#1a1a1a", yellow: C.yellow,
+    red: "#c62828", green: C.green, white: "#fff",
+    muted: "#8b7355", rowEven: "#fafaf5", rowOdd: "#ffffff",
   };
 
   return (
     <div style={{ minHeight: "100vh", background: B.bg, padding: "24px 12px" }}>
-      <div style={{ maxWidth: 860, margin: "0 auto" }}>
+      <div style={{ maxWidth: 700, margin: "0 auto" }}>
 
-        {/* Classic "LEADERS" header */}
+        {/* LEADERS header */}
         <div style={{
-          textAlign: "center", marginBottom: 0,
-          padding: "20px 20px 16px",
-          background: B.headerBg,
-          borderRadius: "8px 8px 0 0",
+          textAlign: "center", padding: "20px 20px 16px",
+          background: B.headerBg, borderRadius: "8px 8px 0 0",
         }}>
           <h2 style={{
             fontFamily: "'Playfair Display',Georgia,serif",
@@ -894,139 +883,110 @@ function Leaderboard({ entries, isLocked, loading }) {
           )}
         </div>
 
-        {/* Scoreboard */}
-        <div className="pool-board" style={{ background: B.board, borderRadius: "0 0 8px 8px",
+        {/* Scoreboard — simple 3-column layout */}
+        <div style={{
+          background: B.board, borderRadius: "0 0 8px 8px",
           overflow: "hidden", boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
           border: `1px solid ${B.border}`,
         }}>
           {/* Column headers */}
           <div style={{
-            display: "grid",
-            gridTemplateColumns: "44px minmax(160px, 2fr) 60px repeat(6, 1fr)",
-            borderBottom: `2px solid ${B.green}`,
-            background: "#f0ebe0",
+            display: "grid", gridTemplateColumns: "50px 1fr 70px",
+            borderBottom: `2px solid ${B.green}`, background: "#f0ebe0",
           }}>
-            {["POS", "TEAM", "TOTAL",
-              ...(isLocked ? ["PICK 1", "PICK 2", "PICK 3", "PICK 4", "PICK 5", "PICK 6"]
-                           : ["", "", "", "", "", ""])
-            ].map((h, i) => (
-              <div key={h+i} style={{
-                padding: "8px 4px", textAlign: "center",
-                fontFamily: "Georgia,serif", fontSize: 9,
+            {["POS", "TEAM", "TOTAL"].map((h, i) => (
+              <div key={h} style={{
+                padding: "10px 6px", textAlign: i === 1 ? "left" : "center",
+                fontFamily: "Georgia,serif", fontSize: 11,
                 fontWeight: 700, letterSpacing: "0.1em",
                 color: B.green, textTransform: "uppercase",
-                borderRight: i < 8 ? `1px solid ${B.border}` : "none",
+                borderRight: i < 2 ? `1px solid ${B.border}` : "none",
               }}>{h}</div>
             ))}
           </div>
 
           {/* Rows */}
           {entries.map((e, i) => {
-            const isExpanded = expanded === i;
+            const isExp = expanded === i;
             return (
               <div key={i}>
-                <div onClick={() => setExpanded(isExpanded ? null : i)}
+                <div onClick={() => setExpanded(isExp ? null : i)}
                   style={{
-                    display: "grid",
-                    gridTemplateColumns: "44px minmax(160px, 2fr) 60px repeat(6, 1fr)",
+                    display: "grid", gridTemplateColumns: "50px 1fr 70px",
                     borderBottom: `1px solid ${B.border}`,
-                    background: i % 2 === 0 ? B.rowEven : B.rowOdd,
-                    cursor: "pointer",
-                    transition: "background 0.15s",
-                  }}
-                  onMouseEnter={ev => ev.currentTarget.style.background = "#f0ebe0"}
-                  onMouseLeave={ev => ev.currentTarget.style.background = i % 2 === 0 ? B.rowEven : B.rowOdd}
-                >
+                    background: isExp ? "#f0ebe0" : (i % 2 === 0 ? B.rowEven : B.rowOdd),
+                    cursor: "pointer", transition: "background 0.15s",
+                  }}>
                   {/* Position */}
                   <div style={{
-                    padding: "10px 4px", textAlign: "center",
+                    padding: "12px 6px", textAlign: "center",
                     fontFamily: "'Playfair Display',Georgia,serif",
-                    fontSize: 16, fontWeight: 700,
-                    color: i === 0 ? B.green : i < 3 ? B.green : B.muted,
+                    fontSize: 18, fontWeight: 700,
+                    color: i < 3 ? B.green : B.muted,
                     borderRight: `1px solid ${B.border}`,
                   }}>{i + 1}</div>
 
-                  {/* Team name */}
+                  {/* Team name + person */}
                   <div style={{
-                    padding: "8px 10px",
+                    padding: "10px 12px",
                     borderRight: `1px solid ${B.border}`,
-                    overflow: "hidden",
                   }}>
                     <div style={{
-                      fontFamily: "Georgia,serif", fontSize: 14, fontWeight: 700,
+                      fontFamily: "Georgia,serif", fontSize: 15, fontWeight: 700,
                       color: B.text, textTransform: "uppercase",
-                      letterSpacing: "0.04em",
-                      whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
+                      letterSpacing: "0.02em", lineHeight: 1.2,
                     }}>{e.name}</div>
                     <div style={{
-                      fontFamily: "Georgia,serif", fontSize: 10,
-                      color: B.muted, marginTop: 1,
-                    }}>{e.fullName || ""}</div>
+                      fontFamily: "Georgia,serif", fontSize: 11,
+                      color: B.muted, marginTop: 2,
+                    }}>
+                      {e.fullName || ""}
+                      {!isLocked && " · 🔒"}
+                      {isLocked && !isExp && " · tap for picks"}
+                    </div>
                   </div>
 
                   {/* Total score */}
                   <div style={{
-                    padding: "10px 4px", textAlign: "center",
+                    padding: "12px 6px", textAlign: "center",
                     fontFamily: "'Playfair Display',Georgia,serif",
-                    fontSize: 18, fontWeight: 900,
+                    fontSize: 20, fontWeight: 900,
                     color: isLocked
                       ? (e.totalScore < 0 ? B.red : e.totalScore > 0 ? B.green : B.text)
                       : B.muted,
-                    borderRight: `1px solid ${B.border}`,
                   }}>
                     {isLocked ? (e.totalScore != null ? (e.totalScore < 0 ? e.totalScore : e.totalScore > 0 ? `+${e.totalScore}` : "E") : "—") : "—"}
                   </div>
-
-                  {/* 6 golfer picks — hidden until locked */}
-                  {(e.picks || []).concat(Array(6).fill("")).slice(0, 6).map((p, j) => {
-                    const lastName = p ? p.split(" ").pop() : "";
-                    return (
-                      <div key={j} style={{
-                        padding: "8px 3px", textAlign: "center",
-                        borderRight: j < 5 ? `1px solid ${B.border}` : "none",
-                        display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-                      }}>
-                        <span style={{
-                          fontFamily: "Georgia,serif", fontSize: isLocked ? 10 : 14,
-                          color: isLocked ? B.green : B.border,
-                          textTransform: "uppercase",
-                          letterSpacing: "0.02em",
-                          whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
-                          maxWidth: "100%",
-                        }}>{isLocked ? lastName : "🔒"}</span>
-                      </div>
-                    );
-                  })}
                 </div>
 
-                {/* Expanded detail row — only after lock */}
-                {isExpanded && (
+                {/* Expanded picks row */}
+                {isExp && (
                   <div style={{
-                    padding: "10px 16px",
+                    padding: "12px 16px",
                     background: "#f0ebe0",
                     borderBottom: `1px solid ${B.border}`,
                   }}>
                     {isLocked ? (
                       <>
+                        <p style={{ fontFamily: "Georgia,serif", fontSize: 11, color: B.muted,
+                          margin: "0 0 8px", textTransform: "uppercase", letterSpacing: "0.08em" }}>Golfers</p>
                         <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
                           {(e.picks || []).map((p, j) => (
                             <span key={j} style={{
-                              fontFamily: "Georgia,serif", fontSize: 11,
-                              padding: "3px 8px", borderRadius: 4,
-                              background: B.white,
-                              color: B.green, border: `1px solid ${B.border}`,
-                              fontWeight: 600,
+                              fontFamily: "Georgia,serif", fontSize: 13,
+                              padding: "4px 10px", borderRadius: 6,
+                              background: B.white, color: B.green,
+                              border: `1px solid ${B.border}`, fontWeight: 600,
                             }}>{p}</span>
                           ))}
                         </div>
                         <p style={{
-                          fontFamily: "Georgia,serif", fontSize: 11, color: B.muted,
-                          marginTop: 6,
-                        }}>Predicted winner: {e.winScore} · Best 4 of 6 scores count</p>
+                          fontFamily: "Georgia,serif", fontSize: 11, color: B.muted, marginTop: 8,
+                        }}>Predicted winning score: {e.winScore} · Best 4 of 6 count</p>
                       </>
                     ) : (
                       <p style={{
-                        fontFamily: "Georgia,serif", fontSize: 12, color: B.green,
+                        fontFamily: "Georgia,serif", fontSize: 13, color: B.green,
                         margin: 0, textAlign: "center", fontWeight: 600,
                       }}>🔒 Picks are hidden until the tournament starts</p>
                     )}
@@ -1049,7 +1009,7 @@ function Leaderboard({ entries, isLocked, loading }) {
           <p style={{ fontFamily: "Georgia,serif", fontSize: 11, color: B.muted }}>
             📡 <a href={`https://www.espn.com/golf/leaderboard/_/tournamentId/${T.espnId}`}
               target="_blank" rel="noopener" style={{ color: B.green }}>ESPN Leaderboard</a>
-            {" · "}{isLocked ? "Tap a row to see full picks" : "🔒 Picks hidden until first tee"}
+            {" · "}{isLocked ? "Tap a row to see picks" : "🔒 Picks hidden until first tee"}
           </p>
         </div>
       </div>
@@ -1659,4 +1619,4 @@ export default function App() {
       </footer>
     </div>
   );
-                     }
+                          }
