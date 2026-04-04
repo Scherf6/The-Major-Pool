@@ -519,43 +519,33 @@ function PicksFlow({ onComplete, isLocked, existingEntry, allEntries }) {
       return;
     }
     const fullName = `${firstName.trim()} ${lastName.trim()}`;
-    const payload = {
-      action: "submit", email, teamName, firstName: firstName.trim(),
-      lastName: lastName.trim(), fullName,
-      picks: pickNames, winningScore: winScore,
-    };
     try {
-      // POST to Apps Script
-      await fetch(SCRIPT_URL, {
-        method: "POST", mode: "no-cors",
-        headers: { "Content-Type": "text/plain" },
-        body: JSON.stringify(payload),
+      // Use GET-based submit — reliable with Google Apps Script (no CORS/redirect issues)
+      const params = new URLSearchParams({
+        mode: "submit",
+        email,
+        teamName,
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        winningScore: String(winScore),
+        pick1: pickNames[0] || "",
+        pick2: pickNames[1] || "",
+        pick3: pickNames[2] || "",
+        pick4: pickNames[3] || "",
+        pick5: pickNames[4] || "",
+        pick6: pickNames[5] || "",
       });
-      setSubmitMsg("✅ Submitting...");
-      
-      // Retry POST after 1 second for reliability
-      setTimeout(() => {
-        fetch(SCRIPT_URL, {
-          method: "POST", mode: "no-cors",
-          headers: { "Content-Type": "text/plain" },
-          body: JSON.stringify(payload),
-        }).catch(() => {});
-      }, 1000);
-      
-      // Verify it saved after 3 seconds
-      setTimeout(async () => {
-        try {
-          const check = await fetch(`${SCRIPT_URL}?email=${encodeURIComponent(email)}`);
-          const checkData = await check.json();
-          if (checkData.userEntry && checkData.userEntry.teamName === teamName) {
-            setSubmitMsg("✅ Entry saved!");
-          } else {
-            setSubmitMsg("⚠️ Verifying... check leaderboard in a moment");
-          }
-        } catch {}
-      }, 3000);
+      const res = await fetch(`${SCRIPT_URL}?${params.toString()}`);
+      const data = await res.json();
+      if (data.success) {
+        setSubmitMsg("✅ Entry saved!");
+      } else {
+        setSubmitMsg("⚠️ " + (data.error || "Save failed — try again"));
+      }
     } catch (e) {
       setSubmitMsg("⚠️ Connection issue — try again");
+      setSubmitting(false);
+      return;
     }
     try {
       const raw = localStorage.getItem("pool-entries");
