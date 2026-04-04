@@ -2260,9 +2260,68 @@ export default function App() {
               ))}
 
               <p style={{
-                fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 13,
-                color: "#5a8a5a", marginTop: 20, fontStyle: "italic",
+                fontFamily: "'Playfair Display',Georgia,serif", fontSize: 16,
+                color: C.yellow, marginTop: 20, fontWeight: 700,
               }}>Will your name be next on the wall?</p>
+            </div>
+
+            {/* 2026 Green Jacket — waiting to be presented */}
+            <div style={{
+              position: "relative", width: 200, margin: "0 auto", marginTop: -20,
+              display: "flex", flexDirection: "column", alignItems: "center",
+            }}>
+              {/* Jacket shape */}
+              <div style={{
+                width: 160, height: 190, borderRadius: "12px 12px 40px 40px",
+                background: `linear-gradient(170deg, ${C.green} 0%, #004d35 60%, ${C.dark} 100%)`,
+                border: `3px solid ${C.yellow}40`,
+                boxShadow: "0 8px 32px rgba(0,0,0,0.4), inset 0 2px 0 rgba(255,255,255,0.1)",
+                position: "relative",
+                display: "flex", flexDirection: "column", alignItems: "center",
+                justifyContent: "center",
+              }}>
+                {/* Lapel lines */}
+                <div style={{
+                  position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)",
+                  width: 0, height: 0,
+                  borderLeft: "30px solid transparent", borderRight: "30px solid transparent",
+                  borderTop: `35px solid ${C.dark}`,
+                }} />
+                {/* Collar notch */}
+                <div style={{
+                  position: "absolute", top: 30, left: "50%", transform: "translateX(-50%)",
+                  width: 8, height: 8, borderRadius: "50%",
+                  background: C.yellow, boxShadow: `0 0 6px ${C.yellow}60`,
+                }} />
+                {/* Patch */}
+                <div style={{
+                  marginTop: 20, padding: "10px 16px", borderRadius: 6,
+                  background: "rgba(0,0,0,0.3)", border: `1px solid ${C.yellow}50`,
+                  textAlign: "center",
+                }}>
+                  <div style={{
+                    fontFamily: "'Playfair Display',Georgia,serif",
+                    fontSize: 24, fontWeight: 900, color: C.yellow,
+                    letterSpacing: "0.1em",
+                    textShadow: "0 1px 4px rgba(0,0,0,0.4)",
+                  }}>2026</div>
+                  <div style={{
+                    fontFamily: "'Cormorant Garamond',Georgia,serif",
+                    fontSize: 10, color: "#a8d5a8", letterSpacing: "0.15em",
+                    textTransform: "uppercase", marginTop: 2,
+                  }}>Masters Champion</div>
+                </div>
+              </div>
+              {/* Hanger */}
+              <div style={{
+                width: 80, height: 4, borderRadius: 2,
+                background: `linear-gradient(90deg, transparent, ${C.yellow}60, transparent)`,
+                position: "absolute", top: -8,
+              }} />
+              <p style={{
+                fontFamily: "Georgia,serif", fontSize: 12, color: "#5a8a5a",
+                fontStyle: "italic", marginTop: 12,
+              }}>awaiting its owner...</p>
             </div>
           </div>
         </>
