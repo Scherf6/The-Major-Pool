@@ -327,6 +327,22 @@ function Hero({ onStart, setView }) {
             textDecoration: "underline", textUnderlineOffset: 3,
           }}>⛳ Live Tournament</button>
         </div>
+
+        {/* Share button */}
+        <button onClick={() => {
+          const url = window.location.href;
+          const text = `Join my Masters Pool! Pick 6 golfers, best 4 scores win. ${url}`;
+          if (navigator.share) {
+            navigator.share({ title: "Masters Pool 2026", text, url }).catch(() => {});
+          } else {
+            navigator.clipboard.writeText(text).then(() => alert("Link copied! Paste it in a text."));
+          }
+        }} style={{
+          marginTop: 14, padding: "10px 24px", borderRadius: 20,
+          background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.25)",
+          color: "#fff", fontFamily: "Georgia,serif", fontSize: 14,
+          cursor: "pointer", display: "flex", alignItems: "center", gap: 8,
+        }}>📤 Invite Your Friends</button>
       </div>
     </div>
   );
@@ -398,30 +414,60 @@ function PicksFlow({ onComplete, isLocked, existingEntry, allEntries }) {
     });
   };
 
-  const generateNames = async () => {
+  const generateNames = () => {
     setGenerating(true);
-    try {
-      const theme = MODE === "masters"
-        ? "Masters golf, Augusta National, azaleas, pimento cheese, green jackets, Amen Corner"
-        : "Valero Texas Open, TPC San Antonio, Texas BBQ, the Alamo, cowboys";
-      const ideasPart = nameIdeas.trim()
-        ? ` The user wants names inspired by these ideas: "${nameIdeas.trim()}".`
-        : "";
-      const res = await fetch("https://api.anthropic.com/v1/messages", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: "claude-sonnet-4-20250514", max_tokens: 1000,
-          messages: [{ role: "user", content: `Generate 6 funny golf team names themed around: ${theme}.${ideasPart} Short (2-4 words), witty. Return ONLY a JSON array of strings.` }],
-        }),
+    const ideas = nameIdeas.trim().toLowerCase();
+    
+    // Masters-themed word banks
+    const prefixes = ["Amen Corner","Augusta","Azalea","Butler Cabin","Magnolia Lane","Rae's Creek",
+      "Green Jacket","Pimento","Dogwood","Golden Bell","Hogan's","Sunday","Amen","Birdie","Eagle",
+      "Bogey","Masters","Pine","Fairway","Clubhouse","Back Nine","Front Nine","Iron","Wedge"];
+    const suffixes = ["Aces","Assassins","Bandits","Crushers","Legends","Maniacs","Monsters",
+      "Pounders","Pushers","Swingers","Warriors","Wizards","Chasers","Hunters","Squad","Crew",
+      "Gang","Posse","Mafia","Mob","Club","Society"];
+    const food = ["Pimento Cheese","Egg Salad","Azalea Cocktail","Turkey Sandwich","BBQ"];
+    const golfers = ["Tiger's","Arnie's","Jack's","Rory's","Scottie's","Freddie's","Phil's","Bubba's"];
+    
+    const results = [];
+    const used = new Set();
+    
+    const addUnique = (name) => {
+      const key = name.toLowerCase();
+      if (!used.has(key) && results.length < 6) { used.add(key); results.push(name); }
+    };
+    
+    // If user gave ideas, weave them in
+    if (ideas) {
+      const words = ideas.split(/[\s,]+/).filter(w => w.length > 1);
+      const cap = w => w.charAt(0).toUpperCase() + w.slice(1);
+      words.forEach(w => {
+        const W = cap(w);
+        addUnique(`${W} ${suffixes[Math.floor(Math.random() * suffixes.length)]}`);
+        addUnique(`Augusta ${W}s`);
+        addUnique(`The ${W} Masters`);
+        addUnique(`${W} at Amen Corner`);
+        addUnique(`Green Jacket ${W}s`);
+        addUnique(`${W} & Pimento`);
+        addUnique(`Magnolia ${W}s`);
+        addUnique(`${golfers[Math.floor(Math.random() * golfers.length)]} ${W}s`);
       });
-      const data = await res.json();
-      const text = data.content.map(i => i.text || "").join("");
-      setGenNames(JSON.parse(text.replace(/```json|```/g, "").trim()));
-    } catch {
-      setGenNames(MODE === "masters"
-        ? ["Amen Corner Aces","Pimento Pushers","Azalea Assassins","Green Jacket Envy","Rae's Creek Monsters","Magnolia Legends"]
-        : ["Alamo Aces","BBQ Birdies","Texas Tee Party","Longhorn Loopers","River Walk Rollers","San Antonio Swingers"]);
     }
+    
+    // Fill remaining slots with random combos
+    while (results.length < 6) {
+      const r = Math.random();
+      if (r < 0.3) {
+        addUnique(`${prefixes[Math.floor(Math.random() * prefixes.length)]} ${suffixes[Math.floor(Math.random() * suffixes.length)]}`);
+      } else if (r < 0.5) {
+        addUnique(`The ${food[Math.floor(Math.random() * food.length)]} ${suffixes[Math.floor(Math.random() * suffixes.length)]}`);
+      } else if (r < 0.7) {
+        addUnique(`${golfers[Math.floor(Math.random() * golfers.length)]} ${suffixes[Math.floor(Math.random() * suffixes.length)]}`);
+      } else {
+        addUnique(`${prefixes[Math.floor(Math.random() * prefixes.length)]} ${["Vibes","Energy","Szn","Mode","Dreams","Party"][Math.floor(Math.random() * 6)]}`);
+      }
+    }
+    
+    setGenNames(results.slice(0, 6));
     setGenerating(false);
   };
 
@@ -614,7 +660,7 @@ function PicksFlow({ onComplete, isLocked, existingEntry, allEntries }) {
                   background: C.green, color: "#fff", fontFamily: "Georgia,serif",
                   fontSize: 13, cursor: "pointer", marginTop: 8,
                   display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
-                {generating ? "⏳ Generating..." : "✨ Generate Names"}
+                {generating ? "⏳ Generating..." : genNames.length > 0 ? "🔄 Generate More" : "✨ Generate Names"}
               </button>
             </div>
             {genNames.length > 0 && (
@@ -843,6 +889,22 @@ function Confirmation({ entry, onLeaderboard, onEdit }) {
           <p style={{ fontFamily: "Georgia,serif", fontSize: 11, color: "#a8d4ff", marginTop: 8, margin: "8px 0 0" }}>
             Scan to pay · Include your team name in the note</p>
         </div>
+
+        {/* Share with friends */}
+        <button onClick={() => {
+          const url = window.location.href;
+          const text = `I just joined the Masters Pool 2026! Join before Thursday and pick your team: ${url}`;
+          if (navigator.share) {
+            navigator.share({ title: "Masters Pool 2026", text, url }).catch(() => {});
+          } else {
+            navigator.clipboard.writeText(text).then(() => alert("Link copied! Paste it in a text."));
+          }
+        }} style={{
+          marginTop: 16, width: "100%", padding: "12px", borderRadius: 8,
+          background: C.green, border: "none", color: "#fff",
+          fontFamily: "Georgia,serif", fontSize: 15, cursor: "pointer",
+          display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+        }}>📤 Invite Friends to Join</button>
       </div>
     </div>
   );
@@ -924,7 +986,7 @@ function Leaderboard({ entries, isLocked, loading }) {
                     fontSize: 18, fontWeight: 700,
                     color: i < 3 ? B.green : B.muted,
                     borderRight: `1px solid ${B.border}`,
-                  }}>{i + 1}</div>
+                  }}>{i === 0 ? "🧥" : i === 1 ? "🥈" : i === 2 ? "🥉" : i + 1}</div>
 
                   {/* Team name + person */}
                   <div style={{
@@ -1549,6 +1611,7 @@ export default function App() {
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-thumb { background: ${C.sand}; border-radius: 4px; }
         @keyframes greetFade { 0% { opacity: 0; transform: scale(0.9); } 15% { opacity: 1; transform: scale(1); } 80% { opacity: 1; } 100% { opacity: 0; transform: scale(1.02); } }
+        @keyframes jacketGlow { 0%,100% { text-shadow: 0 0 8px rgba(0,103,71,0.3); } 50% { text-shadow: 0 0 20px rgba(0,103,71,0.6), 0 0 40px rgba(242,201,76,0.3); } }
         @media (max-width: 700px) {
           .pool-board { overflow-x: auto; -webkit-overflow-scrolling: touch; }
           .pool-board > div { min-width: 700px; }
@@ -1598,6 +1661,86 @@ export default function App() {
       {view === "home" && (
         <>
           <Hero onStart={() => setView("picks")} setView={setView} />
+          
+          {/* Rules & Prizes */}
+          <div style={{
+            background: C.cream, padding: "48px 20px",
+            borderTop: `3px solid ${C.green}`,
+          }}>
+            <div style={{ maxWidth: 700, margin: "0 auto" }}>
+              <h3 style={{
+                fontFamily: "'Playfair Display',Georgia,serif", fontSize: 28,
+                color: C.green, textAlign: "center", margin: "0 0 4px",
+              }}>📋 Rules & Prizes</h3>
+              <p style={{
+                fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 14,
+                color: "#8b7355", textAlign: "center", margin: "0 0 28px",
+                letterSpacing: "0.1em", textTransform: "uppercase",
+              }}>How the pool works</p>
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}
+                className="masters-panels">
+                {/* How to Play */}
+                <div style={{
+                  background: "#fff", borderRadius: 12, padding: "24px 20px",
+                  border: `1px solid ${C.sand}`, boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+                }}>
+                  <h4 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 18,
+                    color: C.green, margin: "0 0 14px" }}>🏌️ How to Play</h4>
+                  {[
+                    ["Pick 6 golfers", "1 from each of 4 tiers + 2 from The Field"],
+                    ["Best 4 count", "Only your 4 lowest-scoring golfers matter"],
+                    ["Cut golfers", "Get a score of 80 for rounds 3 & 4"],
+                    ["Lowest total wins", "4-round combined score of your best 4"],
+                    ["Tiebreaker", "Closest predicted winning score wins"],
+                    ["Edit anytime", "Change picks until 1 min before first tee"],
+                  ].map(([title, desc], i) => (
+                    <div key={i} style={{ marginBottom: 10 }}>
+                      <span style={{ fontFamily: "Georgia,serif", fontSize: 14, fontWeight: 700,
+                        color: C.dark }}>{title}</span>
+                      <span style={{ fontFamily: "Georgia,serif", fontSize: 13, color: "#8b7355",
+                        marginLeft: 6 }}>— {desc}</span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Entry Fees & Prizes */}
+                <div style={{
+                  background: "#fff", borderRadius: 12, padding: "24px 20px",
+                  border: `1px solid ${C.sand}`, boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+                }}>
+                  <h4 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 18,
+                    color: C.green, margin: "0 0 14px" }}>💰 Entry Fees</h4>
+                  <div style={{
+                    background: `${C.green}08`, borderRadius: 8, padding: "16px",
+                    marginBottom: 14,
+                  }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
+                      <span style={{ fontFamily: "Georgia,serif", fontSize: 15, color: C.dark }}>1st Entry</span>
+                      <span style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 20,
+                        fontWeight: 700, color: C.green }}>$15</span>
+                    </div>
+                    <div style={{ display: "flex", justifyContent: "space-between" }}>
+                      <span style={{ fontFamily: "Georgia,serif", fontSize: 15, color: C.dark }}>2nd Entry</span>
+                      <span style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 20,
+                        fontWeight: 700, color: C.green }}>$10</span>
+                    </div>
+                  </div>
+                  <p style={{ fontFamily: "Georgia,serif", fontSize: 13, color: "#8b7355", lineHeight: 1.5 }}>
+                    Pay via Venmo <strong>@ande-scherf</strong>. Include your team name in the note.
+                    Payout structure announced before Thursday based on total entries.
+                  </p>
+                  <a href="https://venmo.com/ande-scherf" target="_blank" rel="noopener" style={{
+                    display: "block", marginTop: 12, padding: "10px", borderRadius: 8,
+                    background: "#008CFF", color: "#fff", textAlign: "center",
+                    fontFamily: "Georgia,serif", fontSize: 14, fontWeight: 600,
+                    textDecoration: "none",
+                  }}>💳 Pay on Venmo</a>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <MastersExperience />
         </>
       )}
@@ -1619,4 +1762,4 @@ export default function App() {
       </footer>
     </div>
   );
-                          }
+}
