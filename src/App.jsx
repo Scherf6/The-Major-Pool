@@ -1489,6 +1489,35 @@ function MastersExperience() {
                 color: C.yellow, margin: 0 }}>🌺 The Azalea</h4>
             </div>
             <div style={{ padding: "18px 18px", flex: 1 }}>
+              {/* Cocktail illustration */}
+              <div style={{ textAlign: "center", marginBottom: 12 }}>
+                <svg width="80" height="100" viewBox="0 0 80 100" style={{ display: "inline-block" }}>
+                  {/* Glass */}
+                  <polygon points="15,15 65,15 50,60 30,60" fill="none" stroke="#006747" strokeWidth="2"/>
+                  {/* Liquid */}
+                  <polygon points="18,20 62,20 50,58 30,58" fill="url(#azaleaGrad)" opacity="0.8"/>
+                  {/* Gradient */}
+                  <defs>
+                    <linearGradient id="azaleaGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#ff6b9d"/>
+                      <stop offset="100%" stopColor="#ff1744"/>
+                    </linearGradient>
+                  </defs>
+                  {/* Stem */}
+                  <line x1="40" y1="60" x2="40" y2="85" stroke="#006747" strokeWidth="2"/>
+                  {/* Base */}
+                  <ellipse cx="40" cy="87" rx="16" ry="4" fill="none" stroke="#006747" strokeWidth="2"/>
+                  {/* Garnish - cherry */}
+                  <circle cx="52" cy="18" r="5" fill="#c62828"/>
+                  <line x1="52" y1="13" x2="56" y2="6" stroke="#2e7d32" strokeWidth="1.5"/>
+                  {/* Orange slice */}
+                  <path d="M58,22 A8,8 0 0 1 66,14" fill="none" stroke="#ff9800" strokeWidth="2.5" strokeLinecap="round"/>
+                  {/* Tiny bubbles */}
+                  <circle cx="35" cy="40" r="1.5" fill="rgba(255,255,255,0.5)"/>
+                  <circle cx="42" cy="35" r="1" fill="rgba(255,255,255,0.4)"/>
+                  <circle cx="38" cy="48" r="1" fill="rgba(255,255,255,0.3)"/>
+                </svg>
+              </div>
               <p style={{
                 fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 15,
                 color: C.dark, fontStyle: "italic", lineHeight: 1.5,
@@ -2187,7 +2216,7 @@ export default function App() {
             background: `linear-gradient(170deg, ${C.dark} 0%, #002a1c 50%, ${C.dark} 100%)`,
             padding: "48px 20px", borderTop: `4px solid ${C.yellow}`,
           }}>
-            <div style={{ maxWidth: 600, margin: "0 auto", textAlign: "center" }}>
+            <div style={{ maxWidth: 800, margin: "0 auto", textAlign: "center" }}>
               <div style={{ fontSize: 48, marginBottom: 8 }}>🏆</div>
               <h3 style={{
                 fontFamily: "'Playfair Display',Georgia,serif", fontSize: 28,
@@ -2199,129 +2228,101 @@ export default function App() {
                 letterSpacing: "0.15em", textTransform: "uppercase",
               }}>Green Jacket Winners</p>
 
-              {[
-                { year: 2025, team: "Lizards All the Way", name: "Jacks Gray" },
-                { year: 2024, team: "Handsome Stranger", name: "Brandon Winkler" },
-                { year: 2023, team: "Hank the Tank", name: "Chris Frick" },
-                { year: 2022, team: "WillaJean76", name: "Carol Miller" },
-              ].map((champ, i) => (
-                <div key={i} style={{
-                  display: "flex", alignItems: "center", gap: 16,
-                  padding: "16px 20px", marginBottom: 12,
-                  background: i === 0
-                    ? "linear-gradient(135deg, rgba(242,201,76,0.15), rgba(242,201,76,0.05))"
-                    : "rgba(255,255,255,0.04)",
-                  borderRadius: 12,
-                  border: i === 0
-                    ? `2px solid ${C.yellow}40`
-                    : "1px solid rgba(255,255,255,0.08)",
-                }}>
-                  {/* Year badge */}
-                  <div style={{
-                    width: 56, height: 56, borderRadius: "50%",
-                    background: i === 0 ? C.green : "rgba(255,255,255,0.08)",
-                    border: i === 0 ? `2px solid ${C.yellow}` : "1px solid rgba(255,255,255,0.15)",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    flexShrink: 0,
-                  }}>
-                    <span style={{
-                      fontFamily: "'Playfair Display',Georgia,serif",
-                      fontSize: 16, fontWeight: 900,
-                      color: i === 0 ? C.yellow : "#a8d5a8",
-                    }}>{champ.year}</span>
-                  </div>
-
-                  {/* Info */}
-                  <div style={{ textAlign: "left", flex: 1 }}>
-                    <div style={{
-                      fontFamily: "'Playfair Display',Georgia,serif",
-                      fontSize: 18, fontWeight: 700, color: "#fff",
-                      lineHeight: 1.2,
-                    }}>{champ.team}</div>
-                    <div style={{
-                      fontFamily: "Georgia,serif", fontSize: 14,
-                      color: "#a8d5a8", marginTop: 3,
-                    }}>{champ.name}</div>
-                  </div>
-
-                  {/* Jacket icon */}
-                  <div style={{
-                    width: 40, height: 40, borderRadius: "50%",
-                    background: C.green, border: `2px solid ${C.yellow}40`,
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    flexShrink: 0,
-                  }}>
-                    <span style={{
-                      fontFamily: "'Playfair Display',Georgia,serif",
-                      fontSize: 14, fontWeight: 900, color: C.yellow,
-                    }}>🧥</span>
-                  </div>
+              <div style={{ display: "flex", gap: 32, alignItems: "center", justifyContent: "center", flexWrap: "wrap" }}>
+                {/* Champions list */}
+                <div style={{ flex: 1, minWidth: 280, maxWidth: 420 }}>
+                  {[
+                    { year: 2025, team: "Lizards All the Way", name: "Jacks Gray" },
+                    { year: 2024, team: "Handsome Stranger", name: "Brandon Winkler" },
+                    { year: 2023, team: "Hank the Tank", name: "Chris Frick" },
+                    { year: 2022, team: "WillaJean76", name: "Carol Miller" },
+                  ].map((champ, i) => (
+                    <div key={i} style={{
+                      display: "flex", alignItems: "center", gap: 16,
+                      padding: "16px 20px", marginBottom: 12,
+                      background: i === 0
+                        ? "linear-gradient(135deg, rgba(242,201,76,0.15), rgba(242,201,76,0.05))"
+                        : "rgba(255,255,255,0.04)",
+                      borderRadius: 12,
+                      border: i === 0 ? `2px solid ${C.yellow}40` : "1px solid rgba(255,255,255,0.08)",
+                      textAlign: "left",
+                    }}>
+                      <div style={{
+                        width: 50, height: 50, borderRadius: "50%",
+                        background: i === 0 ? C.green : "rgba(255,255,255,0.08)",
+                        border: i === 0 ? `2px solid ${C.yellow}` : "1px solid rgba(255,255,255,0.15)",
+                        display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+                      }}>
+                        <span style={{
+                          fontFamily: "'Playfair Display',Georgia,serif",
+                          fontSize: 15, fontWeight: 900, color: i === 0 ? C.yellow : "#a8d5a8",
+                        }}>{champ.year}</span>
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <div style={{
+                          fontFamily: "'Playfair Display',Georgia,serif",
+                          fontSize: 17, fontWeight: 700, color: "#fff", lineHeight: 1.2,
+                        }}>{champ.team}</div>
+                        <div style={{
+                          fontFamily: "Georgia,serif", fontSize: 14, color: "#a8d5a8", marginTop: 3,
+                        }}>{champ.name}</div>
+                      </div>
+                    </div>
+                  ))}
+                  <p style={{
+                    fontFamily: "'Playfair Display',Georgia,serif", fontSize: 16,
+                    color: C.yellow, marginTop: 16, fontWeight: 700, textAlign: "center",
+                  }}>Will your name be next on the wall?</p>
                 </div>
-              ))}
 
-              <p style={{
-                fontFamily: "'Playfair Display',Georgia,serif", fontSize: 16,
-                color: C.yellow, marginTop: 20, fontWeight: 700,
-              }}>Will your name be next on the wall?</p>
-            </div>
-
-            {/* 2026 Green Jacket — waiting to be presented */}
-            <div style={{
-              position: "relative", width: 200, margin: "0 auto", marginTop: -20,
-              display: "flex", flexDirection: "column", alignItems: "center",
-            }}>
-              {/* Jacket shape */}
-              <div style={{
-                width: 160, height: 190, borderRadius: "12px 12px 40px 40px",
-                background: `linear-gradient(170deg, ${C.green} 0%, #004d35 60%, ${C.dark} 100%)`,
-                border: `3px solid ${C.yellow}40`,
-                boxShadow: "0 8px 32px rgba(0,0,0,0.4), inset 0 2px 0 rgba(255,255,255,0.1)",
-                position: "relative",
-                display: "flex", flexDirection: "column", alignItems: "center",
-                justifyContent: "center",
-              }}>
-                {/* Lapel lines */}
-                <div style={{
-                  position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)",
-                  width: 0, height: 0,
-                  borderLeft: "30px solid transparent", borderRight: "30px solid transparent",
-                  borderTop: `35px solid ${C.dark}`,
-                }} />
-                {/* Collar notch */}
-                <div style={{
-                  position: "absolute", top: 30, left: "50%", transform: "translateX(-50%)",
-                  width: 8, height: 8, borderRadius: "50%",
-                  background: C.yellow, boxShadow: `0 0 6px ${C.yellow}60`,
-                }} />
-                {/* Patch */}
-                <div style={{
-                  marginTop: 20, padding: "10px 16px", borderRadius: 6,
-                  background: "rgba(0,0,0,0.3)", border: `1px solid ${C.yellow}50`,
-                  textAlign: "center",
-                }}>
-                  <div style={{
-                    fontFamily: "'Playfair Display',Georgia,serif",
-                    fontSize: 24, fontWeight: 900, color: C.yellow,
-                    letterSpacing: "0.1em",
-                    textShadow: "0 1px 4px rgba(0,0,0,0.4)",
-                  }}>2026</div>
-                  <div style={{
-                    fontFamily: "'Cormorant Garamond',Georgia,serif",
-                    fontSize: 10, color: "#a8d5a8", letterSpacing: "0.15em",
-                    textTransform: "uppercase", marginTop: 2,
-                  }}>Masters Champion</div>
+                {/* 2026 Jacket on hanger */}
+                <div style={{ flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center" }}>
+                  <svg width="180" height="260" viewBox="0 0 180 260">
+                    {/* Hanger hook */}
+                    <path d="M90,8 C90,8 90,2 90,2" stroke="#c4a335" strokeWidth="2" fill="none"/>
+                    <circle cx="90" cy="2" r="3" fill="none" stroke="#c4a335" strokeWidth="1.5"/>
+                    {/* Hanger bar */}
+                    <path d="M40,28 L90,8 L140,28" stroke="#c4a335" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+                    {/* Left shoulder */}
+                    <path d="M40,28 L25,70 L25,230 Q25,245 40,245 L75,245 L75,70 Z" fill="url(#jacket2026)" stroke="rgba(255,255,255,0.1)" strokeWidth="1"/>
+                    {/* Right shoulder */}
+                    <path d="M140,28 L155,70 L155,230 Q155,245 140,245 L105,245 L105,70 Z" fill="url(#jacket2026)" stroke="rgba(255,255,255,0.1)" strokeWidth="1"/>
+                    {/* Center panel / lapel overlap */}
+                    <path d="M75,45 L90,28 L105,45 L105,245 L75,245 Z" fill="url(#jacket2026dark)"/>
+                    {/* Left lapel */}
+                    <path d="M75,45 L90,28 L90,75 L80,80 Z" fill="url(#jacket2026)" stroke="rgba(255,255,255,0.08)" strokeWidth="0.5"/>
+                    {/* Right lapel */}
+                    <path d="M105,45 L90,28 L90,75 L100,80 Z" fill="url(#jacket2026)" stroke="rgba(255,255,255,0.08)" strokeWidth="0.5"/>
+                    {/* Buttons */}
+                    <circle cx="90" cy="100" r="3" fill="#c4a335" opacity="0.8"/>
+                    <circle cx="90" cy="125" r="3" fill="#c4a335" opacity="0.7"/>
+                    <circle cx="90" cy="150" r="3" fill="#c4a335" opacity="0.6"/>
+                    {/* Breast pocket */}
+                    <rect x="96" y="88" width="22" height="2" rx="1" fill="rgba(255,255,255,0.06)"/>
+                    {/* Patch */}
+                    <rect x="56" y="135" width="40" height="50" rx="4" fill="rgba(0,0,0,0.25)" stroke="#c4a335" strokeWidth="1" opacity="0.9"/>
+                    <text x="76" y="158" textAnchor="middle" fontFamily="'Playfair Display',Georgia,serif" fontSize="16" fontWeight="900" fill="#c4a335">2026</text>
+                    <text x="76" y="173" textAnchor="middle" fontFamily="Georgia,serif" fontSize="6" fill="#a8d5a8" letterSpacing="1.5" textTransform="uppercase">MASTERS</text>
+                    <text x="76" y="181" textAnchor="middle" fontFamily="Georgia,serif" fontSize="5.5" fill="#a8d5a8" letterSpacing="1">CHAMPION</text>
+                    {/* Gradients */}
+                    <defs>
+                      <linearGradient id="jacket2026" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stopColor="#006747"/>
+                        <stop offset="50%" stopColor="#004d35"/>
+                        <stop offset="100%" stopColor="#003825"/>
+                      </linearGradient>
+                      <linearGradient id="jacket2026dark" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#003825"/>
+                        <stop offset="100%" stopColor="#002a1c"/>
+                      </linearGradient>
+                    </defs>
+                  </svg>
+                  <p style={{
+                    fontFamily: "Georgia,serif", fontSize: 13, color: C.yellow,
+                    fontStyle: "italic", marginTop: -8, opacity: 0.8,
+                  }}>awaiting its owner...</p>
                 </div>
               </div>
-              {/* Hanger */}
-              <div style={{
-                width: 80, height: 4, borderRadius: 2,
-                background: `linear-gradient(90deg, transparent, ${C.yellow}60, transparent)`,
-                position: "absolute", top: -8,
-              }} />
-              <p style={{
-                fontFamily: "Georgia,serif", fontSize: 12, color: "#5a8a5a",
-                fontStyle: "italic", marginTop: 12,
-              }}>awaiting its owner...</p>
             </div>
           </div>
         </>
