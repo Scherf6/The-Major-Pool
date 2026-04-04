@@ -1185,16 +1185,6 @@ function Leaderboard({ entries, isLocked, loading }) {
               target="_blank" rel="noopener" style={{ color: B.green }}>ESPN Leaderboard</a>
             {" · "}{isLocked ? "Tap a row to see picks" : "🔒 Picks hidden until first tee"}
           </p>
-          
-          {/* Dev test button */}
-          <button onClick={() => { setTestMode(!testMode); if (!testMode && testLog.length === 0) runTest(); }}
-            style={{
-              marginTop: 10, padding: "6px 14px", borderRadius: 16,
-              background: testMode ? "#fff3e0" : "transparent",
-              border: `1px solid ${testMode ? "#ff9800" : B.border}`,
-              fontFamily: "Georgia,serif", fontSize: 13,
-              color: testMode ? "#e65100" : B.muted, cursor: "pointer",
-            }}>🧪 {testMode ? "Hide" : "Test"} Scoring Engine</button>
         </div>
 
         {/* Test results panel */}
@@ -2111,4 +2101,4 @@ export default function App() {
       </footer>
     </div>
   );
-}
+      }
