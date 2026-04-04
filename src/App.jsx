@@ -922,7 +922,7 @@ function Leaderboard({ entries, isLocked, loading }) {
     const log = [];
     try {
       log.push("🔍 Fetching 2026 Players Championship (completed, big field)...");
-      const res = await fetch(`${SCRIPT_URL}?mode=scores&espnId=401811937`);
+      const res = await fetch(`${SCRIPT_URL}?mode=scores&espnId=401811937&season=2026`);
       const data = await res.json();
       if (!data.success) { log.push("❌ ESPN fetch failed: " + (data.error || "unknown")); setTestLog(log); setTestLoading(false); return; }
       
@@ -2095,4 +2095,4 @@ export default function App() {
       </footer>
     </div>
   );
-      }
+}
