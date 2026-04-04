@@ -2181,6 +2181,90 @@ export default function App() {
           </div>
 
           <MastersExperience />
+
+          {/* Past Champions */}
+          <div style={{
+            background: `linear-gradient(170deg, ${C.dark} 0%, #002a1c 50%, ${C.dark} 100%)`,
+            padding: "48px 20px", borderTop: `4px solid ${C.yellow}`,
+          }}>
+            <div style={{ maxWidth: 600, margin: "0 auto", textAlign: "center" }}>
+              <div style={{ fontSize: 48, marginBottom: 8 }}>🏆</div>
+              <h3 style={{
+                fontFamily: "'Playfair Display',Georgia,serif", fontSize: 28,
+                color: C.yellow, margin: "0 0 4px",
+              }}>Past Champions</h3>
+              <p style={{
+                fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 14,
+                color: "#a8d5a8", margin: "0 0 32px",
+                letterSpacing: "0.15em", textTransform: "uppercase",
+              }}>Green Jacket Winners</p>
+
+              {[
+                { year: 2025, team: "Lizards All the Way", name: "Jacks Gray" },
+                { year: 2024, team: "Handsome Stranger", name: "Brandon Winkler" },
+                { year: 2023, team: "Hank the Tank", name: "Chris Frick" },
+                { year: 2022, team: "WillaJean76", name: "Carol Miller" },
+              ].map((champ, i) => (
+                <div key={i} style={{
+                  display: "flex", alignItems: "center", gap: 16,
+                  padding: "16px 20px", marginBottom: 12,
+                  background: i === 0
+                    ? "linear-gradient(135deg, rgba(242,201,76,0.15), rgba(242,201,76,0.05))"
+                    : "rgba(255,255,255,0.04)",
+                  borderRadius: 12,
+                  border: i === 0
+                    ? `2px solid ${C.yellow}40`
+                    : "1px solid rgba(255,255,255,0.08)",
+                }}>
+                  {/* Year badge */}
+                  <div style={{
+                    width: 56, height: 56, borderRadius: "50%",
+                    background: i === 0 ? C.green : "rgba(255,255,255,0.08)",
+                    border: i === 0 ? `2px solid ${C.yellow}` : "1px solid rgba(255,255,255,0.15)",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    flexShrink: 0,
+                  }}>
+                    <span style={{
+                      fontFamily: "'Playfair Display',Georgia,serif",
+                      fontSize: 16, fontWeight: 900,
+                      color: i === 0 ? C.yellow : "#a8d5a8",
+                    }}>{champ.year}</span>
+                  </div>
+
+                  {/* Info */}
+                  <div style={{ textAlign: "left", flex: 1 }}>
+                    <div style={{
+                      fontFamily: "'Playfair Display',Georgia,serif",
+                      fontSize: 18, fontWeight: 700, color: "#fff",
+                      lineHeight: 1.2,
+                    }}>{champ.team}</div>
+                    <div style={{
+                      fontFamily: "Georgia,serif", fontSize: 14,
+                      color: "#a8d5a8", marginTop: 3,
+                    }}>{champ.name}</div>
+                  </div>
+
+                  {/* Jacket icon */}
+                  <div style={{
+                    width: 40, height: 40, borderRadius: "50%",
+                    background: C.green, border: `2px solid ${C.yellow}40`,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    flexShrink: 0,
+                  }}>
+                    <span style={{
+                      fontFamily: "'Playfair Display',Georgia,serif",
+                      fontSize: 14, fontWeight: 900, color: C.yellow,
+                    }}>🧥</span>
+                  </div>
+                </div>
+              ))}
+
+              <p style={{
+                fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 13,
+                color: "#5a8a5a", marginTop: 20, fontStyle: "italic",
+              }}>Will your name be next on the wall?</p>
+            </div>
+          </div>
         </>
       )}
       {view === "picks" && <PicksFlow onComplete={handleComplete} isLocked={isLocked}
