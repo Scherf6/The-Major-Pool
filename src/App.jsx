@@ -230,7 +230,7 @@ function Nav({ view, setView, isLocked, remaining }) {
       </div>
       <div style={{
         background: isLocked ? "#c62828" : "rgba(255,255,255,0.15)",
-        padding: "4px 12px", borderRadius: 20, fontSize: 12,
+        padding: "4px 12px", borderRadius: 20, fontSize: 13,
         fontFamily: "Georgia,serif", color: isLocked ? "#fff" : C.yellow, fontWeight: 600,
       }}>
         {isLocked ? "🔒 LOCKED" : `⏱ ${remaining}`}
@@ -242,7 +242,7 @@ function Nav({ view, setView, isLocked, remaining }) {
             background: view === id ? C.yellow : "transparent",
             color: view === id ? C.dark : "#fff",
             fontFamily: "'Cormorant Garamond',Georgia,serif",
-            fontSize: 12, fontWeight: view === id ? 700 : 400,
+            fontSize: 14, fontWeight: view === id ? 700 : 400,
             cursor: "pointer",
           }}>{id === "picks" ? "My Picks" : id === "tournament" ? "⛳ Live" : id.charAt(0).toUpperCase() + id.slice(1)}</button>
         ))}
@@ -299,7 +299,7 @@ function Hero({ onStart, setView }) {
           ].map((t, i) => (
             <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, color: "#a8d5a8" }}>
               <span style={{ color: C.yellow }}>✓</span>
-              <span style={{ fontFamily: "Georgia,serif", fontSize: 14 }}>{t}</span>
+              <span style={{ fontFamily: "Georgia,serif", fontSize: 15 }}>{t}</span>
             </div>
           ))}
         </div>
@@ -538,7 +538,7 @@ function PicksFlow({ onComplete, isLocked, existingEntry, allEntries }) {
 
             {!lookupMode ? (
               <>
-                <label style={{ fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 11,
+                <label style={{ fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 13,
                   letterSpacing: "0.14em", textTransform: "uppercase", color: "#8b7355" }}>Your Name</label>
                 <div style={{ display: "flex", gap: 8, marginTop: 5 }}>
                   <input type="text" value={firstName} onChange={e => setFirstName(e.target.value)}
@@ -550,9 +550,9 @@ function PicksFlow({ onComplete, isLocked, existingEntry, allEntries }) {
                       border: `2px solid ${C.sand}`, fontSize: 15, fontFamily: "Georgia,serif",
                       outline: "none", boxSizing: "border-box" }} />
                 </div>
-                <label style={{ fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 11,
+                <label style={{ fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 13,
                   letterSpacing: "0.14em", textTransform: "uppercase", color: "#8b7355", display: "block", marginTop: 14 }}>Email</label>
-                <p style={{ fontFamily: "Georgia,serif", fontSize: 12, color: "#999", margin: "3px 0 7px" }}>
+                <p style={{ fontFamily: "Georgia,serif", fontSize: 14, color: "#999", margin: "3px 0 7px" }}>
                   Used to log back in and edit picks</p>
                 <input type="email" value={email} onChange={e => setEmail(e.target.value)}
                   placeholder="your@email.com"
@@ -579,7 +579,7 @@ function PicksFlow({ onComplete, isLocked, existingEntry, allEntries }) {
               <>
                 <h3 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 18,
                   color: C.green, margin: "0 0 12px" }}>Welcome Back</h3>
-                <p style={{ fontFamily: "Georgia,serif", fontSize: 13, color: "#8b7355", margin: "0 0 12px" }}>
+                <p style={{ fontFamily: "Georgia,serif", fontSize: 14, color: "#8b7355", margin: "0 0 12px" }}>
                   Enter the email you signed up with to view and edit your picks.</p>
                 <input type="email" value={email} onChange={e => { setEmail(e.target.value); setLookupMsg(""); }}
                   placeholder="your@email.com"
@@ -633,7 +633,7 @@ function PicksFlow({ onComplete, isLocked, existingEntry, allEntries }) {
         {step === 2 && (
           <div style={{ background: "#fff", borderRadius: 12, padding: 28,
             boxShadow: "0 2px 12px rgba(0,0,0,0.06)", border: `1px solid ${C.sand}` }}>
-            <label style={{ fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 11,
+            <label style={{ fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 13,
               letterSpacing: "0.14em", textTransform: "uppercase", color: "#8b7355" }}>Team Name</label>
             <input type="text" value={teamName} onChange={e => { setTeamName(e.target.value); setNameError(""); }}
               placeholder="Name your squad" maxLength={40}
@@ -641,19 +641,19 @@ function PicksFlow({ onComplete, isLocked, existingEntry, allEntries }) {
                 border: `2px solid ${nameError ? "#c62828" : C.sand}`, fontSize: 15, fontFamily: "Georgia,serif",
                 outline: "none", boxSizing: "border-box" }} />
             {nameError && (
-              <p style={{ fontFamily: "Georgia,serif", fontSize: 12, color: "#c62828", margin: "5px 0 0" }}>{nameError}</p>
+              <p style={{ fontFamily: "Georgia,serif", fontSize: 14, color: "#c62828", margin: "5px 0 0" }}>{nameError}</p>
             )}
 
             {/* AI Name Generator with ideas field */}
             <div style={{ marginTop: 12, padding: "12px", borderRadius: 8,
               border: `1px solid ${C.sand}`, background: "#fafaf7" }}>
-              <label style={{ fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 11,
+              <label style={{ fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 13,
                 letterSpacing: "0.14em", textTransform: "uppercase", color: "#8b7355" }}>
                 🤖 AI Name Generator</label>
               <input type="text" value={nameIdeas} onChange={e => setNameIdeas(e.target.value)}
                 placeholder="Any ideas? e.g. 'my dog Ralph', 'beer puns', 'dad jokes'..."
                 style={{ width: "100%", padding: "10px", borderRadius: 8, marginTop: 6,
-                  border: `1px solid ${C.sand}`, fontSize: 13, fontFamily: "Georgia,serif",
+                  border: `1px solid ${C.sand}`, fontSize: 15, fontFamily: "Georgia,serif",
                   outline: "none", boxSizing: "border-box" }} />
               <button onClick={generateNames} disabled={generating}
                 style={{ width: "100%", padding: 10, border: "none", borderRadius: 8,
@@ -665,7 +665,7 @@ function PicksFlow({ onComplete, isLocked, existingEntry, allEntries }) {
             </div>
             {genNames.length > 0 && (
               <div style={{ marginTop: 10 }}>
-                <p style={{ fontFamily: "Georgia,serif", fontSize: 11, color: "#8b7355", margin: "0 0 6px" }}>Tap to use:</p>
+                <p style={{ fontFamily: "Georgia,serif", fontSize: 14, color: "#8b7355", margin: "0 0 6px" }}>Tap to use:</p>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
                   {genNames.map((n, i) => (
                     <button key={i} onClick={() => { setTeamName(n); setNameError(""); }} style={{
@@ -679,7 +679,7 @@ function PicksFlow({ onComplete, isLocked, existingEntry, allEntries }) {
               </div>
             )}
             <div style={{ marginTop: 20 }}>
-              <label style={{ fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 11,
+              <label style={{ fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 13,
                 letterSpacing: "0.14em", textTransform: "uppercase", color: "#8b7355" }}>
                 Winning Score Prediction (Tiebreaker)</label>
               <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 6 }}>
@@ -714,7 +714,7 @@ function PicksFlow({ onComplete, isLocked, existingEntry, allEntries }) {
           <div>
             <div style={{ background: `${C.green}10`, borderRadius: 10, padding: "12px 16px",
               marginBottom: 14, border: `1px solid ${C.green}30` }}>
-              <p style={{ fontFamily: "Georgia,serif", fontSize: 13, color: C.dark, margin: 0, lineHeight: 1.5 }}>
+              <p style={{ fontFamily: "Georgia,serif", fontSize: 15, color: C.dark, margin: 0, lineHeight: 1.5 }}>
                 <strong>Pick 6, Use Best 4:</strong> 1 from each tier + 2 from The Field. Cut/WD golfers get 80 per unplayed round.</p>
             </div>
 
@@ -722,7 +722,7 @@ function PicksFlow({ onComplete, isLocked, existingEntry, allEntries }) {
             <div style={{ textAlign: "center", marginBottom: 14 }}>
               <span style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 20, fontWeight: 700, color: C.green }}>
                 {totalPicked}</span>
-              <span style={{ fontFamily: "Georgia,serif", fontSize: 14, color: "#8b7355" }}> / {totalNeeded} picked</span>
+              <span style={{ fontFamily: "Georgia,serif", fontSize: 16, color: "#8b7355" }}> / {totalNeeded} picked</span>
             </div>
 
             {tierKeys.map(tier => {
@@ -745,7 +745,7 @@ function PicksFlow({ onComplete, isLocked, existingEntry, allEntries }) {
                   }}>
                     <span style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 14,
                       fontWeight: 700, color: C.green }}>{tier}</span>
-                    <span style={{ fontFamily: "Georgia,serif", fontSize: 11, color: tierDone ? C.green : "#999" }}>
+                    <span style={{ fontFamily: "Georgia,serif", fontSize: 13, color: tierDone ? C.green : "#999" }}>
                       {tierDone ? "✓" : `${pickedCount}/${need}`}
                     </span>
                   </div>
@@ -769,12 +769,12 @@ function PicksFlow({ onComplete, isLocked, existingEntry, allEntries }) {
                               textDecoration: g.wd ? "line-through" : "none",
                             }}>{g.name}</span>
                             {g.note && <span style={{
-                              fontFamily: "Georgia,serif", fontSize: 10,
+                              fontFamily: "Georgia,serif", fontSize: 12,
                               color: g.wd ? "#c62828" : "#8b7355", marginLeft: 6,
                             }}>{g.note}</span>}
                           </div>
                           <span style={{
-                            fontFamily: "Georgia,serif", fontSize: 11, color: "#8b7355",
+                            fontFamily: "Georgia,serif", fontSize: 14, color: "#8b7355",
                             background: C.cream, padding: "2px 7px", borderRadius: 8,
                             whiteSpace: "nowrap", flexShrink: 0,
                           }}>{g.odds}</span>
@@ -827,19 +827,19 @@ function Confirmation({ entry, onLeaderboard, onEdit }) {
           You're In!</h2>
         <div style={{ background: C.cream, borderRadius: 10, padding: 16, textAlign: "left", margin: "16px 0" }}>
           <div style={{ marginBottom: 8 }}>
-            <span style={{ fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 10,
+            <span style={{ fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 12,
               letterSpacing: "0.12em", color: "#8b7355", textTransform: "uppercase" }}>Team</span>
             <div style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 18, color: C.green, fontWeight: 700 }}>
               {entry.teamName}</div>
           </div>
           <div style={{ marginBottom: 8 }}>
-            <span style={{ fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 10,
+            <span style={{ fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 12,
               letterSpacing: "0.12em", color: "#8b7355", textTransform: "uppercase" }}>Winning Score</span>
             <div style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 18, color: C.green, fontWeight: 700 }}>
               {entry.winScore}</div>
           </div>
           <div>
-            <span style={{ fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 10,
+            <span style={{ fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 12,
               letterSpacing: "0.12em", color: "#8b7355", textTransform: "uppercase" }}>Golfers</span>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginTop: 4 }}>
               {entry.picks.map((p, i) => (
@@ -871,7 +871,7 @@ function Confirmation({ entry, onLeaderboard, onEdit }) {
         }}>
           <p style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 17, fontWeight: 700,
             color: "#fff", margin: "0 0 6px" }}>💰 Pay Your Entry Fee</p>
-          <p style={{ fontFamily: "Georgia,serif", fontSize: 13, color: "#d4e9ff", margin: "0 0 12px", lineHeight: 1.5 }}>
+          <p style={{ fontFamily: "Georgia,serif", fontSize: 15, color: "#d4e9ff", margin: "0 0 12px", lineHeight: 1.5 }}>
             <strong>$15</strong> for your 1st entry · <strong>$10</strong> for a 2nd entry</p>
           <a href="https://venmo.com/ande-scherf" target="_blank" rel="noopener"
             style={{
@@ -886,7 +886,7 @@ function Confirmation({ entry, onLeaderboard, onEdit }) {
               alt="Venmo QR" width={140} height={140}
               style={{ borderRadius: 10, border: "3px solid #fff" }} />
           </div>
-          <p style={{ fontFamily: "Georgia,serif", fontSize: 11, color: "#a8d4ff", marginTop: 8, margin: "8px 0 0" }}>
+          <p style={{ fontFamily: "Georgia,serif", fontSize: 13, color: "#a8d4ff", marginTop: 8, margin: "8px 0 0" }}>
             Scan to pay · Include your team name in the note</p>
         </div>
 
@@ -998,11 +998,11 @@ function Leaderboard({ entries, isLocked, loading }) {
             cursor: "default", userSelect: "none",
           }}>LEADERS</h2>
           <p style={{
-            fontFamily: "Georgia,serif", fontSize: 12, color: "#c4d9c4",
+            fontFamily: "Georgia,serif", fontSize: 14, color: "#c4d9c4",
             letterSpacing: "0.2em", textTransform: "uppercase", marginTop: 4,
           }}>{T.year} {T.name} · {entries.length} {entries.length === 1 ? "entry" : "entries"}</p>
           {!isLocked && (
-            <p style={{ fontFamily: "Georgia,serif", fontSize: 12, color: B.yellow, marginTop: 8 }}>
+            <p style={{ fontFamily: "Georgia,serif", fontSize: 14, color: B.yellow, marginTop: 8 }}>
               ⏳ Scores go live when the tournament starts</p>
           )}
         </div>
@@ -1021,7 +1021,7 @@ function Leaderboard({ entries, isLocked, loading }) {
             {["POS", "TEAM", "TOTAL"].map((h, i) => (
               <div key={h} style={{
                 padding: "10px 6px", textAlign: i === 1 ? "left" : "center",
-                fontFamily: "Georgia,serif", fontSize: 11,
+                fontFamily: "Georgia,serif", fontSize: 13,
                 fontWeight: 700, letterSpacing: "0.1em",
                 color: B.green, textTransform: "uppercase",
                 borderRight: i < 2 ? `1px solid ${B.border}` : "none",
@@ -1064,12 +1064,12 @@ function Leaderboard({ entries, isLocked, loading }) {
                     borderRight: `1px solid ${B.border}`,
                   }}>
                     <div style={{
-                      fontFamily: "Georgia,serif", fontSize: 15, fontWeight: 700,
+                      fontFamily: "Georgia,serif", fontSize: 17, fontWeight: 700,
                       color: B.text, textTransform: "uppercase",
                       letterSpacing: "0.02em", lineHeight: 1.2,
                     }}>{e.name}</div>
                     <div style={{
-                      fontFamily: "Georgia,serif", fontSize: 11,
+                      fontFamily: "Georgia,serif", fontSize: 13,
                       color: B.muted, marginTop: 2,
                     }}>
                       {e.fullName || ""}
@@ -1082,7 +1082,7 @@ function Leaderboard({ entries, isLocked, loading }) {
                   <div style={{
                     padding: "12px 6px", textAlign: "center",
                     fontFamily: "'Playfair Display',Georgia,serif",
-                    fontSize: 20, fontWeight: 900,
+                    fontSize: 22, fontWeight: 900,
                     color: isLocked
                       ? (e.totalScore < 0 ? B.red : e.totalScore > 0 ? B.green : B.text)
                       : B.muted,
@@ -1100,7 +1100,7 @@ function Leaderboard({ entries, isLocked, loading }) {
                   }}>
                     {isLocked ? (
                       <>
-                        <p style={{ fontFamily: "Georgia,serif", fontSize: 11, color: B.muted,
+                        <p style={{ fontFamily: "Georgia,serif", fontSize: 13, color: B.muted,
                           margin: "0 0 8px", textTransform: "uppercase", letterSpacing: "0.08em" }}>Golfers</p>
                         <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                           {(e.golferScores || e.picks.map(p => ({ name: p }))).map((gs, j) => {
@@ -1131,12 +1131,12 @@ function Leaderboard({ entries, isLocked, loading }) {
                                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                                   {hasScore && (
                                     <span style={{
-                                      fontFamily: "'Playfair Display',Georgia,serif", fontSize: 14, fontWeight: 700,
+                                      fontFamily: "'Playfair Display',Georgia,serif", fontSize: 15, fontWeight: 700,
                                       color: scoreToPar < 0 ? B.red : scoreToPar > 0 ? B.green : B.text,
                                     }}>{scoreToPar < 0 ? scoreToPar : scoreToPar > 0 ? `+${scoreToPar}` : "E"}</span>
                                   )}
                                   {hasScore && (
-                                    <span style={{ fontFamily: "Georgia,serif", fontSize: 11, color: B.muted }}>
+                                    <span style={{ fontFamily: "Georgia,serif", fontSize: 13, color: B.muted }}>
                                       ({gs.totalStrokes})
                                     </span>
                                   )}
@@ -1148,10 +1148,10 @@ function Leaderboard({ entries, isLocked, loading }) {
                         </div>
                         <div style={{ display: "flex", justifyContent: "space-between", marginTop: 10,
                           padding: "6px 10px", borderRadius: 6, background: `${B.green}08` }}>
-                          <span style={{ fontFamily: "Georgia,serif", fontSize: 11, color: B.muted }}>
+                          <span style={{ fontFamily: "Georgia,serif", fontSize: 13, color: B.muted }}>
                             Best 4 of 6 · Predicted: {e.winScore}</span>
                           {e.totalScore != null && (
-                            <span style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 14, fontWeight: 700,
+                            <span style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 15, fontWeight: 700,
                               color: e.totalScore < 0 ? B.red : e.totalScore > 0 ? B.green : B.text }}>
                               Total: {e.totalScore < 0 ? e.totalScore : e.totalScore > 0 ? `+${e.totalScore}` : "E"}
                             </span>
@@ -1180,7 +1180,7 @@ function Leaderboard({ entries, isLocked, loading }) {
 
         {/* Footer */}
         <div style={{ marginTop: 14, textAlign: "center" }}>
-          <p style={{ fontFamily: "Georgia,serif", fontSize: 11, color: B.muted }}>
+          <p style={{ fontFamily: "Georgia,serif", fontSize: 13, color: B.muted }}>
             📡 <a href={`https://www.espn.com/golf/leaderboard/_/tournamentId/${T.espnId}`}
               target="_blank" rel="noopener" style={{ color: B.green }}>ESPN Leaderboard</a>
             {" · "}{isLocked ? "Tap a row to see picks" : "🔒 Picks hidden until first tee"}
@@ -1192,7 +1192,7 @@ function Leaderboard({ entries, isLocked, loading }) {
               marginTop: 10, padding: "6px 14px", borderRadius: 16,
               background: testMode ? "#fff3e0" : "transparent",
               border: `1px solid ${testMode ? "#ff9800" : B.border}`,
-              fontFamily: "Georgia,serif", fontSize: 11,
+              fontFamily: "Georgia,serif", fontSize: 13,
               color: testMode ? "#e65100" : B.muted, cursor: "pointer",
             }}>🧪 {testMode ? "Hide" : "Test"} Scoring Engine</button>
         </div>
@@ -1204,7 +1204,7 @@ function Leaderboard({ entries, isLocked, loading }) {
             border: "1px solid #333", maxHeight: 500, overflowY: "auto",
           }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-              <span style={{ fontFamily: "Georgia,serif", fontSize: 14, fontWeight: 700, color: "#ff9800" }}>
+              <span style={{ fontFamily: "Georgia,serif", fontSize: 15, fontWeight: 700, color: "#ff9800" }}>
                 🧪 Scoring Engine Test — Live Data</span>
               <button onClick={runTest} disabled={testLoading} style={{
                 padding: "4px 12px", borderRadius: 12, border: "1px solid #555",
@@ -1217,7 +1217,7 @@ function Leaderboard({ entries, isLocked, loading }) {
               <p style={{ fontFamily: "monospace", fontSize: 12, color: "#aaa" }}>⏳ Fetching ESPN data...</p>
             )}
             
-            <div style={{ fontFamily: "monospace", fontSize: 11, color: "#ccc", lineHeight: 1.6 }}>
+            <div style={{ fontFamily: "monospace", fontSize: 13, color: "#ccc", lineHeight: 1.6 }}>
               {testLog.map((line, i) => (
                 <div key={i} style={{
                   color: line.startsWith("❌") ? "#ef5350"
@@ -1251,7 +1251,7 @@ function Leaderboard({ entries, isLocked, loading }) {
                       </span>
                     </span>
                     <span style={{
-                      fontFamily: "'Playfair Display',Georgia,serif", fontSize: 14, fontWeight: 700,
+                      fontFamily: "'Playfair Display',Georgia,serif", fontSize: 15, fontWeight: 700,
                       color: e.totalScore != null
                         ? (e.totalScore < 0 ? "#ef5350" : e.totalScore > 0 ? "#66bb6a" : "#fff")
                         : "#555",
@@ -1324,7 +1324,7 @@ function MastersExperience() {
       {items.map(([name, price], i) => (
         <div key={i} style={{
           display: "flex", justifyContent: "space-between", padding: "2px 0",
-          fontFamily: "Georgia,serif", fontSize: 12, color: "#333",
+          fontFamily: "Georgia,serif", fontSize: 14, color: "#333",
         }}>
           <span>{name}</span><span>{price}</span>
         </div>
@@ -1409,10 +1409,10 @@ function MastersExperience() {
                       display: "flex", justifyContent: "space-between", alignItems: "center",
                       padding: "3px 0", gap: 4,
                     }}>
-                      <span style={{ fontFamily: "Georgia,serif", fontSize: 11, color: "#333", flex: 1 }}>{name}</span>
-                      <span style={{ fontFamily: "Georgia,serif", fontSize: 10, color: "#8b7355", whiteSpace: "nowrap" }}>{time}</span>
+                      <span style={{ fontFamily: "Georgia,serif", fontSize: 15, color: "#333", flex: 1 }}>{name}</span>
+                      <span style={{ fontFamily: "Georgia,serif", fontSize: 12, color: "#8b7355", whiteSpace: "nowrap" }}>{time}</span>
                       <span style={{
-                        fontFamily: "Georgia,serif", fontSize: 9, color: C.green,
+                        fontFamily: "Georgia,serif", fontSize: 11, color: C.green,
                         background: `${C.green}10`, padding: "1px 5px", borderRadius: 4,
                         fontWeight: 600, whiteSpace: "nowrap",
                       }}>{channel}</span>
@@ -1453,7 +1453,7 @@ function MastersExperience() {
                     background: i % 2 === 0 ? `${C.green}08` : "transparent",
                   }}>
                     <span style={{ fontSize: 18 }}>{icon}</span>
-                    <span style={{ fontFamily: "Georgia,serif", fontSize: 13, color: "#333" }}>{text}</span>
+                    <span style={{ fontFamily: "Georgia,serif", fontSize: 15, color: "#333" }}>{text}</span>
                   </div>
                 ))}
               </div>
@@ -1461,7 +1461,7 @@ function MastersExperience() {
                 marginTop: 14, padding: "10px 12px", borderRadius: 6,
                 background: `${C.green}08`, border: `1px solid ${C.green}20`,
               }}>
-                <p style={{ fontFamily: "Georgia,serif", fontSize: 11, color: C.dark,
+                <p style={{ fontFamily: "Georgia,serif", fontSize: 15, color: C.dark,
                   margin: 0, lineHeight: 1.4 }}>
                   <strong>Mix:</strong> Pour over ice, stir, garnish. Sip while watching Amen Corner. 🌸
                 </p>
@@ -1517,7 +1517,7 @@ function TournamentLive() {
         <div style={{ textAlign: "center", marginBottom: 16 }}>
           <h2 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 28, color: C.green, margin: "0 0 4px" }}>
             ⛳ Live Tournament</h2>
-          <p style={{ fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 14, color: "#8b7355",
+          <p style={{ fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 16, color: "#8b7355",
             letterSpacing: "0.08em", textTransform: "uppercase" }}>{T.year} {T.name} — Augusta National</p>
           {tourneyStatus && (
             <p style={{ fontFamily: "Georgia,serif", fontSize: 12, color: C.green, marginTop: 4 }}>
@@ -1535,7 +1535,7 @@ function TournamentLive() {
           <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" }}>
             <a href="https://www.masters.com/en_US/live/index.html" target="_blank" rel="noopener" style={{
               padding: "8px 18px", borderRadius: 8, background: C.yellow, color: C.dark,
-              fontFamily: "'Playfair Display',Georgia,serif", fontSize: 14, fontWeight: 700,
+              fontFamily: "'Playfair Display',Georgia,serif", fontSize: 15, fontWeight: 700,
               textDecoration: "none",
             }}>▶ Masters.com</a>
             <a href="https://www.youtube.com/@themasters/streams" target="_blank" rel="noopener" style={{
@@ -1563,7 +1563,7 @@ function TournamentLive() {
           }}>
             <span style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 16,
               fontWeight: 700, color: C.yellow }}>Masters Leaderboard</span>
-            <span style={{ fontFamily: "Georgia,serif", fontSize: 11, color: "#c4d9c4" }}>
+            <span style={{ fontFamily: "Georgia,serif", fontSize: 13, color: "#c4d9c4" }}>
               {lastUpdated ? `Updated ${lastUpdated}` : "Loading..."}
             </span>
           </div>
@@ -1604,18 +1604,18 @@ function TournamentLive() {
                   opacity: g.isCut ? 0.5 : 1,
                 }}>
                   <div style={{ padding: "8px 6px", textAlign: "center",
-                    fontFamily: "'Playfair Display',Georgia,serif", fontSize: 14, fontWeight: 700,
+                    fontFamily: "'Playfair Display',Georgia,serif", fontSize: 15, fontWeight: 700,
                     color: i < 3 ? C.green : "#8b7355",
                   }}>{g.position || i + 1}</div>
                   <div style={{ padding: "8px 6px",
-                    fontFamily: "Georgia,serif", fontSize: 13, color: "#333",
+                    fontFamily: "Georgia,serif", fontSize: 15, color: "#333",
                     fontWeight: i < 5 ? 600 : 400,
                   }}>
                     {g.name}
                     {g.isCut && <span style={{ fontSize: 10, color: "#c62828", marginLeft: 6 }}>CUT</span>}
                   </div>
                   <div style={{ padding: "8px 6px", textAlign: "center",
-                    fontFamily: "'Playfair Display',Georgia,serif", fontSize: 15, fontWeight: 700,
+                    fontFamily: "'Playfair Display',Georgia,serif", fontSize: 17, fontWeight: 700,
                     color: g.scoreValue < 0 ? "#c62828" : g.scoreValue > 0 ? C.green : "#333",
                   }}>{g.score}</div>
                   <div style={{ padding: "8px 6px", textAlign: "center",
@@ -1644,8 +1644,8 @@ function TournamentLive() {
               border: `1px solid ${C.sand}`, boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
             }}>
               <div style={{ fontSize: 20, marginBottom: 3 }}>{icon}</div>
-              <div style={{ fontFamily: "Georgia,serif", fontSize: 12, color: C.green, fontWeight: 600 }}>{title}</div>
-              <div style={{ fontFamily: "Georgia,serif", fontSize: 10, color: "#8b7355" }}>{sub}</div>
+              <div style={{ fontFamily: "Georgia,serif", fontSize: 14, color: C.green, fontWeight: 600 }}>{title}</div>
+              <div style={{ fontFamily: "Georgia,serif", fontSize: 12, color: "#8b7355" }}>{sub}</div>
             </a>
           ))}
         </div>
@@ -2030,9 +2030,9 @@ export default function App() {
                     ["Edit anytime", "Change picks until 1 min before first tee"],
                   ].map(([title, desc], i) => (
                     <div key={i} style={{ marginBottom: 10 }}>
-                      <span style={{ fontFamily: "Georgia,serif", fontSize: 14, fontWeight: 700,
+                      <span style={{ fontFamily: "Georgia,serif", fontSize: 15, fontWeight: 700,
                         color: C.dark }}>{title}</span>
-                      <span style={{ fontFamily: "Georgia,serif", fontSize: 13, color: "#8b7355",
+                      <span style={{ fontFamily: "Georgia,serif", fontSize: 14, color: "#8b7355",
                         marginLeft: 6 }}>— {desc}</span>
                     </div>
                   ))}
@@ -2060,7 +2060,7 @@ export default function App() {
                         fontWeight: 700, color: C.green }}>$10</span>
                     </div>
                   </div>
-                  <p style={{ fontFamily: "Georgia,serif", fontSize: 13, color: "#8b7355", lineHeight: 1.5 }}>
+                  <p style={{ fontFamily: "Georgia,serif", fontSize: 14, color: "#8b7355", lineHeight: 1.5 }}>
                     Pay via Venmo <strong>@ande-scherf</strong>. Include your team name in the note.
                     Payout structure announced before Thursday based on total entries.
                   </p>
