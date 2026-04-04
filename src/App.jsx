@@ -1938,10 +1938,24 @@ export default function App() {
       if (!musicRef.current) {
         const base = import.meta.env.BASE_URL || "/";
         musicRef.current = new Audio(`${base}masters-theme.mp3`);
-        musicRef.current.loop = true;
         musicRef.current.volume = 0.3;
+        musicRef.current.onended = () => setMusicPlaying(false);
       }
-      musicRef.current.play().then(() => setMusicPlaying(true)).catch(() => {});
+      musicRef.current.play().then(() => {
+        setMusicPlaying(true);
+        // Fade out starting at 22 seconds
+        setTimeout(() => {
+          if (!musicRef.current) return;
+          const fadeInterval = setInterval(() => {
+            if (!musicRef.current || musicRef.current.volume <= 0.02) {
+              clearInterval(fadeInterval);
+              if (musicRef.current) { musicRef.current.pause(); setMusicPlaying(false); }
+              return;
+            }
+            musicRef.current.volume = Math.max(0, musicRef.current.volume - 0.02);
+          }, 200);
+        }, 22000);
+      }).catch(() => {});
     } catch {}
   }, []);
 
@@ -1954,6 +1968,18 @@ export default function App() {
       musicRef.current.play().then(() => setMusicPlaying(true)).catch(() => {});
     }
   }, [musicPlaying]);
+
+  // Pause music when user leaves page or locks phone
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (document.hidden && musicRef.current) {
+        musicRef.current.pause();
+        setMusicPlaying(false);
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => document.removeEventListener("visibilitychange", handleVisibility);
+  }, []);
 
   // Synthesize a gentle E major piano arpeggio
   const playMastersChime = useCallback(() => {
