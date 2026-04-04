@@ -921,8 +921,9 @@ function Leaderboard({ entries, isLocked, loading }) {
     setTestLoading(true);
     const log = [];
     try {
-      log.push("🔍 Fetching 2026 Players Championship (completed, big field)...");
-      const res = await fetch(`${SCRIPT_URL}?mode=scores&espnId=401811937&season=2026`);
+      // Test against whatever tournament the Live tab is using (currently works)
+      log.push("📡 Fetching live tournament data (same as ⛳ Live tab)...");
+      const res = await fetch(`${SCRIPT_URL}?mode=scores`);
       const data = await res.json();
       if (!data.success) { log.push("❌ ESPN fetch failed: " + (data.error || "unknown")); setTestLog(log); setTestLoading(false); return; }
       
@@ -943,7 +944,7 @@ function Leaderboard({ entries, isLocked, loading }) {
       // Test name matching against current entries
       if (entries.length > 0) {
         log.push(`\n📋 Scoring ${entries.length} pool entries...`);
-        log.push(`ℹ️ Using 2026 Players Championship — most of your picks should match!`);
+        log.push(`ℹ️ Testing against live tournament data — some picks may not match if it's not the Masters.`);
         log.push(`   Validates name matching, scoring, and ranking.\n`);
         const scored = calculatePoolScores(entries, data.golfers, T.par);
         setTestEntries(scored);
@@ -1204,7 +1205,7 @@ function Leaderboard({ entries, isLocked, loading }) {
           }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
               <span style={{ fontFamily: "Georgia,serif", fontSize: 14, fontWeight: 700, color: "#ff9800" }}>
-                🧪 Scoring Engine Test — 2026 Players</span>
+                🧪 Scoring Engine Test — Live Data</span>
               <button onClick={runTest} disabled={testLoading} style={{
                 padding: "4px 12px", borderRadius: 12, border: "1px solid #555",
                 background: "#333", color: "#fff", fontSize: 11, cursor: "pointer",
@@ -1235,7 +1236,7 @@ function Leaderboard({ entries, isLocked, loading }) {
             {testEntries.length > 0 && (
               <div style={{ marginTop: 16, borderTop: "1px solid #333", paddingTop: 12 }}>
                 <p style={{ fontFamily: "Georgia,serif", fontSize: 13, fontWeight: 700, color: "#ff9800", marginBottom: 8 }}>
-                  Test Rankings (Players Championship scores applied to your entries)</p>
+                  Test Rankings (live tournament scores applied to your entries)</p>
                 {testEntries.map((e, i) => (
                   <div key={i} style={{
                     display: "flex", justifyContent: "space-between", alignItems: "center",
