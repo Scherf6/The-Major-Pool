@@ -212,7 +212,7 @@ function useCountdown(lockTimeISO) {
 /*─────────────────────────────────────────────
   COMPONENTS
 ─────────────────────────────────────────────*/
-function Nav({ view, setView, isLocked, remaining }) {
+function Nav({ view, setView, isLocked, remaining, musicPlaying, toggleMusic }) {
   return (
     <nav style={{
       position: "sticky", top: 0, zIndex: 100,
@@ -235,7 +235,13 @@ function Nav({ view, setView, isLocked, remaining }) {
       }}>
         {isLocked ? "🔒 LOCKED" : `⏱ ${remaining}`}
       </div>
-      <div style={{ display: "flex", gap: 3 }}>
+      {toggleMusic && (
+        <button onClick={toggleMusic} style={{
+          background: "none", border: "none", fontSize: 18,
+          cursor: "pointer", padding: "4px 6px", opacity: 0.8,
+        }}>{musicPlaying ? "🔊" : "🔇"}</button>
+      )}
+      <div style={{ display: "flex", gap: 3, alignItems: "center" }}>
         {["home","picks","leaderboard","tournament"].map(id => (
           <button key={id} onClick={() => setView(id)} style={{
             padding: "6px 10px", border: "none", borderRadius: 6,
@@ -1923,6 +1929,31 @@ export default function App() {
 
   const [showGreeting, setShowGreeting] = useState(true);
   const [greetingTapped, setGreetingTapped] = useState(false);
+  const [musicPlaying, setMusicPlaying] = useState(false);
+  const musicRef = useRef(null);
+
+  // Masters theme music
+  const playMastersTheme = useCallback(() => {
+    try {
+      if (!musicRef.current) {
+        const base = import.meta.env.BASE_URL || "/";
+        musicRef.current = new Audio(`${base}masters-theme.mp3`);
+        musicRef.current.loop = true;
+        musicRef.current.volume = 0.3;
+      }
+      musicRef.current.play().then(() => setMusicPlaying(true)).catch(() => {});
+    } catch {}
+  }, []);
+
+  const toggleMusic = useCallback(() => {
+    if (!musicRef.current) return;
+    if (musicPlaying) {
+      musicRef.current.pause();
+      setMusicPlaying(false);
+    } else {
+      musicRef.current.play().then(() => setMusicPlaying(true)).catch(() => {});
+    }
+  }, [musicPlaying]);
 
   // Synthesize a gentle E major piano arpeggio
   const playMastersChime = useCallback(() => {
@@ -1978,11 +2009,12 @@ export default function App() {
       setGreetingTapped(true);
       speakHelloFriends();
       playMastersChime();
+      playMastersTheme();
       setTimeout(() => setShowGreeting(false), 2500);
     } else {
       setShowGreeting(false);
     }
-  }, [greetingTapped, speakHelloFriends, playMastersChime]);
+  }, [greetingTapped, speakHelloFriends, playMastersChime, playMastersTheme]);
 
   return (
     <div style={{ fontFamily: "Georgia,serif", background: C.cream, minHeight: "100vh" }}>
@@ -2040,7 +2072,7 @@ export default function App() {
         </div>
       )}
 
-      {view !== "home" && <Nav view={view} setView={setView} isLocked={isLocked} remaining={remaining} />}
+      {view !== "home" && <Nav view={view} setView={setView} isLocked={isLocked} remaining={remaining} musicPlaying={musicPlaying} toggleMusic={toggleMusic} />}
       {view === "home" && (
         <>
           <Hero onStart={() => setView("picks")} setView={setView} />
@@ -2145,4 +2177,4 @@ export default function App() {
       </footer>
     </div>
   );
-              }
+}
