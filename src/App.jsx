@@ -2275,51 +2275,77 @@ export default function App() {
                   }}>Will your name be next on the wall?</p>
                 </div>
 
-                {/* 2026 Jacket on hanger */}
+                {/* 2026 Jacket on wooden hanger */}
                 <div style={{ flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center" }}>
-                  <svg width="180" height="260" viewBox="0 0 180 260">
+                  <svg width="200" height="280" viewBox="0 0 200 280">
+                    {/* Closet rod */}
+                    <rect x="0" y="0" width="200" height="8" rx="4" fill="#8B6914"/>
+                    <rect x="0" y="1" width="200" height="3" rx="2" fill="#A07818" opacity="0.6"/>
+                    
+                    {/* Hanger - wooden */}
+                    <path d="M100,8 L100,22" stroke="#5C4010" strokeWidth="3"/>
                     {/* Hanger hook */}
-                    <path d="M90,8 C90,8 90,2 90,2" stroke="#c4a335" strokeWidth="2" fill="none"/>
-                    <circle cx="90" cy="2" r="3" fill="none" stroke="#c4a335" strokeWidth="1.5"/>
-                    {/* Hanger bar */}
-                    <path d="M40,28 L90,8 L140,28" stroke="#c4a335" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
-                    {/* Left shoulder */}
-                    <path d="M40,28 L25,70 L25,230 Q25,245 40,245 L75,245 L75,70 Z" fill="url(#jacket2026)" stroke="rgba(255,255,255,0.1)" strokeWidth="1"/>
-                    {/* Right shoulder */}
-                    <path d="M140,28 L155,70 L155,230 Q155,245 140,245 L105,245 L105,70 Z" fill="url(#jacket2026)" stroke="rgba(255,255,255,0.1)" strokeWidth="1"/>
-                    {/* Center panel / lapel overlap */}
-                    <path d="M75,45 L90,28 L105,45 L105,245 L75,245 Z" fill="url(#jacket2026dark)"/>
+                    <path d="M100,8 C100,4 100,4 100,4" stroke="#888" strokeWidth="2"/>
+                    <path d="M97,5 C97,0 103,0 103,5" stroke="#999" strokeWidth="2" fill="none"/>
+                    {/* Wooden hanger body */}
+                    <path d="M45,35 Q70,22 100,22 Q130,22 155,35" stroke="#8B5E14" strokeWidth="8" fill="none" strokeLinecap="round"/>
+                    <path d="M45,35 Q70,22 100,22 Q130,22 155,35" stroke="#A07818" strokeWidth="5" fill="none" strokeLinecap="round"/>
+                    <path d="M48,33 Q70,23 100,23 Q130,23 152,33" stroke="#C49A28" strokeWidth="1.5" fill="none" strokeLinecap="round" opacity="0.5"/>
+                    
+                    {/* Name tag */}
+                    <rect x="72" y="28" width="56" height="22" rx="2" fill="#f5f0e0" stroke="#d4c9a8" strokeWidth="1"/>
+                    <text x="100" y="43" textAnchor="middle" fontFamily="Georgia,serif" fontSize="11" fontWeight="700" fill="#333">2026</text>
+                    
+                    {/* Jacket body - left side */}
+                    <path d="M45,35 L28,55 L22,240 Q22,255 35,258 L88,258 L88,65 Z" 
+                      fill="url(#jacketGreen)" stroke="rgba(0,0,0,0.15)" strokeWidth="0.5"/>
+                    {/* Jacket body - right side */}
+                    <path d="M155,35 L172,55 L178,240 Q178,255 165,258 L112,258 L112,65 Z" 
+                      fill="url(#jacketGreen)" stroke="rgba(0,0,0,0.15)" strokeWidth="0.5"/>
+                    
                     {/* Left lapel */}
-                    <path d="M75,45 L90,28 L90,75 L80,80 Z" fill="url(#jacket2026)" stroke="rgba(255,255,255,0.08)" strokeWidth="0.5"/>
+                    <path d="M88,50 L100,30 L100,90 L92,95 Z" fill="url(#jacketDark)" stroke="rgba(0,0,0,0.1)" strokeWidth="0.5"/>
                     {/* Right lapel */}
-                    <path d="M105,45 L90,28 L90,75 L100,80 Z" fill="url(#jacket2026)" stroke="rgba(255,255,255,0.08)" strokeWidth="0.5"/>
+                    <path d="M112,50 L100,30 L100,90 L108,95 Z" fill="url(#jacketDark)" stroke="rgba(0,0,0,0.1)" strokeWidth="0.5"/>
+                    {/* Center seam */}
+                    <line x1="100" y1="90" x2="100" y2="258" stroke="rgba(0,0,0,0.08)" strokeWidth="1"/>
+                    
                     {/* Buttons */}
-                    <circle cx="90" cy="100" r="3" fill="#c4a335" opacity="0.8"/>
-                    <circle cx="90" cy="125" r="3" fill="#c4a335" opacity="0.7"/>
-                    <circle cx="90" cy="150" r="3" fill="#c4a335" opacity="0.6"/>
+                    <circle cx="100" cy="110" r="3.5" fill="#c4a335" stroke="#a08520" strokeWidth="0.5"/>
+                    <circle cx="100" cy="140" r="3.5" fill="#c4a335" stroke="#a08520" strokeWidth="0.5"/>
+                    <circle cx="100" cy="170" r="3.5" fill="#c4a335" stroke="#a08520" strokeWidth="0.5"/>
+                    
                     {/* Breast pocket */}
-                    <rect x="96" y="88" width="22" height="2" rx="1" fill="rgba(255,255,255,0.06)"/>
-                    {/* Patch */}
-                    <rect x="56" y="135" width="40" height="50" rx="4" fill="rgba(0,0,0,0.25)" stroke="#c4a335" strokeWidth="1" opacity="0.9"/>
-                    <text x="76" y="158" textAnchor="middle" fontFamily="'Playfair Display',Georgia,serif" fontSize="16" fontWeight="900" fill="#c4a335">2026</text>
-                    <text x="76" y="173" textAnchor="middle" fontFamily="Georgia,serif" fontSize="6" fill="#a8d5a8" letterSpacing="1.5" textTransform="uppercase">MASTERS</text>
-                    <text x="76" y="181" textAnchor="middle" fontFamily="Georgia,serif" fontSize="5.5" fill="#a8d5a8" letterSpacing="1">CHAMPION</text>
-                    {/* Gradients */}
+                    <path d="M108,105 L130,105 L130,107" stroke="rgba(0,0,0,0.1)" strokeWidth="1" fill="none"/>
+                    
+                    {/* Augusta National patch */}
+                    <rect x="60" y="150" width="34" height="44" rx="3" fill="rgba(0,0,0,0.2)" stroke="#c4a335" strokeWidth="0.8"/>
+                    <text x="77" y="168" textAnchor="middle" fontFamily="'Playfair Display',Georgia,serif" fontSize="12" fontWeight="900" fill="#c4a335">2026</text>
+                    <text x="77" y="180" textAnchor="middle" fontFamily="Georgia,serif" fontSize="5" fill="#a8d5a8" letterSpacing="1">MASTERS</text>
+                    <text x="77" y="188" textAnchor="middle" fontFamily="Georgia,serif" fontSize="4.5" fill="#a8d5a8" letterSpacing="0.8">CHAMPION</text>
+                    
+                    {/* Fabric texture lines */}
+                    <line x1="40" y1="80" x2="85" y2="75" stroke="rgba(255,255,255,0.03)" strokeWidth="0.5"/>
+                    <line x1="115" y1="75" x2="165" y2="80" stroke="rgba(255,255,255,0.03)" strokeWidth="0.5"/>
+                    <line x1="35" y1="120" x2="85" y2="115" stroke="rgba(255,255,255,0.02)" strokeWidth="0.5"/>
+                    <line x1="115" y1="115" x2="170" y2="120" stroke="rgba(255,255,255,0.02)" strokeWidth="0.5"/>
+
                     <defs>
-                      <linearGradient id="jacket2026" x1="0" y1="0" x2="1" y2="1">
-                        <stop offset="0%" stopColor="#006747"/>
-                        <stop offset="50%" stopColor="#004d35"/>
-                        <stop offset="100%" stopColor="#003825"/>
+                      <linearGradient id="jacketGreen" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stopColor="#1a6b44"/>
+                        <stop offset="30%" stopColor="#006747"/>
+                        <stop offset="70%" stopColor="#005538"/>
+                        <stop offset="100%" stopColor="#004028"/>
                       </linearGradient>
-                      <linearGradient id="jacket2026dark" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#003825"/>
-                        <stop offset="100%" stopColor="#002a1c"/>
+                      <linearGradient id="jacketDark" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#004d35"/>
+                        <stop offset="100%" stopColor="#003825"/>
                       </linearGradient>
                     </defs>
                   </svg>
                   <p style={{
                     fontFamily: "Georgia,serif", fontSize: 13, color: C.yellow,
-                    fontStyle: "italic", marginTop: -8, opacity: 0.8,
+                    fontStyle: "italic", marginTop: -4, opacity: 0.8,
                   }}>awaiting its owner...</p>
                 </div>
               </div>
