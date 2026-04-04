@@ -267,7 +267,7 @@ function Hero({ onStart, setView }) {
           left: `${Math.random() * 100}%`, top: `${Math.random() * 100}%`,
         }} />
       ))}
-      <div style={{ position: "relative", zIndex: 1, maxWidth: 650 }}>
+      <div style={{ position: "relative", zIndex: 1, maxWidth: 650, display: "flex", flexDirection: "column", alignItems: "center" }}>
         {MODE === "valero" && (
           <div style={{
             background: "#ff9800", color: "#fff", display: "inline-block",
@@ -341,7 +341,7 @@ function Hero({ onStart, setView }) {
           marginTop: 14, padding: "10px 24px", borderRadius: 20,
           background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.25)",
           color: "#fff", fontFamily: "Georgia,serif", fontSize: 14,
-          cursor: "pointer", display: "flex", alignItems: "center", gap: 8,
+          cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
         }}>📤 Invite Your Friends</button>
       </div>
     </div>
@@ -1928,7 +1928,7 @@ export default function App() {
       setGreetingTapped(true);
       speakHelloFriends();
       playMastersChime();
-      setTimeout(() => setShowGreeting(false), 4000);
+      setTimeout(() => setShowGreeting(false), 2500);
     } else {
       setShowGreeting(false);
     }
@@ -1942,7 +1942,7 @@ export default function App() {
         button:hover { opacity: 0.93; }
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-thumb { background: ${C.sand}; border-radius: 4px; }
-        @keyframes greetFade { 0% { opacity: 0; transform: scale(0.9); } 15% { opacity: 1; transform: scale(1); } 80% { opacity: 1; } 100% { opacity: 0; transform: scale(1.02); } }
+        @keyframes greetFade { 0% { opacity: 1; } 70% { opacity: 1; } 100% { opacity: 0; transform: scale(1.02); } }
         @keyframes jacketGlow { 0%,100% { text-shadow: 0 0 8px rgba(0,103,71,0.3); } 50% { text-shadow: 0 0 20px rgba(0,103,71,0.6), 0 0 40px rgba(242,201,76,0.3); } }
         @media (max-width: 700px) {
           .pool-board { overflow-x: auto; -webkit-overflow-scrolling: touch; }
@@ -1958,19 +1958,20 @@ export default function App() {
           background: "rgba(0,40,20,0.93)", backdropFilter: "blur(10px)",
           display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
           cursor: "pointer",
-          ...(greetingTapped ? { animation: "greetFade 4s ease-in-out 0.5s forwards" } : {}),
+          ...(greetingTapped ? { animation: "greetFade 2.5s ease-in-out forwards" } : {}),
         }}>
           <div style={{ fontSize: 64, marginBottom: 20 }}>⛳</div>
           <p style={{
             fontFamily: "'Playfair Display',Georgia,serif",
             fontSize: 48, fontWeight: 700, color: C.yellow,
-            textAlign: "center", lineHeight: 1.2,
+            textAlign: "center", lineHeight: 1.2, padding: "0 16px",
             textShadow: "0 2px 20px rgba(0,0,0,0.3)",
           }}>Hello, Friends.</p>
           <p style={{
             fontFamily: "'Cormorant Garamond',Georgia,serif",
             fontSize: 20, color: "#a8d5a8", marginTop: 12,
             letterSpacing: "0.15em", textTransform: "uppercase",
+            textAlign: "center", padding: "0 20px",
           }}>Welcome to the Masters Pool</p>
           <div style={{
             marginTop: 28, display: "flex", flexDirection: "column", alignItems: "center", gap: 8,
@@ -2094,4 +2095,4 @@ export default function App() {
       </footer>
     </div>
   );
-                                                                 }
+      }
