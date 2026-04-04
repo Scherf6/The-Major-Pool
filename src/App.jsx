@@ -2007,14 +2007,12 @@ export default function App() {
   const handleGreetingTap = useCallback(() => {
     if (!greetingTapped) {
       setGreetingTapped(true);
-      speakHelloFriends();
-      playMastersChime();
       playMastersTheme();
       setTimeout(() => setShowGreeting(false), 2500);
     } else {
       setShowGreeting(false);
     }
-  }, [greetingTapped, speakHelloFriends, playMastersChime, playMastersTheme]);
+  }, [greetingTapped, playMastersTheme]);
 
   return (
     <div style={{ fontFamily: "Georgia,serif", background: C.cream, minHeight: "100vh" }}>
