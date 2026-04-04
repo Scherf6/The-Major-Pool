@@ -921,8 +921,8 @@ function Leaderboard({ entries, isLocked, loading }) {
     setTestLoading(true);
     const log = [];
     try {
-      log.push("🔍 Fetching 2025 Masters scores from ESPN...");
-      const res = await fetch(`${SCRIPT_URL}?mode=scores&espnId=401703504`);
+      log.push("🔍 Fetching Valero Texas Open (live) to validate engine...");
+      const res = await fetch(`${SCRIPT_URL}?mode=scores&espnId=401811940`);
       const data = await res.json();
       if (!data.success) { log.push("❌ ESPN fetch failed: " + (data.error || "unknown")); setTestLog(log); setTestLoading(false); return; }
       
@@ -943,6 +943,8 @@ function Leaderboard({ entries, isLocked, loading }) {
       // Test name matching against current entries
       if (entries.length > 0) {
         log.push(`\n📋 Scoring ${entries.length} pool entries...`);
+        log.push(`ℹ️ Using Valero field — many Masters picks won't match (expected)`);
+        log.push(`   This validates the engine mechanics, not name matching.\n`);
         const scored = calculatePoolScores(entries, data.golfers, T.par);
         setTestEntries(scored);
         
@@ -1194,7 +1196,7 @@ function Leaderboard({ entries, isLocked, loading }) {
           }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
               <span style={{ fontFamily: "Georgia,serif", fontSize: 14, fontWeight: 700, color: "#ff9800" }}>
-                🧪 Scoring Engine Test — 2025 Masters Data</span>
+                🧪 Scoring Engine Test — Live Valero Data</span>
               <button onClick={runTest} disabled={testLoading} style={{
                 padding: "4px 12px", borderRadius: 12, border: "1px solid #555",
                 background: "#333", color: "#fff", fontSize: 11, cursor: "pointer",
@@ -1225,7 +1227,7 @@ function Leaderboard({ entries, isLocked, loading }) {
             {testEntries.length > 0 && (
               <div style={{ marginTop: 16, borderTop: "1px solid #333", paddingTop: 12 }}>
                 <p style={{ fontFamily: "Georgia,serif", fontSize: 13, fontWeight: 700, color: "#ff9800", marginBottom: 8 }}>
-                  Test Rankings (2025 Masters scores applied to your entries)</p>
+                  Test Rankings (Valero scores — validates engine mechanics)</p>
                 {testEntries.map((e, i) => (
                   <div key={i} style={{
                     display: "flex", justifyContent: "space-between", alignItems: "center",
@@ -1250,72 +1252,6 @@ function Leaderboard({ entries, isLocked, loading }) {
                     </span>
                   </div>
                 ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Hidden test mode — triple-tap LEADERS to toggle */}
-        {testMode && (
-          <div style={{
-            marginTop: 20, background: "#1a1a1a", borderRadius: 12,
-            padding: 20, color: "#0f0", fontFamily: "monospace",
-            border: "2px solid #333",
-          }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-              <span style={{ fontSize: 14, fontWeight: 700, color: "#0f0" }}>🔧 SCORING ENGINE TEST MODE</span>
-              <button onClick={() => { setTestMode(false); setTestEntries(null); setTestLog([]); }} style={{
-                background: "#333", border: "none", color: "#999", padding: "4px 10px",
-                borderRadius: 4, fontSize: 11, cursor: "pointer",
-              }}>✕ Close</button>
-            </div>
-            <p style={{ fontSize: 11, color: "#888", marginBottom: 12 }}>
-              Tests scoring against 2025 Masters (completed tournament) using your current entries.
-              No config changes needed.</p>
-            
-            <button onClick={runTest} disabled={testLoading} style={{
-              padding: "8px 20px", border: "none", borderRadius: 6,
-              background: testLoading ? "#333" : "#0a0", color: "#fff",
-              fontFamily: "monospace", fontSize: 13, cursor: testLoading ? "default" : "pointer",
-              marginBottom: 12,
-            }}>{testLoading ? "Running..." : "▶ Run Scoring Test"}</button>
-
-            {testLog.length > 0 && (
-              <div style={{
-                background: "#111", borderRadius: 6, padding: 12,
-                maxHeight: 400, overflowY: "auto", fontSize: 11, lineHeight: 1.6,
-              }}>
-                {testLog.map((line, i) => (
-                  <div key={i} style={{
-                    color: line.includes("❌") ? "#f44" : line.includes("✅") ? "#4f4" :
-                      line.includes("⚠️") ? "#fa0" : line.startsWith("  ") ? "#8f8" : "#0f0",
-                  }}>{line}</div>
-                ))}
-              </div>
-            )}
-
-            {testEntries && testEntries.length > 0 && (
-              <div style={{ marginTop: 12 }}>
-                <p style={{ fontSize: 12, color: "#0f0", fontWeight: 700, marginBottom: 6 }}>
-                  Scored Leaderboard Preview:</p>
-                <div style={{ background: "#111", borderRadius: 6, padding: 8, fontSize: 12 }}>
-                  {testEntries.map((e, i) => (
-                    <div key={i} style={{
-                      display: "flex", justifyContent: "space-between", padding: "4px 8px",
-                      color: i === 0 ? "#ff0" : "#ccc",
-                      borderBottom: "1px solid #222",
-                    }}>
-                      <span>{i === 0 ? "🧥 " : `#${i+1} `}{e.name}</span>
-                      <span style={{
-                        color: e.totalScore < 0 ? "#f44" : e.totalScore > 0 ? "#4f4" : "#fff",
-                        fontWeight: 700,
-                      }}>
-                        {e.totalScore != null ? (e.totalScore < 0 ? e.totalScore : e.totalScore > 0 ? `+${e.totalScore}` : "E") : "—"}
-                        {e.totalStrokes ? ` (${e.totalStrokes})` : ""}
-                      </span>
-                    </div>
-                  ))}
-                </div>
               </div>
             )}
           </div>
@@ -2150,4 +2086,4 @@ export default function App() {
       </footer>
     </div>
   );
-      }
+}
