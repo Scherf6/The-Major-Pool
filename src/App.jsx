@@ -542,11 +542,11 @@ function PicksFlow({ onComplete, isLocked, existingEntry, allEntries }) {
                   letterSpacing: "0.14em", textTransform: "uppercase", color: "#8b7355" }}>Your Name</label>
                 <div style={{ display: "flex", gap: 8, marginTop: 5 }}>
                   <input type="text" value={firstName} onChange={e => setFirstName(e.target.value)}
-                    placeholder="First" style={{ flex: 1, padding: "12px", borderRadius: 8,
+                    placeholder="First" style={{ flex: 1, minWidth: 0, padding: "12px", borderRadius: 8,
                       border: `2px solid ${C.sand}`, fontSize: 15, fontFamily: "Georgia,serif",
                       outline: "none", boxSizing: "border-box" }} />
                   <input type="text" value={lastName} onChange={e => setLastName(e.target.value)}
-                    placeholder="Last" style={{ flex: 1, padding: "12px", borderRadius: 8,
+                    placeholder="Last" style={{ flex: 1, minWidth: 0, padding: "12px", borderRadius: 8,
                       border: `2px solid ${C.sand}`, fontSize: 15, fontFamily: "Georgia,serif",
                       outline: "none", boxSizing: "border-box" }} />
                 </div>
@@ -2094,4 +2094,4 @@ export default function App() {
       </footer>
     </div>
   );
-                                           }
+                                                                 }
