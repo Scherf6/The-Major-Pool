@@ -912,6 +912,64 @@ function Confirmation({ entry, onLeaderboard, onEdit }) {
 
 function Leaderboard({ entries, isLocked, loading }) {
   const [expanded, setExpanded] = useState(null);
+  const [testMode, setTestMode] = useState(false);
+  const [testEntries, setTestEntries] = useState([]);
+  const [testLoading, setTestLoading] = useState(false);
+  const [testLog, setTestLog] = useState([]);
+
+  const runTest = async () => {
+    setTestLoading(true);
+    const log = [];
+    try {
+      log.push("🔍 Fetching 2025 Masters scores from ESPN...");
+      const res = await fetch(`${SCRIPT_URL}?mode=scores&espnId=401703504`);
+      const data = await res.json();
+      if (!data.success) { log.push("❌ ESPN fetch failed: " + (data.error || "unknown")); setTestLog(log); setTestLoading(false); return; }
+      
+      log.push(`✅ Got ${data.golfers.length} golfers from ${data.tournament}`);
+      log.push(`📊 Status: ${data.status} · Round: ${data.round}`);
+      
+      // Show sample golfer data format
+      const sample = data.golfers[0];
+      if (sample) {
+        log.push(`🏌️ #1: ${sample.name} · Score: ${sample.score} (${sample.scoreValue}) · Rounds: ${sample.rounds.map(r => r.score).join(", ")}`);
+        log.push(`   Cut: ${sample.isCut} · State: ${sample.state} · Thru: ${sample.thru}`);
+      }
+      const sample2 = data.golfers.find(g => g.isCut);
+      if (sample2) {
+        log.push(`✂️ Cut example: ${sample2.name} · Rounds: ${sample2.rounds.map(r => r.score).join(", ")} · isCut: ${sample2.isCut}`);
+      }
+      
+      // Test name matching against current entries
+      if (entries.length > 0) {
+        log.push(`\n📋 Scoring ${entries.length} pool entries...`);
+        const scored = calculatePoolScores(entries, data.golfers, T.par);
+        setTestEntries(scored);
+        
+        scored.forEach((entry, i) => {
+          const gs = entry.golferScores || [];
+          const matched = gs.filter(g => g.found).length;
+          const missed = gs.filter(g => !g.found).map(g => g.name);
+          log.push(`\n${i+1}. ${entry.name} — Total: ${entry.totalScore != null ? entry.totalScore : "N/A"} (${entry.totalStrokes || "—"} strokes)`);
+          log.push(`   Matched: ${matched}/6 golfers`);
+          if (missed.length > 0) log.push(`   ⚠️ NOT FOUND: ${missed.join(", ")}`);
+          gs.forEach(g => {
+            if (g.found) {
+              log.push(`   ${g.found ? "✅" : "❌"} ${g.name} → ${g.totalStrokes} strokes ${g.isCut ? "(CUT)" : ""}`);
+            }
+          });
+        });
+      } else {
+        log.push("⚠️ No pool entries to score — submit some picks first");
+      }
+      
+      log.push("\n✅ Test complete");
+    } catch (err) {
+      log.push("❌ Error: " + err.toString());
+    }
+    setTestLog(log);
+    setTestLoading(false);
+  };
 
   const B = {
     bg: "#f5f1e8", board: "#ffffff", headerBg: C.green,
@@ -934,6 +992,7 @@ function Leaderboard({ entries, isLocked, loading }) {
             fontSize: 36, fontWeight: 900, color: B.yellow,
             letterSpacing: "0.15em", textTransform: "uppercase",
             margin: 0, textShadow: "2px 2px 4px rgba(0,0,0,0.3)",
+            cursor: "default", userSelect: "none",
           }}>LEADERS</h2>
           <p style={{
             fontFamily: "Georgia,serif", fontSize: 12, color: "#c4d9c4",
@@ -1032,19 +1091,61 @@ function Leaderboard({ entries, isLocked, loading }) {
                       <>
                         <p style={{ fontFamily: "Georgia,serif", fontSize: 11, color: B.muted,
                           margin: "0 0 8px", textTransform: "uppercase", letterSpacing: "0.08em" }}>Golfers</p>
-                        <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-                          {(e.picks || []).map((p, j) => (
-                            <span key={j} style={{
-                              fontFamily: "Georgia,serif", fontSize: 13,
-                              padding: "4px 10px", borderRadius: 6,
-                              background: B.white, color: B.green,
-                              border: `1px solid ${B.border}`, fontWeight: 600,
-                            }}>{p}</span>
-                          ))}
+                        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                          {(e.golferScores || e.picks.map(p => ({ name: p }))).map((gs, j) => {
+                            const hasScore = gs.totalStrokes != null;
+                            // Determine if this golfer is in the best 4
+                            const allStrokes = (e.golferScores || [])
+                              .map(g => g.totalStrokes).filter(s => s != null).sort((a,b) => a - b);
+                            const best4Threshold = allStrokes.length >= 4 ? allStrokes[3] : Infinity;
+                            const isInBest4 = hasScore && gs.totalStrokes <= best4Threshold;
+                            const scoreToPar = hasScore ? gs.totalStrokes - (T.par * (gs.golfer?.rounds?.length || 4)) : null;
+                            
+                            return (
+                              <div key={j} style={{
+                                display: "flex", justifyContent: "space-between", alignItems: "center",
+                                padding: "5px 10px", borderRadius: 6,
+                                background: isInBest4 ? `${B.green}10` : (gs.isCut ? "#fff5f5" : B.white),
+                                border: `1px solid ${isInBest4 ? B.green + "30" : B.border}`,
+                                opacity: !isInBest4 && hasScore ? 0.6 : 1,
+                              }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                                  {isInBest4 && <span style={{ color: B.green, fontSize: 10 }}>✓</span>}
+                                  <span style={{ fontFamily: "Georgia,serif", fontSize: 13,
+                                    color: B.text, fontWeight: isInBest4 ? 600 : 400 }}>
+                                    {gs.name || (e.picks && e.picks[j]) || ""}
+                                  </span>
+                                  {gs.isCut && <span style={{ fontSize: 10, color: B.red, marginLeft: 4 }}>CUT</span>}
+                                </div>
+                                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                  {hasScore && (
+                                    <span style={{
+                                      fontFamily: "'Playfair Display',Georgia,serif", fontSize: 14, fontWeight: 700,
+                                      color: scoreToPar < 0 ? B.red : scoreToPar > 0 ? B.green : B.text,
+                                    }}>{scoreToPar < 0 ? scoreToPar : scoreToPar > 0 ? `+${scoreToPar}` : "E"}</span>
+                                  )}
+                                  {hasScore && (
+                                    <span style={{ fontFamily: "Georgia,serif", fontSize: 11, color: B.muted }}>
+                                      ({gs.totalStrokes})
+                                    </span>
+                                  )}
+                                  {!hasScore && <span style={{ fontFamily: "Georgia,serif", fontSize: 12, color: B.muted }}>—</span>}
+                                </div>
+                              </div>
+                            );
+                          })}
                         </div>
-                        <p style={{
-                          fontFamily: "Georgia,serif", fontSize: 11, color: B.muted, marginTop: 8,
-                        }}>Predicted winning score: {e.winScore} · Best 4 of 6 count</p>
+                        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 10,
+                          padding: "6px 10px", borderRadius: 6, background: `${B.green}08` }}>
+                          <span style={{ fontFamily: "Georgia,serif", fontSize: 11, color: B.muted }}>
+                            Best 4 of 6 · Predicted: {e.winScore}</span>
+                          {e.totalScore != null && (
+                            <span style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 14, fontWeight: 700,
+                              color: e.totalScore < 0 ? B.red : e.totalScore > 0 ? B.green : B.text }}>
+                              Total: {e.totalScore < 0 ? e.totalScore : e.totalScore > 0 ? `+${e.totalScore}` : "E"}
+                            </span>
+                          )}
+                        </div>
                       </>
                     ) : (
                       <p style={{
@@ -1073,7 +1174,152 @@ function Leaderboard({ entries, isLocked, loading }) {
               target="_blank" rel="noopener" style={{ color: B.green }}>ESPN Leaderboard</a>
             {" · "}{isLocked ? "Tap a row to see picks" : "🔒 Picks hidden until first tee"}
           </p>
+          
+          {/* Dev test button */}
+          <button onClick={() => { setTestMode(!testMode); if (!testMode && testLog.length === 0) runTest(); }}
+            style={{
+              marginTop: 10, padding: "6px 14px", borderRadius: 16,
+              background: testMode ? "#fff3e0" : "transparent",
+              border: `1px solid ${testMode ? "#ff9800" : B.border}`,
+              fontFamily: "Georgia,serif", fontSize: 11,
+              color: testMode ? "#e65100" : B.muted, cursor: "pointer",
+            }}>🧪 {testMode ? "Hide" : "Test"} Scoring Engine</button>
         </div>
+
+        {/* Test results panel */}
+        {testMode && (
+          <div style={{
+            marginTop: 16, background: "#1a1a2e", borderRadius: 12, padding: 20,
+            border: "1px solid #333", maxHeight: 500, overflowY: "auto",
+          }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+              <span style={{ fontFamily: "Georgia,serif", fontSize: 14, fontWeight: 700, color: "#ff9800" }}>
+                🧪 Scoring Engine Test — 2025 Masters Data</span>
+              <button onClick={runTest} disabled={testLoading} style={{
+                padding: "4px 12px", borderRadius: 12, border: "1px solid #555",
+                background: "#333", color: "#fff", fontSize: 11, cursor: "pointer",
+                fontFamily: "Georgia,serif",
+              }}>{testLoading ? "Running..." : "🔄 Re-run"}</button>
+            </div>
+            
+            {testLoading && (
+              <p style={{ fontFamily: "monospace", fontSize: 12, color: "#aaa" }}>⏳ Fetching ESPN data...</p>
+            )}
+            
+            <div style={{ fontFamily: "monospace", fontSize: 11, color: "#ccc", lineHeight: 1.6 }}>
+              {testLog.map((line, i) => (
+                <div key={i} style={{
+                  color: line.startsWith("❌") ? "#ef5350"
+                    : line.startsWith("✅") ? "#66bb6a"
+                    : line.startsWith("⚠️") ? "#ffa726"
+                    : line.startsWith("🏌️") || line.startsWith("✂️") ? "#42a5f5"
+                    : line.includes("Total:") ? "#fff"
+                    : "#aaa",
+                  borderBottom: line.startsWith("\n") ? "1px solid #333" : "none",
+                  paddingTop: line.startsWith("\n") ? 6 : 0,
+                  whiteSpace: "pre-wrap",
+                }}>{line}</div>
+              ))}
+            </div>
+
+            {testEntries.length > 0 && (
+              <div style={{ marginTop: 16, borderTop: "1px solid #333", paddingTop: 12 }}>
+                <p style={{ fontFamily: "Georgia,serif", fontSize: 13, fontWeight: 700, color: "#ff9800", marginBottom: 8 }}>
+                  Test Rankings (2025 Masters scores applied to your entries)</p>
+                {testEntries.map((e, i) => (
+                  <div key={i} style={{
+                    display: "flex", justifyContent: "space-between", alignItems: "center",
+                    padding: "6px 8px", borderRadius: 6,
+                    background: i === 0 ? "rgba(102,187,106,0.15)" : "transparent",
+                    marginBottom: 2,
+                  }}>
+                    <span style={{ fontFamily: "Georgia,serif", fontSize: 12, color: "#fff" }}>
+                      {i === 0 ? "🧥" : `${i+1}.`} {e.name}
+                      <span style={{ color: "#888", marginLeft: 6, fontSize: 10 }}>
+                        ({(e.golferScores || []).filter(g => g.found).length}/6 matched)
+                      </span>
+                    </span>
+                    <span style={{
+                      fontFamily: "'Playfair Display',Georgia,serif", fontSize: 14, fontWeight: 700,
+                      color: e.totalScore != null
+                        ? (e.totalScore < 0 ? "#ef5350" : e.totalScore > 0 ? "#66bb6a" : "#fff")
+                        : "#555",
+                    }}>
+                      {e.totalScore != null ? (e.totalScore < 0 ? e.totalScore : e.totalScore > 0 ? `+${e.totalScore}` : "E") : "—"}
+                      <span style={{ fontSize: 10, color: "#888", marginLeft: 4 }}>({e.totalStrokes || "—"})</span>
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Hidden test mode — triple-tap LEADERS to toggle */}
+        {testMode && (
+          <div style={{
+            marginTop: 20, background: "#1a1a1a", borderRadius: 12,
+            padding: 20, color: "#0f0", fontFamily: "monospace",
+            border: "2px solid #333",
+          }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+              <span style={{ fontSize: 14, fontWeight: 700, color: "#0f0" }}>🔧 SCORING ENGINE TEST MODE</span>
+              <button onClick={() => { setTestMode(false); setTestEntries(null); setTestLog([]); }} style={{
+                background: "#333", border: "none", color: "#999", padding: "4px 10px",
+                borderRadius: 4, fontSize: 11, cursor: "pointer",
+              }}>✕ Close</button>
+            </div>
+            <p style={{ fontSize: 11, color: "#888", marginBottom: 12 }}>
+              Tests scoring against 2025 Masters (completed tournament) using your current entries.
+              No config changes needed.</p>
+            
+            <button onClick={runTest} disabled={testLoading} style={{
+              padding: "8px 20px", border: "none", borderRadius: 6,
+              background: testLoading ? "#333" : "#0a0", color: "#fff",
+              fontFamily: "monospace", fontSize: 13, cursor: testLoading ? "default" : "pointer",
+              marginBottom: 12,
+            }}>{testLoading ? "Running..." : "▶ Run Scoring Test"}</button>
+
+            {testLog.length > 0 && (
+              <div style={{
+                background: "#111", borderRadius: 6, padding: 12,
+                maxHeight: 400, overflowY: "auto", fontSize: 11, lineHeight: 1.6,
+              }}>
+                {testLog.map((line, i) => (
+                  <div key={i} style={{
+                    color: line.includes("❌") ? "#f44" : line.includes("✅") ? "#4f4" :
+                      line.includes("⚠️") ? "#fa0" : line.startsWith("  ") ? "#8f8" : "#0f0",
+                  }}>{line}</div>
+                ))}
+              </div>
+            )}
+
+            {testEntries && testEntries.length > 0 && (
+              <div style={{ marginTop: 12 }}>
+                <p style={{ fontSize: 12, color: "#0f0", fontWeight: 700, marginBottom: 6 }}>
+                  Scored Leaderboard Preview:</p>
+                <div style={{ background: "#111", borderRadius: 6, padding: 8, fontSize: 12 }}>
+                  {testEntries.map((e, i) => (
+                    <div key={i} style={{
+                      display: "flex", justifyContent: "space-between", padding: "4px 8px",
+                      color: i === 0 ? "#ff0" : "#ccc",
+                      borderBottom: "1px solid #222",
+                    }}>
+                      <span>{i === 0 ? "🧥 " : `#${i+1} `}{e.name}</span>
+                      <span style={{
+                        color: e.totalScore < 0 ? "#f44" : e.totalScore > 0 ? "#4f4" : "#fff",
+                        fontWeight: 700,
+                      }}>
+                        {e.totalScore != null ? (e.totalScore < 0 ? e.totalScore : e.totalScore > 0 ? `+${e.totalScore}` : "E") : "—"}
+                        {e.totalStrokes ? ` (${e.totalStrokes})` : ""}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -1473,12 +1719,126 @@ function TournamentLive() {
 }
 
 /*─────────────────────────────────────────────
+  SCORING ENGINE
+  Takes pool entries + ESPN golfer data, calculates
+  best-4-of-6 totals and ranks entries.
+─────────────────────────────────────────────*/
+const PAR = 72;
+const CUT_ROUND_SCORE = 80;
+
+function matchGolfer(pickName, espnGolfers) {
+  if (!pickName || !espnGolfers.length) return null;
+  const pick = pickName.toLowerCase().trim();
+  // Try exact match first
+  let match = espnGolfers.find(g => g.name.toLowerCase() === pick);
+  if (match) return match;
+  // Try last name match
+  const pickLast = pick.split(" ").pop();
+  const lastMatches = espnGolfers.filter(g => g.lastName.toLowerCase() === pickLast);
+  if (lastMatches.length === 1) return lastMatches[0];
+  // Try first+last contains
+  match = espnGolfers.find(g => g.name.toLowerCase().includes(pick) || pick.includes(g.name.toLowerCase()));
+  if (match) return match;
+  // Try last name contains
+  match = espnGolfers.find(g => g.lastName.toLowerCase().includes(pickLast) || pickLast.includes(g.lastName.toLowerCase()));
+  return match || null;
+}
+
+function getGolferTotalStrokes(golfer) {
+  if (!golfer) return CUT_ROUND_SCORE * 4; // Unknown golfer = worst case
+  const rounds = golfer.rounds || [];
+  let total = 0;
+  const completedRounds = rounds.length;
+  
+  for (let i = 0; i < 4; i++) {
+    if (i < completedRounds && rounds[i] && rounds[i].score != null) {
+      total += rounds[i].score;
+    } else if (golfer.isCut && i >= 2) {
+      // Cut after R2: give 80 for R3 and R4
+      total += CUT_ROUND_SCORE;
+    } else if (golfer.state === "withdrawn" || golfer.state === "disqualified") {
+      total += CUT_ROUND_SCORE;
+    } else {
+      // Round not yet played — don't count it yet
+      // During tournament, only count completed rounds
+      total += 0;
+    }
+  }
+  
+  // If golfer has 0 completed rounds, return null (tournament hasn't started for them)
+  if (completedRounds === 0 && !golfer.isCut) return null;
+  return total;
+}
+
+function calculatePoolScores(entries, espnGolfers, par) {
+  if (!espnGolfers || espnGolfers.length === 0) return entries;
+  
+  // Find the winning score for tiebreaker
+  const winner = espnGolfers[0];
+  const winningScore = winner ? winner.scoreValue : 0;
+  
+  const scored = entries.map(entry => {
+    const picks = entry.picks || [];
+    const golferScores = picks.map(pickName => {
+      const golfer = matchGolfer(pickName, espnGolfers);
+      const totalStrokes = getGolferTotalStrokes(golfer);
+      return {
+        name: pickName,
+        golfer: golfer,
+        totalStrokes: totalStrokes,
+        found: !!golfer,
+        isCut: golfer ? golfer.isCut : false,
+        score: golfer ? golfer.score : "—",
+      };
+    });
+    
+    // Get valid scores (non-null), sort ascending
+    const validScores = golferScores
+      .map(gs => gs.totalStrokes)
+      .filter(s => s != null)
+      .sort((a, b) => a - b);
+    
+    // Best 4 of 6 (or however many are available)
+    const best4 = validScores.slice(0, 4);
+    const totalStrokes = best4.length > 0 ? best4.reduce((a, b) => a + b, 0) : null;
+    
+    // Convert to score relative to par (for display like -12, +4, E)
+    const totalScore = totalStrokes != null ? totalStrokes - (par * best4.length) : null;
+    
+    // Tiebreaker: distance from predicted winning score to actual
+    const tbDistance = entry.winScore != null ? Math.abs(entry.winScore - winningScore) : 999;
+    
+    return {
+      ...entry,
+      golferScores,
+      totalStrokes,
+      totalScore,
+      tbDistance,
+      best4Count: best4.length,
+    };
+  });
+  
+  // Sort: lowest totalScore first, then tiebreaker
+  scored.sort((a, b) => {
+    if (a.totalScore == null && b.totalScore == null) return 0;
+    if (a.totalScore == null) return 1;
+    if (b.totalScore == null) return -1;
+    if (a.totalScore !== b.totalScore) return a.totalScore - b.totalScore;
+    return a.tbDistance - b.tbDistance;
+  });
+  
+  return scored;
+}
+
+/*─────────────────────────────────────────────
   APP
 ─────────────────────────────────────────────*/
 export default function App() {
   const [view, setView] = useState("home");
   const [entry, setEntry] = useState(null);
   const [entries, setEntries] = useState([]);
+  const [espnGolfers, setEspnGolfers] = useState([]);
+  const [scoredEntries, setScoredEntries] = useState([]);
   const [loadingEntries, setLoadingEntries] = useState(true);
   const { remaining, isLocked } = useCountdown(T.lockTime);
 
@@ -1499,7 +1859,6 @@ export default function App() {
         }
       } catch (err) {
         console.warn("Sheet fetch failed, falling back to localStorage:", err);
-        // Fallback to localStorage
         try {
           const raw = localStorage.getItem("pool-entries");
           if (raw) {
@@ -1516,6 +1875,35 @@ export default function App() {
     const interval = setInterval(fetchEntries, 60000);
     return () => clearInterval(interval);
   }, []);
+
+  // Fetch ESPN scores when locked (tournament in progress)
+  useEffect(() => {
+    if (!isLocked) return;
+    const fetchScores = async () => {
+      try {
+        const res = await fetch(`${SCRIPT_URL}?mode=scores`);
+        const data = await res.json();
+        if (data.success && data.golfers) {
+          setEspnGolfers(data.golfers);
+        }
+      } catch (err) {
+        console.warn("ESPN fetch failed:", err);
+      }
+    };
+    fetchScores();
+    const interval = setInterval(fetchScores, 120000); // every 2 min during tournament
+    return () => clearInterval(interval);
+  }, [isLocked]);
+
+  // Recalculate scores whenever entries or ESPN data changes
+  useEffect(() => {
+    if (isLocked && espnGolfers.length > 0) {
+      const scored = calculatePoolScores(entries, espnGolfers, T.par);
+      setScoredEntries(scored);
+    } else {
+      setScoredEntries(entries);
+    }
+  }, [entries, espnGolfers, isLocked]);
 
   const handleComplete = (data) => {
     setEntry(data);
@@ -1746,10 +2134,10 @@ export default function App() {
       )}
       {view === "picks" && <PicksFlow onComplete={handleComplete} isLocked={isLocked}
         existingEntry={entry ? { email: entry.email, teamName: entry.teamName, winScore: entry.winScore, firstName: entry.firstName, lastName: entry.lastName } : null}
-        allEntries={entries} />}
+        allEntries={scoredEntries.length > 0 ? scoredEntries : entries} />}
       {view === "confirmed" && entry && <Confirmation entry={entry}
         onLeaderboard={() => setView("leaderboard")} onEdit={() => setView("picks")} />}
-      {view === "leaderboard" && <Leaderboard entries={entries} isLocked={isLocked} loading={loadingEntries} />}
+      {view === "leaderboard" && <Leaderboard entries={scoredEntries} isLocked={isLocked} loading={loadingEntries} />}
       {view === "tournament" && <TournamentLive />}
       <footer style={{
         background: C.dark, padding: "18px 16px", textAlign: "center",
@@ -1762,4 +2150,4 @@ export default function App() {
       </footer>
     </div>
   );
-}
+      }
