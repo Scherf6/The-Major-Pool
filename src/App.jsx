@@ -2199,7 +2199,7 @@ export default function App() {
         @media (max-width: 700px) {
           .pool-board { overflow-x: auto; -webkit-overflow-scrolling: touch; }
           .pool-board > div { min-width: 700px; }
-          .masters-panels { grid-template-columns: 1fr !important; }
+          .masters-panels { grid-template-columns: 1fr !important; flex-direction: column !important; }
         }
       `}</style>
 
