@@ -1471,7 +1471,7 @@ function MastersExperience() {
         }}>Watch party essentials</p>
 
         <div style={{
-          display: "grid", gridTemplateColumns: "1fr 1.2fr 1fr", gap: 16,
+          display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16,
         }} className="masters-panels">
           {/* LEFT: Menu */}
           <div style={{
@@ -1605,6 +1605,48 @@ function MastersExperience() {
             <div style={{ padding: "6px 16px", background: "#fafaf7", borderTop: `1px solid ${C.sand}` }}>
               <p style={{ fontFamily: "Georgia,serif", fontSize: 10, color: "#999",
                 textAlign: "center", fontStyle: "italic", margin: 0 }}>It's not the Masters without one.</p>
+            </div>
+          </div>
+
+          {/* PANEL 4: Patron Rules */}
+          <div style={{
+            background: "rgba(255,255,255,0.97)", borderRadius: 4, overflow: "hidden",
+            border: `2px solid ${C.dark}`, boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
+          }}>
+            <div style={{ background: C.dark, padding: "8px 16px", textAlign: "center" }}>
+              <h4 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 15,
+                color: C.yellow, margin: 0 }}>🤫 Patron Rules</h4>
+            </div>
+            <div style={{ padding: "14px 18px" }}>
+              <p style={{ fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 15,
+                color: C.dark, fontStyle: "italic", lineHeight: 1.5,
+                margin: "0 0 12px", textAlign: "center",
+              }}>A tradition unlike any other</p>
+              {[
+                ["🤫", "Silence during all shots"],
+                ["📵", "No cell phones on the course"],
+                ["📷", "No cameras or recording"],
+                ["🏃", "No running — ever"],
+                ["🪑", "No lawn chairs (use theirs)"],
+                ["👔", "No shorts above the knee"],
+                ["🚫", "No flags, banners, or signs"],
+                ["🗣️", "They're \"patrons\" not \"fans\""],
+                ["🛌", "No lying down on the grounds"],
+                ["👏", "Polite applause only"],
+              ].map(([icon, rule], i) => (
+                <div key={i} style={{
+                  display: "flex", alignItems: "center", gap: 8,
+                  padding: "4px 8px", borderRadius: 6,
+                  background: i % 2 === 0 ? `${C.green}06` : "transparent",
+                }}>
+                  <span style={{ fontSize: 14, flexShrink: 0 }}>{icon}</span>
+                  <span style={{ fontFamily: "Georgia,serif", fontSize: 13, color: "#333" }}>{rule}</span>
+                </div>
+              ))}
+            </div>
+            <div style={{ padding: "6px 16px", background: "#fafaf7", borderTop: `1px solid ${C.sand}` }}>
+              <p style={{ fontFamily: "Georgia,serif", fontSize: 10, color: "#999",
+                textAlign: "center", fontStyle: "italic", margin: 0 }}>Violators will be escorted off the premises.</p>
             </div>
           </div>
         </div>
@@ -2497,4 +2539,4 @@ export default function App() {
       </footer>
     </div>
   );
-      }
+}
