@@ -2328,97 +2328,12 @@ export default function App() {
 
           <MastersExperience />
 
-          {/* Champions Dinner */}
-          <div style={{
-            background: C.cream, padding: "48px 20px",
-            borderTop: `3px solid ${C.green}`,
-          }}>
-            <div style={{ maxWidth: 480, margin: "0 auto" }}>
-              <div style={{
-                background: "#fff", borderRadius: 4, overflow: "hidden",
-                boxShadow: "0 4px 24px rgba(0,0,0,0.1)",
-                border: "1px solid #d4cdb8",
-              }}>
-                {/* Header with crest */}
-                <div style={{ textAlign: "center", padding: "28px 24px 16px" }}>
-                  <div style={{ fontSize: 32, marginBottom: 6 }}>⛳</div>
-                  <div style={{
-                    fontFamily: "'Cormorant Garamond',Georgia,serif",
-                    fontSize: 11, color: C.green, letterSpacing: "0.25em",
-                    textTransform: "uppercase", marginBottom: 4,
-                  }}>The Masters Pool</div>
-                  <h3 style={{
-                    fontFamily: "'Playfair Display',Georgia,serif",
-                    fontSize: 24, color: C.green, margin: "0 0 2px",
-                    fontStyle: "italic",
-                  }}>Champions Dinner</h3>
-                  <p style={{
-                    fontFamily: "Georgia,serif", fontSize: 13,
-                    color: "#8b7355", margin: 0,
-                  }}>April 7, 2026</p>
-                </div>
-
-                <div style={{ padding: "0 32px 28px" }}>
-                  {/* Divider */}
-                  <div style={{ width: 60, height: 1, background: C.green, margin: "0 auto 20px", opacity: 0.4 }} />
-
-                  {[
-                    { course: "Appetizer", dish: "Pretzel Bites with Queso", desc: null },
-                    { course: "First Course", dish: "Two Pronto Pups", desc: null },
-                    { course: "Main Course", dish: "Steak with A1 Sauce", desc: "Jet's Ranch & Domino's Parmesan Knots" },
-                    { course: "Dessert", dish: "Little Foot Nerd's Slushy", desc: "from Dairy Treat" },
-                  ].map((item, i) => (
-                    <div key={i} style={{ textAlign: "center", marginBottom: 18 }}>
-                      <div style={{
-                        fontFamily: "'Playfair Display',Georgia,serif",
-                        fontSize: 14, fontWeight: 700, color: C.green,
-                        fontStyle: "italic", marginBottom: 4,
-                      }}>{item.course}</div>
-                      <div style={{
-                        fontFamily: "Georgia,serif", fontSize: 16,
-                        color: "#333", fontWeight: 600,
-                      }}>{item.dish}</div>
-                      {item.desc && (
-                        <div style={{
-                          fontFamily: "Georgia,serif", fontSize: 13,
-                          color: "#8b7355", fontStyle: "italic", marginTop: 2,
-                        }}>{item.desc}</div>
-                      )}
-                    </div>
-                  ))}
-
-                  {/* Wine pairings... or not */}
-                  <div style={{ width: 40, height: 1, background: "#d4cdb8", margin: "20px auto 16px" }} />
-                  <p style={{
-                    fontFamily: "Georgia,serif", fontSize: 11,
-                    color: "#bbb", textAlign: "center", fontStyle: "italic",
-                    margin: 0,
-                  }}>Beverages: Whatever's in the fridge</p>
-
-                  {/* Flourish */}
-                  <div style={{ textAlign: "center", marginTop: 16, fontSize: 14, color: C.green, opacity: 0.5 }}>❧</div>
-
-                  {/* Honoree */}
-                  <p style={{
-                    fontFamily: "'Cormorant Garamond',Georgia,serif",
-                    fontSize: 14, color: C.green, textAlign: "center",
-                    marginTop: 14, fontStyle: "italic",
-                  }}>Served in Honor of Mr. Jacks Gray</p>
-                  <p style={{
-                    fontFamily: "Georgia,serif", fontSize: 11,
-                    color: "#8b7355", textAlign: "center", margin: "4px 0 0",
-                  }}>2025 Champion — "Lizards All the Way"</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Past Champions */}
+          {/* Past Champions & Champions Dinner — side by side */}
           <div style={{
             background: `linear-gradient(170deg, ${C.dark} 0%, #002a1c 50%, ${C.dark} 100%)`,
             padding: "48px 20px", borderTop: `4px solid ${C.yellow}`,
           }}>
-            <div style={{ maxWidth: 800, margin: "0 auto", textAlign: "center" }}>
+            <div style={{ maxWidth: 900, margin: "0 auto", textAlign: "center" }}>
               <div style={{ fontSize: 48, marginBottom: 8 }}>🏆</div>
               <h3 style={{
                 fontFamily: "'Playfair Display',Georgia,serif", fontSize: 28,
@@ -2430,8 +2345,9 @@ export default function App() {
                 letterSpacing: "0.15em", textTransform: "uppercase",
               }}>Green Jacket Winners</p>
 
-              <div style={{ display: "flex", gap: 32, alignItems: "center", justifyContent: "center", flexWrap: "wrap" }}>
-                {/* Champions list */}
+              <div style={{ display: "flex", gap: 32, alignItems: "flex-start", justifyContent: "center" }}
+                className="masters-panels">
+                {/* LEFT: Champions list + 2026 card */}
                 <div style={{ flex: 1, minWidth: 280, maxWidth: 420 }}>
                   {[
                     { year: 2025, team: "Lizards All the Way", name: "Jacks Gray" },
@@ -2471,48 +2387,103 @@ export default function App() {
                       </div>
                     </div>
                   ))}
-                  <p style={{
-                    fontFamily: "'Playfair Display',Georgia,serif", fontSize: 16,
-                    color: C.yellow, marginTop: 16, fontWeight: 700, textAlign: "center",
-                  }}>Will your name be next on the wall?</p>
-                </div>
 
-                {/* 2026 — awaiting champion */}
-                <div style={{ flexShrink: 0, width: 200 }}>
+                  {/* 2026 awaiting */}
                   <div style={{
+                    marginTop: 8,
                     background: `linear-gradient(135deg, ${C.green}, #004d35)`,
-                    borderRadius: 16, padding: "28px 20px",
+                    borderRadius: 12, padding: "20px",
                     border: `2px solid ${C.yellow}`,
-                    boxShadow: `0 0 30px rgba(242,201,76,0.15), 0 8px 32px rgba(0,0,0,0.3)`,
+                    boxShadow: `0 0 30px rgba(242,201,76,0.15)`,
                     textAlign: "center",
                   }}>
-                    <div style={{
-                      fontFamily: "'Playfair Display',Georgia,serif",
-                      fontSize: 42, fontWeight: 900, color: C.yellow,
-                      textShadow: "0 2px 8px rgba(0,0,0,0.3)",
-                    }}>2026</div>
-                    <div style={{
-                      width: 40, height: 2, background: C.yellow, margin: "10px auto",
-                      borderRadius: 1, opacity: 0.5,
-                    }} />
-                    <div style={{
-                      fontFamily: "'Cormorant Garamond',Georgia,serif",
-                      fontSize: 12, color: "#a8d5a8", letterSpacing: "0.2em",
-                      textTransform: "uppercase", marginBottom: 16,
-                    }}>Masters Champion</div>
-                    <div style={{
-                      fontFamily: "'Playfair Display',Georgia,serif",
-                      fontSize: 32, color: C.yellow, opacity: 0.4,
-                    }}>?</div>
-                    <div style={{
-                      marginTop: 16, padding: "8px 14px", borderRadius: 8,
-                      background: "rgba(0,0,0,0.2)", border: "1px solid rgba(255,255,255,0.1)",
-                      display: "inline-block",
-                    }}>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12 }}>
                       <span style={{
+                        fontFamily: "'Playfair Display',Georgia,serif",
+                        fontSize: 28, fontWeight: 900, color: C.yellow,
+                      }}>2026</span>
+                      <span style={{
+                        fontFamily: "Georgia,serif", fontSize: 16,
+                        color: C.yellow, opacity: 0.5,
+                      }}>— ?</span>
+                    </div>
+                    <p style={{
+                      fontFamily: "'Playfair Display',Georgia,serif", fontSize: 14,
+                      color: C.yellow, marginTop: 8, fontWeight: 700,
+                    }}>Will your name be next?</p>
+                  </div>
+                </div>
+
+                {/* RIGHT: Champions Dinner menu */}
+                <div style={{ flex: 1, minWidth: 280, maxWidth: 380 }}>
+                  <div style={{
+                    background: "#fff", borderRadius: 4, overflow: "hidden",
+                    boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
+                    border: "1px solid #d4cdb8",
+                  }}>
+                    <div style={{ textAlign: "center", padding: "28px 24px 16px" }}>
+                      <div style={{ fontSize: 28, marginBottom: 6 }}>⛳</div>
+                      <div style={{
+                        fontFamily: "'Cormorant Garamond',Georgia,serif",
+                        fontSize: 11, color: C.green, letterSpacing: "0.25em",
+                        textTransform: "uppercase", marginBottom: 4,
+                      }}>The Masters Pool</div>
+                      <h4 style={{
+                        fontFamily: "'Playfair Display',Georgia,serif",
+                        fontSize: 22, color: C.green, margin: "0 0 2px",
+                        fontStyle: "italic",
+                      }}>Champions Dinner</h4>
+                      <p style={{
+                        fontFamily: "Georgia,serif", fontSize: 13,
+                        color: "#8b7355", margin: 0,
+                      }}>April 7, 2026</p>
+                    </div>
+
+                    <div style={{ padding: "0 28px 24px" }}>
+                      <div style={{ width: 50, height: 1, background: C.green, margin: "0 auto 18px", opacity: 0.4 }} />
+
+                      {[
+                        { course: "Appetizer", dish: "Pretzel Bites with Queso", desc: null },
+                        { course: "First Course", dish: "Two Pronto Pups", desc: null },
+                        { course: "Main Course", dish: "Steak with A1 Sauce", desc: "Jet's Ranch & Domino's Parmesan Knots" },
+                        { course: "Dessert", dish: "Little Foot Nerd's Slushy", desc: "from Dairy Treat" },
+                      ].map((item, i) => (
+                        <div key={i} style={{ textAlign: "center", marginBottom: 16 }}>
+                          <div style={{
+                            fontFamily: "'Playfair Display',Georgia,serif",
+                            fontSize: 13, fontWeight: 700, color: C.green,
+                            fontStyle: "italic", marginBottom: 3,
+                          }}>{item.course}</div>
+                          <div style={{
+                            fontFamily: "Georgia,serif", fontSize: 15,
+                            color: "#333", fontWeight: 600,
+                          }}>{item.dish}</div>
+                          {item.desc && (
+                            <div style={{
+                              fontFamily: "Georgia,serif", fontSize: 12,
+                              color: "#8b7355", fontStyle: "italic", marginTop: 2,
+                            }}>{item.desc}</div>
+                          )}
+                        </div>
+                      ))}
+
+                      <div style={{ width: 30, height: 1, background: "#d4cdb8", margin: "16px auto 12px" }} />
+                      <p style={{
                         fontFamily: "Georgia,serif", fontSize: 11,
-                        color: C.yellow, fontStyle: "italic",
-                      }}>awaiting its owner</span>
+                        color: "#bbb", textAlign: "center", fontStyle: "italic", margin: 0,
+                      }}>Beverages: Whatever's in the fridge</p>
+
+                      <div style={{ textAlign: "center", marginTop: 14, fontSize: 14, color: C.green, opacity: 0.5 }}>❧</div>
+
+                      <p style={{
+                        fontFamily: "'Cormorant Garamond',Georgia,serif",
+                        fontSize: 13, color: C.green, textAlign: "center",
+                        marginTop: 12, fontStyle: "italic",
+                      }}>Served in Honor of Mr. Jacks Gray</p>
+                      <p style={{
+                        fontFamily: "Georgia,serif", fontSize: 10,
+                        color: "#8b7355", textAlign: "center", margin: "3px 0 0",
+                      }}>2025 Champion — "Lizards All the Way"</p>
                     </div>
                   </div>
                 </div>
