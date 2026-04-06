@@ -1011,7 +1011,7 @@ function Confirmation({ entry, onLeaderboard, onEdit }) {
   );
 }
 
-function Leaderboard({ entries, isLocked, loading }) {
+function Leaderboard({ entries, isLocked, loading, potInfo }) {
   const [expanded, setExpanded] = useState(null);
   const [testMode, setTestMode] = useState(false);
   const [testEntries, setTestEntries] = useState([]);
@@ -1107,6 +1107,34 @@ function Leaderboard({ entries, isLocked, loading }) {
               ⏳ Scores go live when the tournament starts</p>
           )}
         </div>
+
+        {/* Prize Pool */}
+        {potInfo && potInfo.totalPot > 0 && (
+          <div style={{
+            display: "flex", justifyContent: "center", gap: 12,
+            padding: "12px 16px", background: "#fff",
+            borderLeft: `1px solid ${B.border}`, borderRight: `1px solid ${B.border}`,
+            flexWrap: "wrap",
+          }}>
+            <div style={{ textAlign: "center", padding: "4px 12px" }}>
+              <div style={{ fontFamily: "Georgia,serif", fontSize: 11, color: B.muted, textTransform: "uppercase", letterSpacing: "0.08em" }}>Pot</div>
+              <div style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 20, fontWeight: 900, color: B.green }}>${potInfo.totalPot}</div>
+            </div>
+            <div style={{ width: 1, background: B.border }} />
+            <div style={{ textAlign: "center", padding: "4px 12px" }}>
+              <div style={{ fontFamily: "Georgia,serif", fontSize: 11, color: B.muted }}>🥇 1st</div>
+              <div style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 18, fontWeight: 700, color: B.green }}>${potInfo.payouts.first}</div>
+            </div>
+            <div style={{ textAlign: "center", padding: "4px 12px" }}>
+              <div style={{ fontFamily: "Georgia,serif", fontSize: 11, color: B.muted }}>🥈 2nd</div>
+              <div style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 18, fontWeight: 700, color: B.green }}>${potInfo.payouts.second}</div>
+            </div>
+            <div style={{ textAlign: "center", padding: "4px 12px" }}>
+              <div style={{ fontFamily: "Georgia,serif", fontSize: 11, color: B.muted }}>🥉 3rd</div>
+              <div style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 18, fontWeight: 700, color: B.green }}>${potInfo.payouts.third}</div>
+            </div>
+          </div>
+        )}
 
         {/* Scoreboard — simple 3-column layout */}
         <div style={{
@@ -1962,6 +1990,7 @@ export default function App() {
   const [espnGolfers, setEspnGolfers] = useState([]);
   const [scoredEntries, setScoredEntries] = useState([]);
   const [loadingEntries, setLoadingEntries] = useState(true);
+  const [potInfo, setPotInfo] = useState({ totalPot: 0, payouts: { first: 0, second: 0, third: 0 } });
   const { remaining, isLocked } = useCountdown(T.lockTime);
 
   // Fetch entries from Google Sheet on load and every 60 seconds
@@ -1978,6 +2007,12 @@ export default function App() {
             winScore: e.winningScore,
             fullName: e.fullName || "",
           })));
+          if (data.totalPot != null) {
+            setPotInfo({
+              totalPot: data.totalPot,
+              payouts: data.payouts || { first: 0, second: 0, third: 0 },
+            });
+          }
         }
       } catch (err) {
         console.warn("Sheet fetch failed, falling back to localStorage:", err);
@@ -2038,6 +2073,9 @@ export default function App() {
             setEntries(data.entries.map(e => ({
               name: e.teamName, email: e.email, picks: e.picks, winScore: e.winningScore, fullName: e.fullName || "",
             })));
+            if (data.totalPot != null) {
+              setPotInfo({ totalPot: data.totalPot, payouts: data.payouts || { first: 0, second: 0, third: 0 } });
+            }
           }
         } catch {}
       })();
@@ -2497,7 +2535,7 @@ export default function App() {
         allEntries={scoredEntries.length > 0 ? scoredEntries : entries} />}
       {view === "confirmed" && entry && <Confirmation entry={entry}
         onLeaderboard={() => setView("leaderboard")} onEdit={() => setView("picks")} />}
-      {view === "leaderboard" && <Leaderboard entries={scoredEntries} isLocked={isLocked} loading={loadingEntries} />}
+      {view === "leaderboard" && <Leaderboard entries={scoredEntries} isLocked={isLocked} loading={loadingEntries} potInfo={potInfo} />}
       {view === "tournament" && <TournamentLive />}
       <footer style={{
         background: C.dark, padding: "18px 16px", textAlign: "center",
