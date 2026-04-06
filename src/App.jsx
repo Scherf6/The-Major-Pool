@@ -403,6 +403,7 @@ function PicksFlow({ onComplete, isLocked, existingEntry, allEntries }) {
   const [lookupMode, setLookupMode] = useState(false);
   const [lookupMsg, setLookupMsg] = useState("");
   const [originalTeamName, setOriginalTeamName] = useState(existingEntry?.teamName || "");
+  const [foundEntries, setFoundEntries] = useState([]);
 
   const tierKeys = Object.keys(TIERS);
   const totalNeeded = tierKeys.reduce((s, k) => s + TIERS[k].pick, 0);
@@ -679,23 +680,28 @@ function PicksFlow({ onComplete, isLocked, existingEntry, allEntries }) {
                 <button onClick={async () => {
                   if (!email.includes("@")) return;
                   setLookupMsg("Looking up...");
+                  setFoundEntries([]);
                   try {
                     const res = await fetch(`${SCRIPT_URL}?email=${encodeURIComponent(email)}`);
                     const data = await res.json();
                     const allUserEntries = data.userEntries || (data.userEntry ? [data.userEntry] : []);
-                    if (allUserEntries.length > 0) {
-                      const ue = allUserEntries[0]; // Load first entry by default
+                    if (allUserEntries.length === 1) {
+                      // Single entry — load directly
+                      const ue = allUserEntries[0];
                       setFirstName(ue.firstName || "");
                       setLastName(ue.lastName || "");
                       setTeamName(ue.teamName || "");
                       setOriginalTeamName(ue.teamName || "");
                       setWinScore(ue.winningScore || -12);
                       if (ue.picks) loadPicksFromNames(ue.picks);
-                      const msg = allUserEntries.length === 1
-                        ? "✅ Found your entry! Edit it or create a 2nd entry with a new team name."
-                        : `✅ Found ${allUserEntries.length} entries! Loading your first one.`;
-                      setLookupMsg(msg);
-                      setTimeout(() => setStep(2), 1000);
+                      setLookupMsg("✅ Found your entry! Edit it or create a 2nd with a new team name.");
+                      setTimeout(() => setStep(2), 800);
+                    } else if (allUserEntries.length > 1) {
+                      // Multiple entries — let them choose
+                      setFoundEntries(allUserEntries);
+                      setFirstName(allUserEntries[0].firstName || "");
+                      setLastName(allUserEntries[0].lastName || "");
+                      setLookupMsg("✅ Found " + allUserEntries.length + " entries! Pick which one to edit:");
                     } else {
                       setLookupMsg("No entry found for that email. Try signing up below.");
                     }
@@ -708,6 +714,50 @@ function PicksFlow({ onComplete, isLocked, existingEntry, allEntries }) {
                     color: "#fff", fontFamily: "'Playfair Display',Georgia,serif",
                     fontSize: 16, fontWeight: 600, cursor: email.includes("@") ? "pointer" : "default",
                     marginTop: 12 }}>Look Up My Entry</button>
+
+                {/* Entry picker for multiple entries */}
+                {foundEntries.length > 1 && (
+                  <div style={{ marginTop: 12, display: "flex", flexDirection: "column", gap: 8 }}>
+                    {foundEntries.map((ue, idx) => (
+                      <button key={idx} onClick={() => {
+                        setTeamName(ue.teamName || "");
+                        setOriginalTeamName(ue.teamName || "");
+                        setWinScore(ue.winningScore || -12);
+                        if (ue.picks) loadPicksFromNames(ue.picks);
+                        setFoundEntries([]);
+                        setLookupMsg(`✅ Editing "${ue.teamName}"`);
+                        setTimeout(() => setStep(2), 500);
+                      }} style={{
+                        padding: "14px 16px", borderRadius: 10,
+                        background: "#fff", border: `2px solid ${C.green}`,
+                        cursor: "pointer", textAlign: "left",
+                        display: "flex", justifyContent: "space-between", alignItems: "center",
+                      }}>
+                        <div>
+                          <div style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 16,
+                            fontWeight: 700, color: C.green }}>{ue.teamName}</div>
+                          <div style={{ fontFamily: "Georgia,serif", fontSize: 12, color: "#8b7355", marginTop: 2 }}>
+                            {(ue.picks || []).filter(p => p).join(", ")}
+                          </div>
+                        </div>
+                        <span style={{ fontFamily: "Georgia,serif", fontSize: 13, color: C.green }}>Edit →</span>
+                      </button>
+                    ))}
+                    <button onClick={() => {
+                      setFoundEntries([]);
+                      setTeamName("");
+                      setOriginalTeamName("");
+                      setPicks({});
+                      setLookupMsg("Create a new team name for your 2nd entry.");
+                      setTimeout(() => setStep(2), 500);
+                    }} style={{
+                      padding: "10px 16px", borderRadius: 10,
+                      background: "transparent", border: `1px solid ${C.sand}`,
+                      cursor: "pointer", fontFamily: "Georgia,serif", fontSize: 14,
+                      color: "#8b7355",
+                    }}>+ Create a new entry instead</button>
+                  </div>
+                )}
 
                 <div style={{ textAlign: "center", marginTop: 14 }}>
                   <button onClick={() => { setLookupMode(false); setLookupMsg(""); }} style={{
