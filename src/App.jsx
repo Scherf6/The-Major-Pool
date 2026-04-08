@@ -1470,29 +1470,38 @@ function MastersExperience() {
   };
 
   const schedule = [
-    { day: "MON 4/6", events: [["On the Range", "12–2 PM", "Masters.com"]] },
-    { day: "TUE 4/7", events: [["On the Range", "9–11 AM", "Masters.com"], ["Practice Round", "12–2 PM", "ESPN App"]] },
-    { day: "WED 4/8", events: [["Par 3 Contest", "12–4 PM", "ESPN"]] },
-    { day: "THU 4/9", events: [
+    { day: "WED 4/8", link: "https://www.masters.com/en_US/live/index.html", events: [
+      ["Par 3 Contest", "12–4 PM", "ESPN"],
+      ["Par 3 Contest", "12–4 PM", "Masters.com"],
+    ]},
+    { day: "THU 4/9 — Round 1", link: "https://www.masters.com/coverage/day1/index.html", events: [
       ["Honorary Starters", "7:30 AM", "Masters.com"],
+      ["Holes 4, 5 & 6", "8:45 AM", "Masters.com"],
       ["Featured Groups", "9:15 AM", "Masters.com"],
       ["Amen Corner", "10:45 AM", "Masters.com"],
+      ["Holes 15 & 16", "11:45 AM", "Masters.com"],
       ["Round 1", "1–3 PM", "Prime Video"],
       ["Round 1", "3–7:30 PM", "ESPN"],
     ]},
-    { day: "FRI 4/10", events: [
+    { day: "FRI 4/10 — Round 2", link: "https://www.masters.com/coverage/day2/index.html", events: [
+      ["Holes 4, 5 & 6", "8:45 AM", "Masters.com"],
       ["Featured Groups", "9:15 AM", "Masters.com"],
       ["Amen Corner", "10:45 AM", "Masters.com"],
+      ["Holes 15 & 16", "11:45 AM", "Masters.com"],
       ["Round 2", "1–3 PM", "Prime Video"],
       ["Round 2", "3–7:30 PM", "ESPN"],
     ]},
-    { day: "SAT 4/11", events: [
+    { day: "SAT 4/11 — Round 3", link: "https://www.masters.com/coverage/day3/index.html", events: [
       ["Featured Groups", "10:15 AM", "Masters.com"],
+      ["Amen Corner", "11:45 AM", "Masters.com"],
+      ["Holes 15 & 16", "11:45 AM", "Masters.com"],
       ["Round 3", "12–2 PM", "Paramount+"],
       ["Round 3", "2–7 PM", "CBS"],
     ]},
-    { day: "SUN 4/12", events: [
+    { day: "SUN 4/12 — Final Round", link: "https://www.masters.com/coverage/day4/index.html", events: [
       ["Featured Groups", "10:15 AM", "Masters.com"],
+      ["Amen Corner", "11:45 AM", "Masters.com"],
+      ["Holes 15 & 16", "11:45 AM", "Masters.com"],
       ["Final Round", "12–2 PM", "Paramount+"],
       ["Final Round", "2–7 PM", "CBS"],
     ]},
@@ -1588,11 +1597,20 @@ function MastersExperience() {
             <div style={{ padding: "12px 14px", maxHeight: 480, overflowY: "auto" }}>
               {schedule.map((day, di) => (
                 <div key={di} style={{ marginBottom: 12 }}>
-                  <div style={{
-                    fontFamily: "'Playfair Display',Georgia,serif", fontSize: 13,
-                    fontWeight: 700, color: C.green, marginBottom: 4,
-                    borderBottom: `1px solid ${C.sand}`, paddingBottom: 3,
-                  }}>{day.day}</div>
+                  {day.link ? (
+                    <a href={day.link} target="_blank" rel="noopener" style={{
+                      fontFamily: "'Playfair Display',Georgia,serif", fontSize: 13,
+                      fontWeight: 700, color: C.green, marginBottom: 4,
+                      borderBottom: `1px solid ${C.sand}`, paddingBottom: 3,
+                      display: "block", textDecoration: "none",
+                    }}>{day.day} ↗</a>
+                  ) : (
+                    <div style={{
+                      fontFamily: "'Playfair Display',Georgia,serif", fontSize: 13,
+                      fontWeight: 700, color: C.green, marginBottom: 4,
+                      borderBottom: `1px solid ${C.sand}`, paddingBottom: 3,
+                    }}>{day.day}</div>
+                  )}
                   {day.events.map(([name, time, channel], ei) => (
                     <div key={ei} style={{
                       display: "flex", justifyContent: "space-between", alignItems: "center",
