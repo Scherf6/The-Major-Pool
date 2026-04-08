@@ -2039,7 +2039,15 @@ function calculatePoolScores(entries, espnGolfers, par) {
   APP
 ─────────────────────────────────────────────*/
 export default function App() {
-  const [view, setView] = useState("home");
+  const getInitialView = () => {
+    const hash = window.location.hash.replace("#", "");
+    return ["home","picks","leaderboard","tournament","confirmed"].includes(hash) ? hash : "home";
+  };
+  const [view, _setView] = useState(getInitialView);
+  const setView = (v) => {
+    _setView(v);
+    window.location.hash = v === "home" ? "" : v;
+  };
   const [entry, setEntry] = useState(null);
   const [entries, setEntries] = useState([]);
   const [espnGolfers, setEspnGolfers] = useState([]);
