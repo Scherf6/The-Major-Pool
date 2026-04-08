@@ -1811,6 +1811,21 @@ function TournamentLive() {
           </div>
         </div>
 
+        {/* YouTube Live Embed */}
+        <div style={{
+          background: "#000", borderRadius: 12, overflow: "hidden",
+          boxShadow: "0 4px 16px rgba(0,0,0,0.2)",
+          marginBottom: 16, position: "relative", paddingTop: "56.25%",
+        }}>
+          <iframe
+            src="https://www.youtube.com/embed/OApSh_daggc?autoplay=0&rel=0"
+            style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", border: "none" }}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            title="Masters Live Stream"
+          />
+        </div>
+
         {/* Live Leaderboard */}
         <div style={{
           background: "#fff", borderRadius: 12, overflow: "hidden",
