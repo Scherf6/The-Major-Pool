@@ -1068,6 +1068,17 @@ function Confirmation({ entry, onLeaderboard, onEdit }) {
 
 function Leaderboard({ entries, isLocked, loading, potInfo }) {
   const [expanded, setExpanded] = useState(null);
+  const [starred, setStarred] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("pool-starred") || "[]"); } catch { return []; }
+  });
+  const toggleStar = (name, evt) => {
+    evt.stopPropagation();
+    setStarred(prev => {
+      const next = prev.includes(name) ? prev.filter(n => n !== name) : [...prev, name];
+      localStorage.setItem("pool-starred", JSON.stringify(next));
+      return next;
+    });
+  };
   const [testMode, setTestMode] = useState(false);
   const [testEntries, setTestEntries] = useState([]);
   const [testLoading, setTestLoading] = useState(false);
@@ -1216,14 +1227,16 @@ function Leaderboard({ entries, isLocked, loading, potInfo }) {
           {/* Rows */}
           {entries.map((e, i) => {
             const isExp = expanded === i;
+            const isStarred = starred.includes(e.name);
             return (
               <div key={i}>
                 <div onClick={() => setExpanded(isExp ? null : i)}
                   style={{
                     display: "grid", gridTemplateColumns: "50px 1fr 70px",
                     borderBottom: `1px solid ${B.border}`,
-                    background: isExp ? "#f0ebe0" : (i % 2 === 0 ? B.rowEven : B.rowOdd),
+                    background: isStarred ? "#fdf6e3" : (isExp ? "#f0ebe0" : (i % 2 === 0 ? B.rowEven : B.rowOdd)),
                     cursor: "pointer", transition: "background 0.15s",
+                    borderLeft: isStarred ? `3px solid ${B.yellow}` : "3px solid transparent",
                   }}>
                   {/* Position */}
                   <div style={{
@@ -1247,11 +1260,17 @@ function Leaderboard({ entries, isLocked, loading, potInfo }) {
                     padding: "10px 12px",
                     borderRight: `1px solid ${B.border}`,
                   }}>
-                    <div style={{
-                      fontFamily: "Georgia,serif", fontSize: 17, fontWeight: 700,
-                      color: B.text, textTransform: "uppercase",
-                      letterSpacing: "0.02em", lineHeight: 1.2,
-                    }}>{e.name}</div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                      <span onClick={(evt) => toggleStar(e.name, evt)} style={{
+                        fontSize: 14, cursor: "pointer", flexShrink: 0,
+                        opacity: isStarred ? 1 : 0.3,
+                      }}>{isStarred ? "⭐" : "☆"}</span>
+                      <span style={{
+                        fontFamily: "Georgia,serif", fontSize: 17, fontWeight: 700,
+                        color: B.text, textTransform: "uppercase",
+                        letterSpacing: "0.02em", lineHeight: 1.2,
+                      }}>{e.name}</span>
+                    </div>
                     <div style={{
                       fontFamily: "Georgia,serif", fontSize: 13,
                       color: B.muted, marginTop: 2,
@@ -1287,7 +1306,14 @@ function Leaderboard({ entries, isLocked, loading, potInfo }) {
                         <p style={{ fontFamily: "Georgia,serif", fontSize: 13, color: B.muted,
                           margin: "0 0 8px", textTransform: "uppercase", letterSpacing: "0.08em" }}>Golfers</p>
                         <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                          {(e.golferScores || e.picks.map(p => ({ name: p }))).map((gs, j) => {
+                          {(e.golferScores || e.picks.map(p => ({ name: p })))
+                            .slice()
+                            .sort((a, b) => {
+                              const aScore = a.scoreToPar != null ? a.scoreToPar : 999;
+                              const bScore = b.scoreToPar != null ? b.scoreToPar : 999;
+                              return aScore - bScore;
+                            })
+                            .map((gs, j) => {
                             const hasScore = gs.scoreToPar != null;
                             // Determine if this golfer is in the best 4
                             const allScores = (e.golferScores || [])
