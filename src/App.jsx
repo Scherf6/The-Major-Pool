@@ -1965,21 +1965,26 @@ function TournamentLive() {
 const PAR = 72;
 const CUT_ROUND_SCORE = 80;
 
+// Strip accents for name matching: Åberg→Aberg, García→Garcia, Højgaard→Hojgaard
+function stripAccents(str) {
+  return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/ø/g, "o").replace(/Ø/g, "O");
+}
+
 function matchGolfer(pickName, espnGolfers) {
   if (!pickName || !espnGolfers.length) return null;
-  const pick = pickName.toLowerCase().trim();
-  // Try exact match first
-  let match = espnGolfers.find(g => g.name.toLowerCase() === pick);
+  const pick = stripAccents(pickName.toLowerCase().trim());
+  // Try exact match (with accent stripping)
+  let match = espnGolfers.find(g => stripAccents(g.name.toLowerCase()) === pick);
   if (match) return match;
   // Try last name match
   const pickLast = pick.split(" ").pop();
-  const lastMatches = espnGolfers.filter(g => g.lastName.toLowerCase() === pickLast);
+  const lastMatches = espnGolfers.filter(g => stripAccents(g.lastName.toLowerCase()) === pickLast);
   if (lastMatches.length === 1) return lastMatches[0];
   // Try first+last contains
-  match = espnGolfers.find(g => g.name.toLowerCase().includes(pick) || pick.includes(g.name.toLowerCase()));
+  match = espnGolfers.find(g => stripAccents(g.name.toLowerCase()).includes(pick) || pick.includes(stripAccents(g.name.toLowerCase())));
   if (match) return match;
   // Try last name contains
-  match = espnGolfers.find(g => g.lastName.toLowerCase().includes(pickLast) || pickLast.includes(g.lastName.toLowerCase()));
+  match = espnGolfers.find(g => stripAccents(g.lastName.toLowerCase()).includes(pickLast) || pickLast.includes(stripAccents(g.lastName.toLowerCase())));
   return match || null;
 }
 
