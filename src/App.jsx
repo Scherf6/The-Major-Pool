@@ -1204,8 +1204,17 @@ function Leaderboard({ entries, isLocked, loading, potInfo }) {
 
         {/* Starred entries quick view */}
         {starred.length > 0 && (() => {
+          // Compute tied positions
+          const tiedPositions = [];
+          for (let idx = 0; idx < entries.length; idx++) {
+            if (idx === 0) { tiedPositions.push(1); }
+            else if (entries[idx].totalScore != null && entries[idx].totalScore === entries[idx - 1].totalScore) { tiedPositions.push(tiedPositions[idx - 1]); }
+            else { tiedPositions.push(idx + 1); }
+          }
+          const posCounts = {};
+          tiedPositions.forEach(p => { posCounts[p] = (posCounts[p] || 0) + 1; });
           const starredEntries = entries
-            .map((e, i) => ({ ...e, pos: i + 1 }))
+            .map((e, i) => ({ ...e, pos: tiedPositions[i], posDisplay: (posCounts[tiedPositions[i]] > 1 ? "T" : "") + tiedPositions[i] }))
             .filter(e => starred.includes(e.name));
           if (starredEntries.length === 0) return null;
           return (
@@ -1231,7 +1240,7 @@ function Leaderboard({ entries, isLocked, loading, potInfo }) {
                     <span style={{
                       fontFamily: "'Playfair Display',Georgia,serif",
                       fontSize: 14, fontWeight: 900, color: B.green,
-                    }}>{e.pos}</span>
+                    }}>{e.posDisplay}</span>
                     <span style={{
                       fontFamily: "Georgia,serif", fontSize: 13,
                       fontWeight: 600, color: B.text,
