@@ -2046,6 +2046,12 @@ function calculatePoolScores(entries, espnGolfers, par) {
     // Tiebreaker: distance from predicted winning score to actual
     const tbDistance = entry.winScore != null ? Math.abs(entry.winScore - winningScore) : 999;
     
+    // Sorted individual scores for scorecard playoff tiebreaker
+    const sortedIndividual = golferScores
+      .map(gs => gs.totalStrokes)
+      .filter(s => s != null)
+      .sort((a, b) => a - b);
+    
     return {
       ...entry,
       golferScores,
@@ -2053,16 +2059,28 @@ function calculatePoolScores(entries, espnGolfers, par) {
       totalScore,
       tbDistance,
       best4Count: best4.length,
+      sortedIndividual,
     };
   });
   
-  // Sort: lowest totalScore first, then tiebreaker
+  // Sort: lowest totalScore first, then tiebreakers
   scored.sort((a, b) => {
     if (a.totalScore == null && b.totalScore == null) return 0;
     if (a.totalScore == null) return 1;
     if (b.totalScore == null) return -1;
+    // 1. Lowest total score
     if (a.totalScore !== b.totalScore) return a.totalScore - b.totalScore;
-    return a.tbDistance - b.tbDistance;
+    // 2. Closest winning score prediction
+    if (a.tbDistance !== b.tbDistance) return a.tbDistance - b.tbDistance;
+    // 3. Scorecard playoff — compare best individual golfer, then 2nd best, etc.
+    const aScores = a.sortedIndividual || [];
+    const bScores = b.sortedIndividual || [];
+    for (let i = 0; i < Math.max(aScores.length, bScores.length); i++) {
+      const aVal = aScores[i] != null ? aScores[i] : 999;
+      const bVal = bScores[i] != null ? bScores[i] : 999;
+      if (aVal !== bVal) return aVal - bVal;
+    }
+    return 0;
   });
   
   return scored;
@@ -2575,7 +2593,8 @@ export default function App() {
                     ["Best 4 count", "Only your 4 lowest-scoring golfers matter"],
                     ["Cut golfers", "Get a score of 80 for rounds 3 & 4"],
                     ["Lowest total wins", "4-round combined score of your best 4"],
-                    ["Tiebreaker", "Closest predicted winning score wins"],
+                    ["Tiebreaker #1", "Closest predicted winning score (over/under)"],
+                    ["Tiebreaker #2", "Scorecard playoff — best individual golfer wins"],
                     ["Edit anytime", "Change picks until 1 min before first tee"],
                   ].map(([title, desc], i) => (
                     <div key={i} style={{ marginBottom: 10 }}>
@@ -2805,7 +2824,15 @@ export default function App() {
           if (a.totalScore == null) return 1;
           if (b.totalScore == null) return -1;
           if (a.totalScore !== b.totalScore) return a.totalScore - b.totalScore;
-          return (a.tbDistance || 999) - (b.tbDistance || 999);
+          if ((a.tbDistance || 999) !== (b.tbDistance || 999)) return (a.tbDistance || 999) - (b.tbDistance || 999);
+          const aS = a.sortedIndividual || [];
+          const bS = b.sortedIndividual || [];
+          for (let i = 0; i < Math.max(aS.length, bS.length); i++) {
+            const aV = aS[i] != null ? aS[i] : 999;
+            const bV = bS[i] != null ? bS[i] : 999;
+            if (aV !== bV) return aV - bV;
+          }
+          return 0;
         });
         return (
           <div style={{ minHeight: "100vh", background: `linear-gradient(170deg, ${C.dark} 0%, #002a1c 50%, ${C.dark} 100%)`, padding: "32px 12px" }}>
