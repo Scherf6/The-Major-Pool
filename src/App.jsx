@@ -1202,6 +1202,56 @@ function Leaderboard({ entries, isLocked, loading, potInfo }) {
           </div>
         )}
 
+        {/* Starred entries quick view */}
+        {starred.length > 0 && (() => {
+          const starredEntries = entries
+            .map((e, i) => ({ ...e, pos: i + 1 }))
+            .filter(e => starred.includes(e.name));
+          if (starredEntries.length === 0) return null;
+          return (
+            <div style={{
+              background: "#fdf6e3", borderRadius: 8, padding: "10px 12px",
+              marginBottom: 8, border: `1px solid ${C.yellow}40`,
+            }}>
+              <div style={{
+                fontFamily: "Georgia,serif", fontSize: 11, color: B.muted,
+                textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 6,
+              }}>⭐ Watching</div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                {starredEntries.map((e, i) => (
+                  <div key={i} style={{
+                    display: "flex", alignItems: "center", gap: 6,
+                    padding: "4px 10px", borderRadius: 6,
+                    background: "#fff", border: `1px solid ${C.yellow}50`,
+                    cursor: "pointer",
+                  }} onClick={() => {
+                    const idx = entries.findIndex(en => en.name === e.name);
+                    if (idx >= 0) setExpanded(expanded === idx ? null : idx);
+                  }}>
+                    <span style={{
+                      fontFamily: "'Playfair Display',Georgia,serif",
+                      fontSize: 14, fontWeight: 900, color: B.green,
+                    }}>{e.pos}</span>
+                    <span style={{
+                      fontFamily: "Georgia,serif", fontSize: 13,
+                      fontWeight: 600, color: B.text,
+                    }}>{e.name}</span>
+                    <span style={{
+                      fontFamily: "'Playfair Display',Georgia,serif",
+                      fontSize: 15, fontWeight: 900,
+                      color: isLocked
+                        ? (e.totalScore < 0 ? B.red : e.totalScore > 0 ? B.green : B.text)
+                        : B.muted,
+                    }}>
+                      {isLocked ? (e.totalScore != null ? (e.totalScore < 0 ? e.totalScore : e.totalScore > 0 ? `+${e.totalScore}` : "E") : "—") : "—"}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
+
         {/* Scoreboard — simple 3-column layout */}
         <div style={{
           background: B.board, borderRadius: "0 0 8px 8px",
