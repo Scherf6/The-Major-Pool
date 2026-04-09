@@ -1275,9 +1275,28 @@ function Leaderboard({ entries, isLocked, loading, potInfo }) {
           </div>
 
           {/* Rows */}
-          {entries.map((e, i) => {
+          {(() => {
+            // Compute tied positions
+            const positions = [];
+            for (let idx = 0; idx < entries.length; idx++) {
+              if (idx === 0) {
+                positions.push(1);
+              } else if (entries[idx].totalScore != null && entries[idx].totalScore === entries[idx - 1].totalScore) {
+                positions.push(positions[idx - 1]);
+              } else {
+                positions.push(idx + 1);
+              }
+            }
+            // Determine which positions are tied
+            const posCounts = {};
+            positions.forEach(p => { posCounts[p] = (posCounts[p] || 0) + 1; });
+
+            return entries.map((e, i) => {
             const isExp = expanded === i;
             const isStarred = starred.includes(e.name);
+            const tiedPos = positions[i];
+            const isTied = posCounts[tiedPos] > 1;
+            const posDisplay = isTied ? "T" + tiedPos : String(tiedPos);
             return (
               <div key={i}>
                 <div onClick={() => setExpanded(isExp ? null : i)}
@@ -1292,17 +1311,20 @@ function Leaderboard({ entries, isLocked, loading, potInfo }) {
                   <div style={{
                     padding: "12px 6px", textAlign: "center",
                     fontFamily: "'Playfair Display',Georgia,serif",
-                    fontSize: 18, fontWeight: 700,
-                    color: i < 3 ? B.green : B.muted,
+                    fontSize: isTied ? 14 : 18, fontWeight: 700,
+                    color: tiedPos <= 3 ? B.green : B.muted,
                     borderRight: `1px solid ${B.border}`,
                   }}>
-                    {i === 0 ? (
+                    {tiedPos === 1 && !isTied ? (
                       <span title="Green Jacket" style={{
                         display: "inline-block", width: 28, height: 28, lineHeight: "28px",
                         borderRadius: "50%", background: B.green, color: B.yellow,
                         fontSize: 14, fontWeight: 900, textAlign: "center",
                       }}>1</span>
-                    ) : i === 1 ? "🥈" : i === 2 ? "🥉" : i + 1}
+                    ) : tiedPos === 1 && isTied ? "T1"
+                      : tiedPos === 2 && !isTied ? "🥈"
+                      : tiedPos === 3 && !isTied ? "🥉"
+                      : posDisplay}
                   </div>
 
                   {/* Team name + person */}
@@ -1326,6 +1348,13 @@ function Leaderboard({ entries, isLocked, loading, potInfo }) {
                       color: B.muted, marginTop: 2,
                     }}>
                       {e.fullName || ""}
+                      {(() => {
+                        const onSite = ["collins","desmarteau","gray","lawrence"];
+                        const name = (e.fullName || "").toLowerCase();
+                        return onSite.some(n => name.includes(n))
+                          ? <span style={{ marginLeft: 6, fontSize: 11, color: C.green, fontWeight: 600 }}>📍 At Augusta</span>
+                          : null;
+                      })()}
                       {!isLocked && " · 🔒"}
                       {isLocked && !isExp && " · tap for picks"}
                     </div>
@@ -1429,7 +1458,8 @@ function Leaderboard({ entries, isLocked, loading, potInfo }) {
                 )}
               </div>
             );
-          })}
+          });
+          })()}
 
           {entries.length === 0 && (
             <div style={{ padding: 40, textAlign: "center" }}>
