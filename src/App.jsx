@@ -2127,8 +2127,7 @@ function JpjmChat() {
 
   return (
     <div style={{
-      marginTop: 32, borderTop: `1px solid rgba(255,255,255,0.1)`,
-      paddingTop: 28,
+      textAlign: "center",
     }}>
       <h3 style={{
         fontFamily: "'Playfair Display',Georgia,serif", fontSize: 20,
@@ -2810,7 +2809,7 @@ export default function App() {
         });
         return (
           <div style={{ minHeight: "100vh", background: `linear-gradient(170deg, ${C.dark} 0%, #002a1c 50%, ${C.dark} 100%)`, padding: "32px 12px" }}>
-            <div style={{ maxWidth: 600, margin: "0 auto", textAlign: "center" }}>
+            <div style={{ maxWidth: 1000, margin: "0 auto", textAlign: "center" }}>
               <div style={{ fontSize: 48, marginBottom: 8 }}>🕊️</div>
               <h2 style={{
                 fontFamily: "'Playfair Display',Georgia,serif", fontSize: 32,
@@ -2826,64 +2825,72 @@ export default function App() {
                 color: "#5a8a5a", margin: "0 0 28px", fontStyle: "italic",
               }}>{ranked.length} family {ranked.length === 1 ? "entry" : "entries"}</p>
 
-              {ranked.map((e, i) => (
-                <div key={i} style={{
-                  display: "flex", alignItems: "center", gap: 14,
-                  padding: "16px 20px", marginBottom: 10,
-                  background: i === 0
-                    ? "linear-gradient(135deg, rgba(242,201,76,0.15), rgba(242,201,76,0.05))"
-                    : "rgba(255,255,255,0.04)",
-                  borderRadius: 12,
-                  border: i === 0 ? `2px solid ${C.yellow}40` : "1px solid rgba(255,255,255,0.08)",
-                  textAlign: "left",
-                }}>
-                  <div style={{
-                    width: 40, height: 40, borderRadius: "50%",
-                    background: i === 0 ? C.green : i < 3 ? "rgba(255,255,255,0.08)" : "transparent",
-                    border: i === 0 ? `2px solid ${C.yellow}` : i < 3 ? "1px solid rgba(255,255,255,0.15)" : "none",
-                    display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
-                  }}>
-                    <span style={{
-                      fontFamily: "'Playfair Display',Georgia,serif",
-                      fontSize: 16, fontWeight: 900,
-                      color: i === 0 ? C.yellow : "#a8d5a8",
-                    }}>{i === 0 ? "🏆" : i + 1}</span>
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{
-                      fontFamily: "'Playfair Display',Georgia,serif",
-                      fontSize: 17, fontWeight: 700, color: "#fff", lineHeight: 1.2,
-                    }}>{e.name}</div>
-                    <div style={{
-                      fontFamily: "Georgia,serif", fontSize: 13, color: "#a8d5a8", marginTop: 2,
-                    }}>{e.fullName || ""}</div>
-                  </div>
-                  <div style={{
-                    fontFamily: "'Playfair Display',Georgia,serif",
-                    fontSize: 22, fontWeight: 900,
-                    color: isLocked
-                      ? (e.totalScore != null ? (e.totalScore < 0 ? "#ef5350" : e.totalScore > 0 ? "#66bb6a" : "#fff") : "#555")
-                      : "#555",
-                  }}>
-                    {isLocked ? (e.totalScore != null ? (e.totalScore < 0 ? e.totalScore : e.totalScore > 0 ? `+${e.totalScore}` : "E") : "—") : "—"}
-                  </div>
+              <div style={{ display: "flex", gap: 24, alignItems: "flex-start", justifyContent: "center" }}
+                className="masters-panels">
+                {/* LEFT: Family Leaderboard */}
+                <div style={{ flex: 1, minWidth: 280, maxWidth: 450 }}>
+                  {ranked.map((e, i) => (
+                    <div key={i} style={{
+                      display: "flex", alignItems: "center", gap: 14,
+                      padding: "16px 20px", marginBottom: 10,
+                      background: i === 0
+                        ? "linear-gradient(135deg, rgba(242,201,76,0.15), rgba(242,201,76,0.05))"
+                        : "rgba(255,255,255,0.04)",
+                      borderRadius: 12,
+                      border: i === 0 ? `2px solid ${C.yellow}40` : "1px solid rgba(255,255,255,0.08)",
+                      textAlign: "left",
+                    }}>
+                      <div style={{
+                        width: 40, height: 40, borderRadius: "50%",
+                        background: i === 0 ? C.green : i < 3 ? "rgba(255,255,255,0.08)" : "transparent",
+                        border: i === 0 ? `2px solid ${C.yellow}` : i < 3 ? "1px solid rgba(255,255,255,0.15)" : "none",
+                        display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+                      }}>
+                        <span style={{
+                          fontFamily: "'Playfair Display',Georgia,serif",
+                          fontSize: 16, fontWeight: 900,
+                          color: i === 0 ? C.yellow : "#a8d5a8",
+                        }}>{i === 0 ? "🏆" : i + 1}</span>
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <div style={{
+                          fontFamily: "'Playfair Display',Georgia,serif",
+                          fontSize: 17, fontWeight: 700, color: "#fff", lineHeight: 1.2,
+                        }}>{e.name}</div>
+                        <div style={{
+                          fontFamily: "Georgia,serif", fontSize: 13, color: "#a8d5a8", marginTop: 2,
+                        }}>{e.fullName || ""}</div>
+                      </div>
+                      <div style={{
+                        fontFamily: "'Playfair Display',Georgia,serif",
+                        fontSize: 22, fontWeight: 900,
+                        color: isLocked
+                          ? (e.totalScore != null ? (e.totalScore < 0 ? "#ef5350" : e.totalScore > 0 ? "#66bb6a" : "#fff") : "#555")
+                          : "#555",
+                      }}>
+                        {isLocked ? (e.totalScore != null ? (e.totalScore < 0 ? e.totalScore : e.totalScore > 0 ? `+${e.totalScore}` : "E") : "—") : "—"}
+                      </div>
+                    </div>
+                  ))}
+
+                  {ranked.length === 0 && (
+                    <p style={{ fontFamily: "Georgia,serif", fontSize: 14, color: "#5a8a5a", marginTop: 20 }}>
+                      No family entries tagged yet. Add "Y" in column O of the spreadsheet.</p>
+                  )}
+
+                  <button onClick={() => setView("leaderboard")} style={{
+                    marginTop: 16, padding: "10px 24px", borderRadius: 20,
+                    background: "rgba(255,255,255,0.1)", border: `1px solid ${C.yellow}40`,
+                    color: C.yellow, fontFamily: "Georgia,serif", fontSize: 14,
+                    cursor: "pointer",
+                  }}>← Back to Full Leaderboard</button>
                 </div>
-              ))}
 
-              {ranked.length === 0 && (
-                <p style={{ fontFamily: "Georgia,serif", fontSize: 14, color: "#5a8a5a", marginTop: 20 }}>
-                  No family entries tagged yet. Add "Y" in column O of the spreadsheet.</p>
-              )}
-
-              <button onClick={() => setView("leaderboard")} style={{
-                marginTop: 24, padding: "10px 24px", borderRadius: 20,
-                background: "rgba(255,255,255,0.1)", border: `1px solid ${C.yellow}40`,
-                color: C.yellow, fontFamily: "Georgia,serif", fontSize: 14,
-                cursor: "pointer",
-              }}>← Back to Full Leaderboard</button>
-
-              {/* Trash Talk Section */}
-              <JpjmChat />
+                {/* RIGHT: Trash Talk */}
+                <div style={{ flex: 1, minWidth: 280, maxWidth: 400 }}>
+                  <JpjmChat />
+                </div>
+              </div>
             </div>
           </div>
         );
