@@ -1288,13 +1288,13 @@ function Leaderboard({ entries, isLocked, loading, potInfo }) {
                           margin: "0 0 8px", textTransform: "uppercase", letterSpacing: "0.08em" }}>Golfers</p>
                         <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                           {(e.golferScores || e.picks.map(p => ({ name: p }))).map((gs, j) => {
-                            const hasScore = gs.totalStrokes != null;
+                            const hasScore = gs.scoreToPar != null;
                             // Determine if this golfer is in the best 4
-                            const allStrokes = (e.golferScores || [])
-                              .map(g => g.totalStrokes).filter(s => s != null).sort((a,b) => a - b);
-                            const best4Threshold = allStrokes.length >= 4 ? allStrokes[3] : Infinity;
-                            const isInBest4 = hasScore && gs.totalStrokes <= best4Threshold;
-                            const scoreToPar = hasScore ? gs.totalStrokes - (T.par * (gs.golfer?.rounds?.length || 4)) : null;
+                            const allScores = (e.golferScores || [])
+                              .map(g => g.scoreToPar).filter(s => s != null).sort((a,b) => a - b);
+                            const best4Threshold = allScores.length >= 4 ? allScores[3] : Infinity;
+                            const isInBest4 = hasScore && gs.scoreToPar <= best4Threshold;
+                            const scoreToPar = gs.scoreToPar;
                             
                             return (
                               <div key={j} style={{
@@ -1311,6 +1311,7 @@ function Leaderboard({ entries, isLocked, loading, potInfo }) {
                                     {gs.name || (e.picks && e.picks[j]) || ""}
                                   </span>
                                   {gs.isCut && <span style={{ fontSize: 10, color: B.red, marginLeft: 4 }}>CUT</span>}
+                                  {gs.thru > 0 && gs.thru < 18 && <span style={{ fontSize: 10, color: B.muted, marginLeft: 4 }}>thru {gs.thru}</span>}
                                 </div>
                                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                                   {hasScore && (
@@ -1319,9 +1320,9 @@ function Leaderboard({ entries, isLocked, loading, potInfo }) {
                                       color: scoreToPar < 0 ? B.red : scoreToPar > 0 ? B.green : B.text,
                                     }}>{scoreToPar < 0 ? scoreToPar : scoreToPar > 0 ? `+${scoreToPar}` : "E"}</span>
                                   )}
-                                  {hasScore && (
-                                    <span style={{ fontFamily: "Georgia,serif", fontSize: 13, color: B.muted }}>
-                                      ({gs.totalStrokes})
+                                  {gs.today && (
+                                    <span style={{ fontFamily: "Georgia,serif", fontSize: 11, color: B.muted }}>
+                                      ({gs.today})
                                     </span>
                                   )}
                                   {!hasScore && <span style={{ fontFamily: "Georgia,serif", fontSize: 12, color: B.muted }}>—</span>}
@@ -2019,36 +2020,45 @@ function calculatePoolScores(entries, espnGolfers, par) {
     const picks = entry.picks || [];
     const golferScores = picks.map(pickName => {
       const golfer = matchGolfer(pickName, espnGolfers);
+      // Use ESPN's live scoreValue (score-to-par) — updates hole by hole
+      const scoreToPar = golfer ? golfer.scoreValue : null;
       const totalStrokes = getGolferTotalStrokes(golfer);
       return {
         name: pickName,
         golfer: golfer,
         totalStrokes: totalStrokes,
+        scoreToPar: scoreToPar,
         found: !!golfer,
         isCut: golfer ? golfer.isCut : false,
         score: golfer ? golfer.score : "—",
+        thru: golfer ? golfer.thru : 0,
+        today: golfer ? golfer.today : "",
       };
     });
     
-    // Get valid scores (non-null), sort ascending
-    const validScores = golferScores
-      .map(gs => gs.totalStrokes)
+    // Use live score-to-par for ranking (updates every hole)
+    const validScoresToPar = golferScores
+      .map(gs => gs.scoreToPar)
       .filter(s => s != null)
       .sort((a, b) => a - b);
     
-    // Best 4 of 6 (or however many are available)
-    const best4 = validScores.slice(0, 4);
-    const totalStrokes = best4.length > 0 ? best4.reduce((a, b) => a + b, 0) : null;
+    // Best 4 of 6
+    const best4 = validScoresToPar.slice(0, 4);
+    const totalScore = best4.length > 0 ? best4.reduce((a, b) => a + b, 0) : null;
     
-    // Convert to score relative to par (for display like -12, +4, E)
-    const totalScore = totalStrokes != null ? totalStrokes - (par * best4.length) : null;
+    // Also compute total strokes for tiebreaker (scorecard playoff)
+    const validStrokes = golferScores
+      .map(gs => gs.totalStrokes)
+      .filter(s => s != null)
+      .sort((a, b) => a - b);
+    const totalStrokes = validStrokes.length > 0 ? validStrokes.slice(0, 4).reduce((a, b) => a + b, 0) : null;
     
     // Tiebreaker: distance from predicted winning score to actual
     const tbDistance = entry.winScore != null ? Math.abs(entry.winScore - winningScore) : 999;
     
     // Sorted individual scores for scorecard playoff tiebreaker
     const sortedIndividual = golferScores
-      .map(gs => gs.totalStrokes)
+      .map(gs => gs.scoreToPar)
       .filter(s => s != null)
       .sort((a, b) => a - b);
     
