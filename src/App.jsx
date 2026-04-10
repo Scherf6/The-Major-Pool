@@ -217,7 +217,7 @@ function useCountdown(lockTimeISO) {
 /*─────────────────────────────────────────────
   COMPONENTS
 ─────────────────────────────────────────────*/
-function Nav({ view, setView, isLocked, remaining, musicPlaying, toggleMusic }) {
+function Nav({ view, setView, isLocked, remaining }) {
   return (
     <nav style={{
       position: "sticky", top: 0, zIndex: 100,
@@ -240,12 +240,6 @@ function Nav({ view, setView, isLocked, remaining, musicPlaying, toggleMusic }) 
       }}>
         {isLocked ? "🔒 LOCKED" : `⏱ ${remaining}`}
       </div>
-      {toggleMusic && (
-        <button onClick={toggleMusic} style={{
-          background: "none", border: "none", fontSize: 18,
-          cursor: "pointer", padding: "4px 6px", opacity: 0.8,
-        }}>{musicPlaying ? "🔊" : "🔇"}</button>
-      )}
       <div style={{ display: "flex", gap: 3, alignItems: "center" }}>
         {["home","picks","leaderboard","tournament"].map(id => (
           <button key={id} onClick={() => setView(id)} style={{
@@ -2519,10 +2513,12 @@ export default function App() {
     setView("confirmed");
   };
 
-  const [showGreeting, setShowGreeting] = useState(true);
+  const [showGreeting, setShowGreeting] = useState(() => {
+    const seen = localStorage.getItem("greeting-seen");
+    if (seen === new Date().toDateString()) return false;
+    return true;
+  });
   const [greetingTapped, setGreetingTapped] = useState(false);
-  const [musicPlaying, setMusicPlaying] = useState(false);
-  const musicRef = useRef(null);
 
   // Masters theme music
   const playMastersTheme = useCallback(() => {
@@ -2625,12 +2621,12 @@ export default function App() {
   const handleGreetingTap = useCallback(() => {
     if (!greetingTapped) {
       setGreetingTapped(true);
-      playMastersTheme();
+      localStorage.setItem("greeting-seen", new Date().toDateString());
       setTimeout(() => setShowGreeting(false), 2500);
     } else {
       setShowGreeting(false);
     }
-  }, [greetingTapped, playMastersTheme]);
+  }, [greetingTapped]);
 
   return (
     <div style={{ fontFamily: "Georgia,serif", background: C.cream, minHeight: "100vh" }}>
@@ -2667,28 +2663,27 @@ export default function App() {
           }}>Hello, Friends.</p>
           <p style={{
             fontFamily: "'Cormorant Garamond',Georgia,serif",
-            fontSize: 20, color: "#a8d5a8", marginTop: 12,
-            letterSpacing: "0.15em", textTransform: "uppercase",
-            textAlign: "center", padding: "0 20px",
-          }}>Welcome to the Masters Pool</p>
+            fontSize: 18, color: "#a8d5a8", marginTop: 12,
+            letterSpacing: "0.1em",
+            textAlign: "center", padding: "0 20px", lineHeight: 1.5,
+          }}>{(() => {
+            const day = new Date().getDay(); // 0=Sun,1=Mon,...4=Thu,5=Fri,6=Sat
+            const date = new Date().getDate();
+            if (date === 10 || day === 5) return "The cut line looms. Some dreams will end today, others will just be getting started.";
+            if (date === 11 || day === 6) return "Moving day at Augusta National. The leaderboard is taking shape.";
+            if (date === 12 || day === 0) return "The final round at Augusta. Somewhere out there, a green jacket is waiting.";
+            return "The azaleas are in bloom, the pines stand tall, and the 2026 Masters Tournament begins.";
+          })()}</p>
           <div style={{
             marginTop: 28, display: "flex", flexDirection: "column", alignItems: "center", gap: 8,
           }}>
-            <a href="https://www.youtube.com/watch?v=G97AdMLbfr4" target="_blank" rel="noopener"
-              onClick={e => e.stopPropagation()}
-              style={{
-                padding: "8px 20px", borderRadius: 20,
-                background: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.2)",
-                color: C.yellow, fontFamily: "Georgia,serif", fontSize: 13,
-                textDecoration: "none",
-              }}>🎵 Play the Masters Theme</a>
             <p style={{ fontFamily: "Georgia,serif", fontSize: 13, color: C.yellow, marginTop: 6 }}>
               {greetingTapped ? "entering Augusta..." : "👆 tap anywhere to enter"}</p>
           </div>
         </div>
       )}
 
-      {view !== "home" && <Nav view={view} setView={setView} isLocked={isLocked} remaining={remaining} musicPlaying={musicPlaying} toggleMusic={toggleMusic} />}
+      {view !== "home" && <Nav view={view} setView={setView} isLocked={isLocked} remaining={remaining} />}
       {view === "home" && (
         <>
           <Hero onStart={() => setView("picks")} setView={setView} />
