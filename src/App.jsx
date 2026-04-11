@@ -1352,7 +1352,7 @@ function Leaderboard({ entries, isLocked, loading, potInfo }) {
                     }}>
                       {e.fullName || ""}
                       {(() => {
-                        const onSite = ["alan collins","patty collins","griffin collins","cason collins","stuart collins","ross gray","blake desmarteau","jenna lawrence","bill lawrence","cindy lawrence","jae mccaskill"];
+                        const onSite = ["alan collins","patty collins","griffin collins","cason collins","stuart collins","ross gray","blake desmarteau","jenna lawrence","bill lawrence","cindy lawrence","dave lawrence","megan mahoney","jae mccaskill"];
                         const name = (e.fullName || "").toLowerCase();
                         return onSite.some(n => name.includes(n))
                           ? <span style={{ marginLeft: 6, fontSize: 11, color: C.green, fontWeight: 600 }}>📍 At Augusta</span>
