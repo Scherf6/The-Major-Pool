@@ -2524,7 +2524,13 @@ export default function App() {
     if (!greetingTapped) {
       setGreetingTapped(true);
       localStorage.setItem("greeting-seen", new Date().toDateString());
-      setTimeout(() => setShowGreeting(false), 2500);
+      try {
+        const base = import.meta.env.BASE_URL || "/";
+        const audio = new Audio(`${base}masters-greeting.mp3`);
+        audio.volume = 0.6;
+        audio.play().catch(() => {});
+      } catch {}
+      setTimeout(() => setShowGreeting(false), 3500);
     } else {
       setShowGreeting(false);
     }
@@ -2538,7 +2544,7 @@ export default function App() {
         button:hover { opacity: 0.93; }
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-thumb { background: ${C.sand}; border-radius: 4px; }
-        @keyframes greetFade { 0% { opacity: 1; } 70% { opacity: 1; } 100% { opacity: 0; transform: scale(1.02); } }
+        @keyframes greetFade { 0% { opacity: 1; } 60% { opacity: 1; } 100% { opacity: 0; transform: scale(1.02); } }
         @keyframes jacketGlow { 0%,100% { text-shadow: 0 0 8px rgba(0,103,71,0.3); } 50% { text-shadow: 0 0 20px rgba(0,103,71,0.6), 0 0 40px rgba(242,201,76,0.3); } }
         @media (max-width: 700px) {
           .pool-board { overflow-x: auto; -webkit-overflow-scrolling: touch; }
@@ -2554,7 +2560,7 @@ export default function App() {
           background: "rgba(0,40,20,0.93)", backdropFilter: "blur(10px)",
           display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
           cursor: "pointer",
-          ...(greetingTapped ? { animation: "greetFade 2.5s ease-in-out forwards" } : {}),
+          ...(greetingTapped ? { animation: "greetFade 3.5s ease-in-out forwards" } : {}),
         }}>
           <div style={{ fontSize: 64, marginBottom: 20 }}>⛳</div>
           <p style={{
