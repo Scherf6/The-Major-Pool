@@ -2128,7 +2128,7 @@ function calculatePoolScores(entries, espnGolfers, par) {
   
   // Find the winning score for tiebreaker
   const winner = espnGolfers[0];
-  const winningScore = winner ? winner.scoreValue : 0;
+  const winningScore = winner ? (Number(winner.scoreValue) || 0) : 0;
   
   const scored = entries.map(entry => {
     const picks = entry.picks || [];
@@ -2168,7 +2168,7 @@ function calculatePoolScores(entries, espnGolfers, par) {
     const totalStrokes = validStrokes.length > 0 ? validStrokes.slice(0, 4).reduce((a, b) => a + b, 0) : null;
     
     // Tiebreaker: distance from predicted winning score to actual
-    const tbDistance = entry.winScore != null ? Math.abs(entry.winScore - winningScore) : 999;
+    const tbDistance = entry.winScore != null ? Math.abs(Number(entry.winScore) - winningScore) : 999;
     
     // Sorted individual scores for scorecard playoff tiebreaker
     const sortedIndividual = golferScores
@@ -2514,16 +2514,14 @@ export default function App() {
   };
 
   const [showGreeting, setShowGreeting] = useState(() => {
-    const seen = localStorage.getItem("greeting-seen");
-    if (seen === new Date().toDateString()) return false;
-    return true;
+    return !localStorage.getItem("ceremony-2026");
   });
   const [greetingTapped, setGreetingTapped] = useState(false);
 
   const handleGreetingTap = useCallback(() => {
     if (!greetingTapped) {
       setGreetingTapped(true);
-      localStorage.setItem("greeting-seen", new Date().toDateString());
+      localStorage.setItem("ceremony-2026", "1");
       try {
         const base = import.meta.env.BASE_URL || "/";
         const audio = new Audio(`${base}masters-greeting.mp3`);
@@ -2546,6 +2544,9 @@ export default function App() {
         ::-webkit-scrollbar-thumb { background: ${C.sand}; border-radius: 4px; }
         @keyframes greetFade { 0% { opacity: 1; } 60% { opacity: 1; } 100% { opacity: 0; transform: scale(1.02); } }
         @keyframes jacketGlow { 0%,100% { text-shadow: 0 0 8px rgba(0,103,71,0.3); } 50% { text-shadow: 0 0 20px rgba(0,103,71,0.6), 0 0 40px rgba(242,201,76,0.3); } }
+        @keyframes jacketSlide { 0% { opacity: 0; transform: scale(0.8) translateY(20px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
+        @keyframes sparkle { 0%,100% { opacity: 0.3; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1.2); } }
+        @keyframes confetti { 0% { transform: translateY(-10px) rotate(0deg); opacity: 1; } 100% { transform: translateY(60vh) rotate(720deg); opacity: 0; } }
         @media (max-width: 700px) {
           .pool-board { overflow-x: auto; -webkit-overflow-scrolling: touch; }
           .pool-board > div { min-width: 700px; }
@@ -2553,41 +2554,97 @@ export default function App() {
         }
       `}</style>
 
-      {/* Jim Nantz Greeting Overlay */}
+      {/* Green Jacket Ceremony Overlay */}
       {showGreeting && (
         <div onClick={handleGreetingTap} style={{
           position: "fixed", top: 0, left: 0, right: 0, bottom: 0, zIndex: 9999,
-          background: "rgba(0,40,20,0.93)", backdropFilter: "blur(10px)",
+          background: "linear-gradient(170deg, rgba(0,40,20,0.97) 0%, rgba(0,60,30,0.95) 50%, rgba(0,40,20,0.97) 100%)",
+          backdropFilter: "blur(12px)",
           display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-          cursor: "pointer",
+          cursor: "pointer", overflow: "hidden",
           ...(greetingTapped ? { animation: "greetFade 3.5s ease-in-out forwards" } : {}),
         }}>
-          <div style={{ fontSize: 64, marginBottom: 20 }}>⛳</div>
-          <p style={{
-            fontFamily: "'Playfair Display',Georgia,serif",
-            fontSize: 48, fontWeight: 700, color: C.yellow,
-            textAlign: "center", lineHeight: 1.2, padding: "0 16px",
-            textShadow: "0 2px 20px rgba(0,0,0,0.3)",
-          }}>Hello, Friends.</p>
+          {/* Confetti */}
+          {greetingTapped && Array.from({ length: 20 }).map((_, i) => (
+            <div key={i} style={{
+              position: "absolute", top: -20,
+              left: `${Math.random() * 100}%`,
+              width: 8, height: 8, borderRadius: i % 3 === 0 ? "50%" : "0",
+              background: [C.yellow, C.green, "#fff", "#f2c94c", "#006747"][i % 5],
+              animation: `confetti ${2 + Math.random() * 2}s ease-out ${Math.random() * 0.5}s forwards`,
+            }} />
+          ))}
+
+          {/* Trophy */}
+          <div style={{
+            fontSize: 72, marginBottom: 16,
+            animation: "jacketSlide 1s ease-out",
+          }}>🏆</div>
+
+          {/* Champion text */}
           <p style={{
             fontFamily: "'Cormorant Garamond',Georgia,serif",
-            fontSize: 18, color: "#a8d5a8", marginTop: 12,
-            letterSpacing: "0.1em",
-            textAlign: "center", padding: "0 20px", lineHeight: 1.5,
-          }}>{(() => {
-            const day = new Date().getDay(); // 0=Sun,1=Mon,...4=Thu,5=Fri,6=Sat
-            const date = new Date().getDate();
-            if (date === 10 || day === 5) return "The cut line looms. Some dreams will end today, others will just be getting started.";
-            if (date === 11 || day === 6) return "Moving day at Augusta National. The leaderboard is taking shape.";
-            if (date === 12 || day === 0) return "The final round at Augusta. Somewhere out there, a green jacket is waiting.";
-            return "The azaleas are in bloom, the pines stand tall, and the 2026 Masters Tournament begins.";
-          })()}</p>
+            fontSize: 14, color: "#a8d5a8", letterSpacing: "0.25em",
+            textTransform: "uppercase", marginBottom: 8,
+            animation: "jacketSlide 1s ease-out 0.2s both",
+          }}>2026 JPJM Memorial Masters Champion</p>
+
+          {/* Winner name */}
+          <p style={{
+            fontFamily: "'Playfair Display',Georgia,serif",
+            fontSize: 42, fontWeight: 900, color: C.yellow,
+            textAlign: "center", lineHeight: 1.1, padding: "0 16px",
+            textShadow: "0 2px 20px rgba(0,0,0,0.4)",
+            animation: "jacketSlide 1s ease-out 0.4s both, jacketGlow 3s ease-in-out infinite",
+          }}>Cason Collins</p>
+
+          {/* Team name */}
+          <p style={{
+            fontFamily: "Georgia,serif",
+            fontSize: 18, color: "#fff", marginTop: 8,
+            fontStyle: "italic",
+            animation: "jacketSlide 1s ease-out 0.6s both",
+          }}>"CASON"</p>
+
+          {/* Green Jacket */}
           <div style={{
-            marginTop: 28, display: "flex", flexDirection: "column", alignItems: "center", gap: 8,
+            marginTop: 24, fontSize: 56,
+            animation: "jacketSlide 1.2s ease-out 0.8s both, sparkle 2s ease-in-out 2s infinite",
+          }}>🧥</div>
+          <p style={{
+            fontFamily: "'Playfair Display',Georgia,serif",
+            fontSize: 16, color: C.yellow, marginTop: 8,
+            animation: "jacketSlide 1s ease-out 1s both",
+          }}>The Green Jacket</p>
+
+          {/* Score */}
+          <div style={{
+            marginTop: 24, display: "flex", gap: 24, alignItems: "center",
+            animation: "jacketSlide 1s ease-out 1.2s both",
           }}>
-            <p style={{ fontFamily: "Georgia,serif", fontSize: 13, color: C.yellow, marginTop: 6 }}>
-              {greetingTapped ? "entering Augusta..." : "👆 tap anywhere to enter"}</p>
+            <div style={{ textAlign: "center" }}>
+              <div style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 36, fontWeight: 900, color: "#ef5350" }}>-34</div>
+              <div style={{ fontFamily: "Georgia,serif", fontSize: 11, color: "#a8d5a8", textTransform: "uppercase", letterSpacing: "0.1em" }}>Pool Score</div>
+            </div>
+            <div style={{ width: 1, height: 40, background: "rgba(255,255,255,0.2)" }} />
+            <div style={{ textAlign: "center" }}>
+              <div style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 36, fontWeight: 900, color: C.yellow }}>$1,053</div>
+              <div style={{ fontFamily: "Georgia,serif", fontSize: 11, color: "#a8d5a8", textTransform: "uppercase", letterSpacing: "0.1em" }}>1st Place</div>
+            </div>
           </div>
+
+          {/* At Augusta badge */}
+          <p style={{
+            fontFamily: "Georgia,serif", fontSize: 13, color: "#a8d5a8",
+            marginTop: 20, fontStyle: "italic",
+            animation: "jacketSlide 1s ease-out 1.4s both",
+          }}>📍 Watched it happen from Augusta National</p>
+
+          {/* Tap prompt */}
+          <p style={{
+            fontFamily: "Georgia,serif", fontSize: 13, color: C.yellow, marginTop: 24,
+            animation: "jacketSlide 1s ease-out 1.6s both",
+          }}>{greetingTapped ? "entering Augusta..." : "👆 tap to continue"}</p>
         </div>
       )}
 
