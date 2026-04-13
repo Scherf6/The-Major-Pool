@@ -2514,14 +2514,14 @@ export default function App() {
   };
 
   const [showGreeting, setShowGreeting] = useState(() => {
-    return !localStorage.getItem("ceremony-2026");
+    return !localStorage.getItem("ceremony-cason-wins");
   });
   const [greetingTapped, setGreetingTapped] = useState(false);
 
   const handleGreetingTap = useCallback(() => {
     if (!greetingTapped) {
       setGreetingTapped(true);
-      localStorage.setItem("ceremony-2026", "1");
+      localStorage.setItem("ceremony-cason-wins", "1");
       try {
         const base = import.meta.env.BASE_URL || "/";
         const audio = new Audio(`${base}masters-greeting.mp3`);
@@ -2776,6 +2776,7 @@ export default function App() {
                 {/* LEFT: Champions list + 2026 card */}
                 <div style={{ flex: 1, minWidth: 280, maxWidth: 420 }}>
                   {[
+                    { year: 2026, team: "Cason", name: "Cason Collins" },
                     { year: 2025, team: "Lizards All the Way", name: "Jacks Gray" },
                     { year: 2024, team: "Handsome Stranger", name: "Brandon Winkler" },
                     { year: 2023, team: "Hank the Tank", name: "Chris Frick" },
@@ -2814,7 +2815,7 @@ export default function App() {
                     </div>
                   ))}
 
-                  {/* 2026 awaiting */}
+                  {/* 2027 awaiting */}
                   <div style={{
                     marginTop: 8,
                     background: `linear-gradient(135deg, ${C.green}, #004d35)`,
@@ -2827,7 +2828,7 @@ export default function App() {
                       <span style={{
                         fontFamily: "'Playfair Display',Georgia,serif",
                         fontSize: 28, fontWeight: 900, color: C.yellow,
-                      }}>2026</span>
+                      }}>2027</span>
                       <span style={{
                         fontFamily: "Georgia,serif", fontSize: 16,
                         color: C.yellow, opacity: 0.5,
@@ -2862,36 +2863,26 @@ export default function App() {
                       <p style={{
                         fontFamily: "Georgia,serif", fontSize: 13,
                         color: "#8b7355", margin: 0,
-                      }}>April 7, 2026</p>
+                      }}>April 2027</p>
                     </div>
 
                     <div style={{ padding: "0 28px 24px" }}>
                       <div style={{ width: 50, height: 1, background: C.green, margin: "0 auto 18px", opacity: 0.4 }} />
 
-                      {[
-                        { course: "Appetizer", dish: "Pretzel Bites with Queso", desc: null },
-                        { course: "First Course", dish: "Two Pronto Pups", desc: null },
-                        { course: "Main Course", dish: "Steak with A1 Sauce", desc: "Jet's Ranch & Domino's Parmesan Knots" },
-                        { course: "Dessert", dish: "Little Foot Nerd's Slushy", desc: "from Dairy Treat" },
-                      ].map((item, i) => (
-                        <div key={i} style={{ textAlign: "center", marginBottom: 16 }}>
-                          <div style={{
-                            fontFamily: "'Playfair Display',Georgia,serif",
-                            fontSize: 13, fontWeight: 700, color: C.green,
-                            fontStyle: "italic", marginBottom: 3,
-                          }}>{item.course}</div>
-                          <div style={{
-                            fontFamily: "Georgia,serif", fontSize: 15,
-                            color: "#333", fontWeight: 600,
-                          }}>{item.dish}</div>
-                          {item.desc && (
-                            <div style={{
-                              fontFamily: "Georgia,serif", fontSize: 12,
-                              color: "#8b7355", fontStyle: "italic", marginTop: 2,
-                            }}>{item.desc}</div>
-                          )}
-                        </div>
-                      ))}
+                      <div style={{ textAlign: "center", padding: "20px 0" }}>
+                        <p style={{
+                          fontFamily: "'Playfair Display',Georgia,serif",
+                          fontSize: 16, color: "#333", fontStyle: "italic",
+                        }}>Menu TBD</p>
+                        <p style={{
+                          fontFamily: "Georgia,serif", fontSize: 13,
+                          color: "#8b7355", marginTop: 8, fontStyle: "italic",
+                        }}>Cason gets to pick the menu.</p>
+                        <p style={{
+                          fontFamily: "Georgia,serif", fontSize: 12,
+                          color: "#8b7355", marginTop: 4,
+                        }}>No pressure.</p>
+                      </div>
 
                       <div style={{ width: 30, height: 1, background: "#d4cdb8", margin: "16px auto 12px" }} />
                       <p style={{
@@ -2905,11 +2896,11 @@ export default function App() {
                         fontFamily: "'Cormorant Garamond',Georgia,serif",
                         fontSize: 13, color: C.green, textAlign: "center",
                         marginTop: 12, fontStyle: "italic",
-                      }}>Served in Honor of Mr. Jacks Gray</p>
+                      }}>Served in Honor of Ms. Cason Collins</p>
                       <p style={{
                         fontFamily: "Georgia,serif", fontSize: 10,
                         color: "#8b7355", textAlign: "center", margin: "3px 0 0",
-                      }}>2025 Champion — "Lizards All the Way"</p>
+                      }}>2026 Champion — "Cason"</p>
                     </div>
                   </div>
                 </div>
