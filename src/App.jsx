@@ -2585,7 +2585,7 @@ export default function App() {
           <p style={{
             fontFamily: "'Cormorant Garamond',Georgia,serif",
             fontSize: 14, color: "#a8d5a8", letterSpacing: "0.25em",
-            textTransform: "uppercase", marginBottom: 8,
+            textTransform: "uppercase", marginBottom: 8, textAlign: "center",
             animation: "jacketSlide 1s ease-out 0.2s both",
           }}>2026 JPJM Memorial Masters Champion</p>
 
@@ -2608,9 +2608,28 @@ export default function App() {
 
           {/* Green Jacket */}
           <div style={{
-            marginTop: 24, fontSize: 56,
+            marginTop: 24,
             animation: "jacketSlide 1.2s ease-out 0.8s both, sparkle 2s ease-in-out 2s infinite",
-          }}>🧥</div>
+          }}>
+            <div style={{
+              width: 64, height: 72, borderRadius: "12px 12px 8px 8px",
+              background: "linear-gradient(135deg, #006747, #004d35)",
+              border: "2px solid #a8d5a8",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              boxShadow: "0 4px 20px rgba(0,103,71,0.5), 0 0 30px rgba(242,201,76,0.2)",
+              position: "relative",
+            }}>
+              <div style={{
+                width: 12, height: 12, borderRadius: "50%",
+                background: C.yellow, boxShadow: "0 0 8px rgba(242,201,76,0.6)",
+                position: "absolute", top: 14,
+              }} />
+              <div style={{
+                width: 20, height: 1, background: "#a8d5a8",
+                position: "absolute", top: 36,
+              }} />
+            </div>
+          </div>
           <p style={{
             fontFamily: "'Playfair Display',Georgia,serif",
             fontSize: 16, color: C.yellow, marginTop: 8,
