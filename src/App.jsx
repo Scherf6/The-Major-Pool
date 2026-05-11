@@ -3,32 +3,55 @@ import { useState, useEffect, useCallback, useRef } from "react";
 /*─────────────────────────────────────────────
   CONFIG
 ─────────────────────────────────────────────*/
-const MODE = "masters"; // "masters" or "valero"
+const MODE = "pga"; // "masters" | "pga" | "valero"
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzGzrcdc-V90CmcOHVejftmFmTAb9TEUL3iSzePe6bZjkQJZQjaYP_B2HZlUqRzk7as_g/exec";
 
 const TOURNAMENTS = {
   masters: {
     name: "The Masters", year: 2026,
     tagline: "A Tradition Unlike Any Other",
+    venue: "Augusta National Golf Club", location: "Augusta, GA",
     espnId: "401703504",
     lockTime: "2026-04-09T07:59:00-04:00",
     par: 72,
+    trophyLabel: "Green Jacket",
+    winnerDeclared: true,
+    sheetTab: "masters",
+  },
+  pga: {
+    name: "PGA Championship", year: 2026,
+    tagline: "Strongest Field in Golf",
+    venue: "Aronimink Golf Club", location: "Newtown Square, PA",
+    espnId: "401811947",
+    lockTime: "2026-05-14T06:59:00-04:00",
+    par: 70,
+    trophyLabel: "Wanamaker Trophy",
+    winnerDeclared: false, // flip to true Sunday night + fill winner overlay
+    sheetTab: "pga",
   },
   valero: {
     name: "Valero Texas Open", year: 2026,
     tagline: "Test Pool — Validating Scoring Before Masters Week",
+    venue: "TPC San Antonio", location: "San Antonio, TX",
     espnId: "401811940",
     lockTime: "2026-04-03T07:29:00-05:00",
     par: 72,
+    trophyLabel: "Trophy",
+    winnerDeclared: false,
+    sheetTab: "valero",
   },
 };
 const T = TOURNAMENTS[MODE];
 
-const C = {
-  green: "#006747", dark: "#004d35", yellow: "#f2c94c",
-  cream: "#fdf8f0", sand: "#e8dcc8", pink: "#e84393",
-  magenta: "#c2185b", dogwood: "#fff5ee",
-};
+// Color palette — values shift by tournament; key names stay legacy so the
+// 3000-line component tree doesn't need a global rename. (PGA = navy/gold.)
+const C = MODE === "pga"
+  ? { green: "#1a2744", dark: "#0d1522", yellow: "#c9b037",
+      cream: "#f5f4ef", sand: "#d6d3c4", pink: "#c9b037",
+      magenta: "#8a7a28", dogwood: "#fefdf8" }
+  : { green: "#006747", dark: "#004d35", yellow: "#f2c94c",
+      cream: "#fdf8f0", sand: "#e8dcc8", pink: "#e84393",
+      magenta: "#c2185b", dogwood: "#fff5ee" };
 
 /*─────────────────────────────────────────────
   TIERS — 4 tiers (pick 1 each) + Field (pick 2)
@@ -155,6 +178,135 @@ const MASTERS_TIERS = {
   },
 };
 
+// PGA Championship 2026 @ Aronimink — odds from BetMGM, current as of 5/11/26
+const PGA_TIERS = {
+  "Tier 1 — Favorites": {
+    pick: 1, color: "#E3EAF5",
+    golfers: [
+      { name: "Scottie Scheffler", odds: "+450", note: "Defending champ, World #1" },
+      { name: "Rory McIlroy", odds: "+850", note: "Masters champ, slam watch ⭐" },
+      { name: "Cameron Young", odds: "+1200", note: "Hottest player in golf" },
+      { name: "Jon Rahm", odds: "+1600", note: "LIV — 2x major winner" },
+      { name: "Bryson DeChambeau", odds: "+1800", note: "LIV — 2x US Open" },
+      { name: "Xander Schauffele", odds: "+1800", note: "2024 PGA champion" },
+      { name: "Ludvig Aberg", odds: "+2000" },
+      { name: "Matt Fitzpatrick", odds: "+2200" },
+      { name: "Tommy Fleetwood", odds: "+2200", note: "Hot streak, major-less" },
+      { name: "Brooks Koepka", odds: "+4000", note: "3x PGA champ" },
+    ]
+  },
+  "Tier 2 — Contenders": {
+    pick: 1, color: "#C9D5E8",
+    golfers: [
+      { name: "Collin Morikawa", odds: "+4000", note: "2020 PGA winner" },
+      { name: "Justin Thomas", odds: "+4000", note: "2x PGA winner" },
+      { name: "Justin Rose", odds: "+4500", note: "Won at Aronimink in 2010" },
+      { name: "Patrick Cantlay", odds: "+4500" },
+      { name: "Tyrrell Hatton", odds: "+4500", note: "LIV" },
+      { name: "Russell Henley", odds: "+5000", note: "3 top-10s in majors" },
+      { name: "Rickie Fowler", odds: "+5000" },
+      { name: "Viktor Hovland", odds: "+5000" },
+      { name: "Chris Gotterup", odds: "+6000", note: "Local NJ favorite" },
+      { name: "Si Woo Kim", odds: "+6600", note: "Elite off the tee" },
+    ]
+  },
+  "Tier 3 — Dark Horses": {
+    pick: 1, color: "#AEC0DD",
+    golfers: [
+      { name: "Jordan Spieth", odds: "+6600", note: "Career Slam watch ⭐" },
+      { name: "Robert MacIntyre", odds: "+6600" },
+      { name: "Sam Burns", odds: "+6600" },
+      { name: "Patrick Reed", odds: "+6600", note: "LIV" },
+      { name: "Hideki Matsuyama", odds: "+6600", note: "2021 Masters winner" },
+      { name: "J.J. Spaun", odds: "+6600", note: "Won at Oakmont in '25" },
+      { name: "Shane Lowry", odds: "+6600", note: "2019 Open winner" },
+      { name: "Min Woo Lee", odds: "+6600" },
+      { name: "Sepp Straka", odds: "+6600" },
+      { name: "Nicolai Hojgaard", odds: "+6600" },
+    ]
+  },
+  "Tier 4 — Long Shots": {
+    pick: 1, color: "#94ACCB",
+    golfers: [
+      { name: "Akshay Bhatia", odds: "+8000" },
+      { name: "Joaquin Niemann", odds: "+8000", note: "LIV" },
+      { name: "Jake Knapp", odds: "+8000" },
+      { name: "Kristoffer Reitan", odds: "+8000", note: "Truist Champ" },
+      { name: "Keegan Bradley", odds: "+9000", note: "2011 PGA, Ryder Cup capt." },
+      { name: "Maverick McNealy", odds: "+9000" },
+      { name: "Adam Scott", odds: "+10000", note: "99th consecutive major" },
+      { name: "Jason Day", odds: "+10000", note: "2015 PGA winner" },
+      { name: "Sungjae Im", odds: "+10000" },
+      { name: "Corey Conners", odds: "+10000", note: "Elite ball-striker" },
+    ]
+  },
+  "The Field — Pick 2": {
+    pick: 2, color: "#FFF3E0",
+    golfers: [
+      { name: "Ben Griffin", odds: "+10000" },
+      { name: "Gary Woodland", odds: "+10000", note: "2019 US Open winner" },
+      { name: "Harris English", odds: "+10000" },
+      { name: "Alex Fitzpatrick", odds: "+10000" },
+      { name: "Jacob Bridgeman", odds: "+10000" },
+      { name: "Kurt Kitayama", odds: "+10000" },
+      { name: "Aaron Rai", odds: "+12500" },
+      { name: "Alex Noren", odds: "+12500" },
+      { name: "Wyndham Clark", odds: "+12500", note: "2023 US Open winner" },
+      { name: "Marco Penge", odds: "+12500" },
+      { name: "Thomas Detry", odds: "+12500" },
+      { name: "David Puig", odds: "+15000", note: "LIV" },
+      { name: "Alex Smalley", odds: "+15000" },
+      { name: "Michael Thorbjornsen", odds: "+15000" },
+      { name: "Harry Hall", odds: "+15000" },
+      { name: "Dustin Johnson", odds: "+15000", note: "LIV — 2x major" },
+      { name: "Matt McCarty", odds: "+15000" },
+      { name: "Sudarshan Yellamaraju", odds: "+15000", note: "Final qualifying spot" },
+      { name: "Sahith Theegala", odds: "+15000" },
+      { name: "Brian Harman", odds: "+17500", note: "2023 Open winner" },
+      { name: "Nick Taylor", odds: "+17500" },
+      { name: "Rasmus Hojgaard", odds: "+17500" },
+      { name: "Ryan Gerard", odds: "+17500" },
+      { name: "Cameron Smith", odds: "+20000", note: "LIV — 2022 Open winner" },
+      { name: "Keith Mitchell", odds: "+20000" },
+      { name: "Daniel Berger", odds: "+20000" },
+      { name: "Jayden Schaper", odds: "+20000" },
+      { name: "Pierceson Coody", odds: "+20000" },
+      { name: "Sam Stevens", odds: "+20000" },
+      { name: "Max Homa", odds: "+20000" },
+      { name: "Michael Brennan", odds: "+20000" },
+      { name: "Aldrich Potgieter", odds: "+25000", note: "Long-driving phenom" },
+      { name: "Andrew Novak", odds: "+25000" },
+      { name: "Angel Ayora", odds: "+25000" },
+      { name: "Bud Cauley", odds: "+25000" },
+      { name: "J.T. Poston", odds: "+25000" },
+      { name: "Denny McCarthy", odds: "+25000" },
+      { name: "Taylor Pendrith", odds: "+25000" },
+      { name: "Ryo Hisatsune", odds: "+25000" },
+      { name: "Michael Kim", odds: "+25000" },
+      { name: "Matt Wallace", odds: "+25000" },
+      { name: "Tom McKibbin", odds: "+25000" },
+      { name: "Ryan Fox", odds: "+25000" },
+      { name: "Billy Horschel", odds: "+30000" },
+      { name: "Christiaan Bezuidenhout", odds: "+30000" },
+      { name: "Max Greyserman", odds: "+30000" },
+      { name: "Rasmus Neergaard-Petersen", odds: "+30000" },
+      { name: "Lucas Glover", odds: "+35000", note: "2009 US Open winner" },
+      { name: "Stewart Cink", odds: "+35000", note: "2009 Open winner" },
+      { name: "Brandt Snedeker", odds: "+40000", note: "Won Myrtle Beach to qualify" },
+      { name: "Padraig Harrington", odds: "+100000", note: "🇮🇪 3x major winner" },
+      { name: "Martin Kaymer", odds: "+100000", note: "2010 PGA winner" },
+      { name: "Y.E. Yang", odds: "+200000", note: "2009 PGA — beat Tiger" },
+      { name: "Jimmy Walker", odds: "+200000", note: "2016 PGA winner" },
+      { name: "Jason Dufner", odds: "+200000", note: "2013 PGA winner" },
+      { name: "Shaun Micheel", odds: "+200000", note: "2003 PGA winner" },
+      { name: "Luke Donald", odds: "+200000", note: "European Ryder Cup capt." },
+      { name: "Michael Block", odds: "+200000", note: "🎉 Club pro hero" },
+      { name: "Tiger Woods", odds: "+99999", wd: true, note: "🐅 4x PGA — DNP, legend pick" },
+      { name: "Phil Mickelson", odds: "+99999", wd: true, note: "🫡 2x PGA — DNP, legend pick" },
+    ]
+  },
+};
+
 // Simpler tiers for Valero test
 const VALERO_TIERS = {
   "Tier 1": { pick: 1, color: "#E8F5E9", golfers: [
@@ -187,7 +339,9 @@ const VALERO_TIERS = {
   ]},
 };
 
-const TIERS = MODE === "masters" ? MASTERS_TIERS : VALERO_TIERS;
+const TIERS = MODE === "masters" ? MASTERS_TIERS
+            : MODE === "pga"     ? PGA_TIERS
+            : VALERO_TIERS;
 
 const DEMO_ENTRIES = [];
 
@@ -230,7 +384,9 @@ function Nav({ view, setView, isLocked, remaining }) {
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
         <span style={{ fontSize: 20 }}>⛳</span>
         <span style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 17, fontWeight: 700, color: C.yellow }}>
-          {MODE === "valero" ? "🧪 Test Pool" : "Masters Pool '26"}
+          {MODE === "valero" ? "🧪 Test Pool"
+            : MODE === "pga"   ? "PGA Champ '26"
+            : "Masters Pool '26"}
         </span>
       </div>
       <div style={{
@@ -280,6 +436,15 @@ function Hero({ onStart, setView }) {
             fontFamily: "Georgia,serif", fontWeight: 700, marginBottom: 14,
           }}>🧪 TEST MODE — VALERO TEXAS OPEN</div>
         )}
+        {MODE === "pga" && (
+          <div style={{
+            background: "rgba(201,176,55,0.15)", color: C.yellow, display: "inline-block",
+            padding: "5px 16px", borderRadius: 20, fontSize: 12,
+            fontFamily: "Georgia,serif", fontWeight: 700, marginBottom: 14,
+            letterSpacing: "0.2em", textTransform: "uppercase",
+            border: `1px solid ${C.yellow}40`,
+          }}>🏆 The Wanamaker Awaits</div>
+        )}
         <div style={{
           fontFamily: "'Cormorant Garamond',Georgia,serif",
           fontSize: 13, letterSpacing: "0.3em", textTransform: "uppercase",
@@ -289,20 +454,32 @@ function Hero({ onStart, setView }) {
           fontFamily: "'Playfair Display',Georgia,serif",
           fontSize: 48, fontWeight: 700, color: "#fff",
           lineHeight: 1.1, margin: "0 0 16px",
-        }}>{T.year} {MODE === "masters" ? "Masters" : "Valero"}<br />Golf Pool</h1>
+        }}>{T.year} {MODE === "masters" ? "Masters" : MODE === "pga" ? "PGA Championship" : "Valero"}<br />Golf Pool</h1>
+        {MODE === "pga" && (
+          <p style={{
+            fontFamily: "'Cormorant Garamond',Georgia,serif",
+            fontSize: 16, color: "#c4cfdb", lineHeight: 1.4, margin: "0 0 10px",
+            letterSpacing: "0.05em",
+          }}>Aronimink Golf Club · May 14–17 · Newtown Square, PA</p>
+        )}
         <p style={{
           fontFamily: "'Cormorant Garamond',Georgia,serif",
-          fontSize: 19, color: "#c4d9c4", lineHeight: 1.5, margin: "0 0 20px",
+          fontSize: 19, color: MODE === "pga" ? "#a8b5c5" : "#c4d9c4", lineHeight: 1.5, margin: "0 0 20px",
         }}>Pick 6 golfers — 1 from each of 4 tiers + 2 from the field.
         Best 4 scores count. Lowest total wins.</p>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, marginBottom: 24 }}>
-          {[
+          {(MODE === "pga" ? [
+            "Strongest field in golf — 156 players, top 70 + ties make cut",
+            "Donald Ross masterpiece, par 70, 7,394 yards",
+            "Tiger & Phil sitting this one out — legend picks available 🐅🫡",
+            "Edit picks anytime before Thursday's first tee",
+          ] : [
             "4 tiers of ~10 golfers — pick 1 from each",
             "The Field (~52 players) — pick 2 more",
             "Tiger & Phil available as legend picks 🐅🫡",
             "Edit picks anytime before the first tee",
-          ].map((t, i) => (
-            <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, color: "#a8d5a8" }}>
+          ]).map((t, i) => (
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, color: MODE === "pga" ? "#a8b5c5" : "#a8d5a8" }}>
               <span style={{ color: C.yellow }}>✓</span>
               <span style={{ fontFamily: "Georgia,serif", fontSize: 15 }}>{t}</span>
             </div>
@@ -336,9 +513,11 @@ function Hero({ onStart, setView }) {
         {/* Share button */}
         <button onClick={() => {
           const url = window.location.href;
-          const text = `Join my Masters Pool! Pick 6 golfers, best 4 scores win. ${url}`;
+          const text = MODE === "pga"
+            ? `Join the PGA Championship Pool! Pick 6 golfers, best 4 scores win. ${url}`
+            : `Join my Masters Pool! Pick 6 golfers, best 4 scores win. ${url}`;
           if (navigator.share) {
-            navigator.share({ title: "Masters Pool 2026", text, url }).catch(() => {});
+            navigator.share({ title: `${T.name} Pool ${T.year}`, text, url }).catch(() => {});
           } else {
             navigator.clipboard.writeText(text).then(() => alert("Link copied! Paste it in a text."));
           }
@@ -359,7 +538,7 @@ function PicksFlow({ onComplete, isLocked, existingEntry, allEntries }) {
   const [firstName, setFirstName] = useState(existingEntry?.firstName || "");
   const [lastName, setLastName] = useState(existingEntry?.lastName || "");
   const [teamName, setTeamName] = useState(existingEntry?.teamName || "");
-  const [winScore, setWinScore] = useState(existingEntry?.winScore ?? -12);
+  const [winScore, setWinScore] = useState(existingEntry?.winScore ?? (MODE === "pga" ? -8 : -12));
   const [picks, setPicks] = useState({});
 
   const loadPicksFromNames = (pickNames) => {
@@ -457,16 +636,27 @@ function PicksFlow({ onComplete, isLocked, existingEntry, allEntries }) {
     setGenerating(true);
     const ideas = nameIdeas.trim().toLowerCase();
     
-    // Masters-themed word banks
-    const prefixes = ["Amen Corner","Augusta","Azalea","Butler Cabin","Magnolia Lane","Rae's Creek",
+    // Tournament-themed word banks
+    const MASTERS_PREFIXES = ["Amen Corner","Augusta","Azalea","Butler Cabin","Magnolia Lane","Rae's Creek",
       "Green Jacket","Pimento","Dogwood","Golden Bell","Hogan's","Sunday","Amen","Birdie","Eagle",
       "Bogey","Masters","Pine","Fairway","Clubhouse","Back Nine","Front Nine","Iron","Wedge"];
+    const PGA_PREFIXES = ["Aronimink","Wanamaker","Philly","Liberty Bell","Donald Ross","Ben Franklin",
+      "Cheesesteak","Schuylkill","Brotherly","Independence","South Street","Rocky","Eagles",
+      "Birdie","Eagle","Bogey","Bunker","Strokes","Fairway","Bombers","Bombs","Iron","Wedge"];
+    const prefixes = MODE === "pga" ? PGA_PREFIXES : MASTERS_PREFIXES;
+
     const suffixes = ["Aces","Assassins","Bandits","Crushers","Legends","Maniacs","Monsters",
       "Pounders","Pushers","Swingers","Warriors","Wizards","Chasers","Hunters","Squad","Crew",
       "Gang","Posse","Mafia","Mob","Club","Society"];
-    const food = ["Pimento Cheese","Egg Salad","Azalea Cocktail","Turkey Sandwich","BBQ"];
-    const golfers = ["Tiger's","Arnie's","Jack's","Rory's","Scottie's","Freddie's","Phil's","Bubba's"];
-    
+
+    const MASTERS_FOOD = ["Pimento Cheese","Egg Salad","Azalea Cocktail","Turkey Sandwich","BBQ"];
+    const PGA_FOOD = ["Cheesesteak","Soft Pretzel","Wawa Hoagie","Tastykake","Yuengling","Wit-Wiz"];
+    const food = MODE === "pga" ? PGA_FOOD : MASTERS_FOOD;
+
+    const MASTERS_GOLFERS = ["Tiger's","Arnie's","Jack's","Rory's","Scottie's","Freddie's","Phil's","Bubba's"];
+    const PGA_GOLFERS = ["Scottie's","Rory's","Cam's","Bryson's","Brooks'","Xander's","Rahm's","Ludvig's"];
+    const golfers = MODE === "pga" ? PGA_GOLFERS : MASTERS_GOLFERS;
+
     const results = [];
     const used = new Set();
     
@@ -482,12 +672,21 @@ function PicksFlow({ onComplete, isLocked, existingEntry, allEntries }) {
       words.forEach(w => {
         const W = cap(w);
         addUnique(`${W} ${suffixes[Math.floor(Math.random() * suffixes.length)]}`);
-        addUnique(`Augusta ${W}s`);
-        addUnique(`The ${W} Masters`);
-        addUnique(`${W} at Amen Corner`);
-        addUnique(`Green Jacket ${W}s`);
-        addUnique(`${W} & Pimento`);
-        addUnique(`Magnolia ${W}s`);
+        if (MODE === "pga") {
+          addUnique(`Aronimink ${W}s`);
+          addUnique(`The ${W} Wanamaker`);
+          addUnique(`${W} at Aronimink`);
+          addUnique(`Philly ${W}s`);
+          addUnique(`${W} & Cheesesteak`);
+          addUnique(`Wanamaker ${W}s`);
+        } else {
+          addUnique(`Augusta ${W}s`);
+          addUnique(`The ${W} Masters`);
+          addUnique(`${W} at Amen Corner`);
+          addUnique(`Green Jacket ${W}s`);
+          addUnique(`${W} & Pimento`);
+          addUnique(`Magnolia ${W}s`);
+        }
         addUnique(`${golfers[Math.floor(Math.random() * golfers.length)]} ${W}s`);
       });
     }
@@ -523,6 +722,7 @@ function PicksFlow({ onComplete, isLocked, existingEntry, allEntries }) {
       // Try GET-based submit first (new script)
       const params = new URLSearchParams({
         mode: "submit",
+        tournament: T.sheetTab,
         email,
         teamName,
         firstName: firstName.trim(),
@@ -549,7 +749,8 @@ function PicksFlow({ onComplete, isLocked, existingEntry, allEntries }) {
           method: "POST", mode: "no-cors",
           headers: { "Content-Type": "text/plain" },
           body: JSON.stringify({
-            action: "submit", email, teamName, firstName: firstName.trim(),
+            action: "submit", tournament: T.sheetTab,
+            email, teamName, firstName: firstName.trim(),
             lastName: lastName.trim(), fullName,
             picks: pickNames, winningScore: winScore,
           }),
@@ -563,7 +764,8 @@ function PicksFlow({ onComplete, isLocked, existingEntry, allEntries }) {
           method: "POST", mode: "no-cors",
           headers: { "Content-Type": "text/plain" },
           body: JSON.stringify({
-            action: "submit", email, teamName, firstName: firstName.trim(),
+            action: "submit", tournament: T.sheetTab,
+            email, teamName, firstName: firstName.trim(),
             lastName: lastName.trim(), fullName,
             picks: pickNames, winningScore: winScore,
           }),
@@ -576,12 +778,12 @@ function PicksFlow({ onComplete, isLocked, existingEntry, allEntries }) {
       }
     }
     try {
-      const raw = localStorage.getItem("pool-entries");
+      const raw = localStorage.getItem(`pool-entries-${T.sheetTab}`);
       const entries = raw ? JSON.parse(raw) : [];
       const idx = entries.findIndex(e => e.email === email);
       const newE = { email, teamName, firstName: firstName.trim(), lastName: lastName.trim(), fullName, picks: pickNames, winScore, ts: Date.now() };
       if (idx >= 0) entries[idx] = newE; else entries.push(newE);
-      localStorage.setItem("pool-entries", JSON.stringify(entries));
+      localStorage.setItem(`pool-entries-${T.sheetTab}`, JSON.stringify(entries));
     } catch {}
     setSubmitting(false);
     onComplete({ email, teamName, firstName: firstName.trim(), lastName: lastName.trim(), fullName, winScore, picks: pickNames });
@@ -681,7 +883,7 @@ function PicksFlow({ onComplete, isLocked, existingEntry, allEntries }) {
                   setLookupMsg("Looking up...");
                   setFoundEntries([]);
                   try {
-                    const res = await fetch(`${SCRIPT_URL}?email=${encodeURIComponent(email)}`);
+                    const res = await fetch(`${SCRIPT_URL}?mode=lookup&tournament=${T.sheetTab}&email=${encodeURIComponent(email)}`);
                     const data = await res.json();
                     const allUserEntries = data.userEntries || (data.userEntry ? [data.userEntry] : []);
                     if (allUserEntries.length === 1) {
@@ -691,7 +893,7 @@ function PicksFlow({ onComplete, isLocked, existingEntry, allEntries }) {
                       setLastName(ue.lastName || "");
                       setTeamName(ue.teamName || "");
                       setOriginalTeamName(ue.teamName || "");
-                      setWinScore(ue.winningScore || -12);
+                      setWinScore(ue.winningScore != null ? ue.winningScore : (MODE === "pga" ? -8 : -12));
                       if (ue.picks) loadPicksFromNames(ue.picks);
                       setLookupMsg("✅ Found your entry! Edit it or create a 2nd with a new team name.");
                       setTimeout(() => setStep(2), 800);
@@ -721,7 +923,7 @@ function PicksFlow({ onComplete, isLocked, existingEntry, allEntries }) {
                       <button key={idx} onClick={() => {
                         setTeamName(ue.teamName || "");
                         setOriginalTeamName(ue.teamName || "");
-                        setWinScore(ue.winningScore || -12);
+                        setWinScore(ue.winningScore != null ? ue.winningScore : (MODE === "pga" ? -8 : -12));
                         if (ue.picks) loadPicksFromNames(ue.picks);
                         setFoundEntries([]);
                         setLookupMsg(`✅ Editing "${ue.teamName}"`);
@@ -824,12 +1026,19 @@ function PicksFlow({ onComplete, isLocked, existingEntry, allEntries }) {
                 letterSpacing: "0.14em", textTransform: "uppercase", color: "#8b7355" }}>
                 Winning Score Prediction (Tiebreaker)</label>
               <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 6 }}>
-                <input type="range" min={-25} max={0} value={winScore}
+                <input type="range" min={MODE === "pga" ? -20 : -25} max={MODE === "pga" ? 5 : 0} value={winScore}
                   onChange={e => setWinScore(Number(e.target.value))}
                   style={{ flex: 1, accentColor: C.green }} />
                 <div style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 24,
-                  fontWeight: 700, color: C.green, minWidth: 45, textAlign: "center" }}>{winScore}</div>
+                  fontWeight: 700, color: C.green, minWidth: 45, textAlign: "center" }}>
+                  {winScore < 0 ? winScore : winScore > 0 ? `+${winScore}` : "E"}</div>
               </div>
+              {MODE === "pga" && (
+                <p style={{ fontFamily: "Georgia,serif", fontSize: 12, color: "#8b7355",
+                  margin: "4px 0 0", fontStyle: "italic" }}>
+                  Aronimink plays as a par 70 — winners usually finish 6 to 14 under.
+                </p>
+              )}
             </div>
             <div style={{ display: "flex", gap: 8, marginTop: 20 }}>
               <button onClick={() => setStep(1)} style={{
@@ -1063,13 +1272,13 @@ function Confirmation({ entry, onLeaderboard, onEdit }) {
 function Leaderboard({ entries, isLocked, loading, potInfo }) {
   const [expanded, setExpanded] = useState(null);
   const [starred, setStarred] = useState(() => {
-    try { return JSON.parse(localStorage.getItem("pool-starred") || "[]"); } catch { return []; }
+    try { return JSON.parse(localStorage.getItem(`pool-starred-${T.sheetTab}`) || "[]"); } catch { return []; }
   });
   const toggleStar = (name, evt) => {
     evt.stopPropagation();
     setStarred(prev => {
       const next = prev.includes(name) ? prev.filter(n => n !== name) : [...prev, name];
-      localStorage.setItem("pool-starred", JSON.stringify(next));
+      localStorage.setItem(`pool-starred-${T.sheetTab}`, JSON.stringify(next));
       return next;
     });
   };
@@ -1084,7 +1293,7 @@ function Leaderboard({ entries, isLocked, loading, potInfo }) {
     try {
       // Test against whatever tournament the Live tab is using (currently works)
       log.push("📡 Fetching live tournament data (same as ⛳ Live tab)...");
-      const res = await fetch(`${SCRIPT_URL}?mode=scores`);
+      const res = await fetch(`${SCRIPT_URL}?mode=scores&tournament=${T.sheetTab}`);
       const data = await res.json();
       if (!data.success) { log.push("❌ ESPN fetch failed: " + (data.error || "unknown")); setTestLog(log); setTestLoading(false); return; }
       
@@ -1351,7 +1560,7 @@ function Leaderboard({ entries, isLocked, loading, potInfo }) {
                       color: B.muted, marginTop: 2,
                     }}>
                       {e.fullName || ""}
-                      {(() => {
+                      {MODE === "masters" && (() => {
                         const onSite = ["alan collins","patty collins","griffin collins","cason collins","stuart collins","ross gray","blake desmarteau","jenna lawrence","bill lawrence","cindy lawrence","dave lawrence","megan mahoney","jae mccaskill"];
                         const name = (e.fullName || "").toLowerCase();
                         return onSite.some(n => name.includes(n))
@@ -1866,6 +2075,291 @@ function MastersExperience() {
   );
 }
 
+function PGAExperience() {
+  const eats = [
+    ["Pat's Cheesesteak", "Wit-Wiz, no debate"],
+    ["Soft Pretzel + Mustard", "Philly's official snack"],
+    ["Wawa Hoagie", "Shorti or Classic"],
+    ["Tastykake Krimpets", "Butterscotch obviously"],
+    ["Tomato Pie", "Cold, sliced thin"],
+    ["Roast Pork w/ Provolone", "DiNic's-style"],
+  ];
+  const drinks = [
+    ["Yuengling Lager", "America's oldest brewery"],
+    ["Citywide Special", "Lager + shot of Jim Beam"],
+    ["Hank's Root Beer", "Philly classic"],
+    ["Iced Tea", "Lemon, no sugar"],
+  ];
+
+  const channelUrls = {
+    "ESPN": "https://www.espn.com/watch/",
+    "ESPN+": "https://plus.espn.com",
+    "CBS": "https://www.cbs.com",
+    "CBS Sports HQ": "https://www.cbssports.com/watch/live",
+    "PGA": "https://www.pgachampionship.com",
+    "GOLF Channel": "https://www.nbcsports.com/golf",
+  };
+
+  const schedule = [
+    { day: "TUE 5/12 — Practice", link: "https://www.pgachampionship.com", events: [
+      ["Practice Coverage", "12–3 PM", "ESPN+"],
+      ["Live From the PGA", "7–9 PM", "GOLF Channel"],
+    ]},
+    { day: "WED 5/13 — Practice", link: "https://www.pgachampionship.com", events: [
+      ["Practice Coverage", "12–3 PM", "ESPN+"],
+      ["Live From the PGA", "7–9 PM", "GOLF Channel"],
+    ]},
+    { day: "THU 5/14 — Round 1", link: "https://www.pgachampionship.com", events: [
+      ["Early Coverage", "7 AM–12 PM", "ESPN+"],
+      ["Round 1", "12–7 PM", "ESPN"],
+      ["Featured Groups", "7:30 AM–7 PM", "ESPN+"],
+      ["Scorecard Recap", "8–9 PM", "CBS Sports HQ"],
+    ]},
+    { day: "FRI 5/15 — Round 2", link: "https://www.pgachampionship.com", events: [
+      ["Early Coverage", "7 AM–12 PM", "ESPN+"],
+      ["Round 2", "12–8 PM", "ESPN"],
+      ["Late Window", "8–9 PM", "ESPN+"],
+      ["Featured Groups", "8 AM–7 PM", "ESPN+"],
+    ]},
+    { day: "SAT 5/16 — Round 3", link: "https://www.pgachampionship.com", events: [
+      ["Featured Groups", "8 AM–7 PM", "ESPN+"],
+      ["Morning Window", "10 AM–1 PM", "ESPN"],
+      ["Saturday Coverage", "1–7 PM", "CBS"],
+    ]},
+    { day: "SUN 5/17 — Final Round", link: "https://www.pgachampionship.com", events: [
+      ["Featured Groups", "8 AM–7 PM", "ESPN+"],
+      ["Morning Window", "10 AM–1 PM", "ESPN"],
+      ["Final Round", "1–7 PM", "CBS"],
+      ["Wanamaker Presentation", "~6:30 PM", "CBS"],
+    ]},
+  ];
+
+  const Section = ({ title, items }) => (
+    <div style={{ marginBottom: 14 }}>
+      <h4 style={{
+        fontFamily: "'Playfair Display',Georgia,serif", fontSize: 15,
+        fontStyle: "italic", color: C.dark, textAlign: "center",
+        borderBottom: "1px solid #999", paddingBottom: 4, marginBottom: 5,
+      }}>{title}</h4>
+      {items.map(([name, note], i) => (
+        <div key={i} style={{
+          display: "flex", justifyContent: "space-between", padding: "3px 0",
+          fontFamily: "Georgia,serif", fontSize: 14, color: "#333", gap: 8,
+        }}>
+          <span style={{ fontWeight: 600 }}>{name}</span>
+          <span style={{ color: "#8b7355", fontStyle: "italic", textAlign: "right" }}>{note}</span>
+        </div>
+      ))}
+    </div>
+  );
+
+  return (
+    <div style={{
+      position: "relative", overflow: "hidden",
+      borderTop: `4px solid ${C.yellow}`,
+      background: `linear-gradient(135deg, ${C.dark} 0%, ${C.green} 50%, #0d1828 100%)`,
+      padding: "48px 16px",
+    }}>
+      {/* Bunker dots — nod to Aronimink's 174 bunkers */}
+      <div style={{
+        position: "absolute", top: 0, left: 0, right: 0, bottom: 0,
+        opacity: 0.05, pointerEvents: "none",
+        backgroundImage: `
+          radial-gradient(circle at 20% 30%, #c9b037 2px, transparent 3px),
+          radial-gradient(circle at 70% 20%, #c9b037 1.5px, transparent 2px),
+          radial-gradient(circle at 40% 70%, #c9b037 2.5px, transparent 3px),
+          radial-gradient(circle at 80% 80%, #c9b037 2px, transparent 2.5px),
+          radial-gradient(circle at 15% 85%, #c9b037 1.5px, transparent 2px)
+        `,
+        backgroundSize: "180px 180px",
+      }} />
+
+      <div style={{ position: "relative", zIndex: 1, maxWidth: 1100, margin: "0 auto" }}>
+        <h3 style={{
+          fontFamily: "'Playfair Display',Georgia,serif", fontSize: 30,
+          color: C.yellow, textAlign: "center", margin: "0 0 4px",
+        }}>The Wanamaker at Home</h3>
+        <p style={{
+          fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 14,
+          color: "#a8b5c5", textAlign: "center", margin: "0 0 28px",
+          letterSpacing: "0.15em", textTransform: "uppercase",
+        }}>Philly watch-party essentials</p>
+
+        <div style={{
+          display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16,
+        }} className="masters-panels">
+          {/* PANEL 1: Philly Eats & Drinks */}
+          <div style={{
+            background: "rgba(255,255,255,0.97)", borderRadius: 4, overflow: "hidden",
+            border: `2px solid ${C.dark}`, boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
+          }}>
+            <div style={{ background: C.dark, padding: "8px 16px", textAlign: "center" }}>
+              <h4 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 15,
+                color: C.yellow, margin: 0 }}>🥪 Philly Eats</h4>
+            </div>
+            <div style={{ padding: "14px 18px" }}>
+              <Section title="Eats" items={eats} />
+              <Section title="Drinks" items={drinks} />
+            </div>
+            <div style={{ padding: "6px 16px", background: "#fafaf7", borderTop: `1px solid ${C.sand}` }}>
+              <p style={{ fontFamily: "Georgia,serif", fontSize: 10, color: "#999",
+                textAlign: "center", fontStyle: "italic", margin: 0 }}>The cheesesteak debate is settled. Don't argue.</p>
+            </div>
+          </div>
+
+          {/* PANEL 2: TV Schedule */}
+          <div style={{
+            background: "rgba(255,255,255,0.97)", borderRadius: 4, overflow: "hidden",
+            border: `2px solid ${C.dark}`, boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
+          }}>
+            <div style={{ background: C.dark, padding: "8px 16px", textAlign: "center" }}>
+              <h4 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 15,
+                color: C.yellow, margin: 0 }}>📅 TV Schedule</h4>
+            </div>
+            <div style={{ padding: "12px 14px", maxHeight: 480, overflowY: "auto" }}>
+              {schedule.map((day, di) => (
+                <div key={di} style={{ marginBottom: 12 }}>
+                  <a href={day.link} target="_blank" rel="noopener" style={{
+                    fontFamily: "'Playfair Display',Georgia,serif", fontSize: 13,
+                    fontWeight: 700, color: C.green, marginBottom: 4,
+                    borderBottom: `1px solid ${C.sand}`, paddingBottom: 3,
+                    display: "block", textDecoration: "none",
+                  }}>{day.day} ↗</a>
+                  {day.events.map(([name, time, channel], ei) => (
+                    <div key={ei} style={{
+                      display: "flex", justifyContent: "space-between", alignItems: "center",
+                      padding: "3px 0", gap: 4,
+                    }}>
+                      <span style={{ fontFamily: "Georgia,serif", fontSize: 15, color: "#333", flex: 1 }}>{name}</span>
+                      <span style={{ fontFamily: "Georgia,serif", fontSize: 12, color: "#8b7355", whiteSpace: "nowrap" }}>{time}</span>
+                      <a href={channelUrls[channel] || "#"} target="_blank" rel="noopener" style={{
+                        fontFamily: "Georgia,serif", fontSize: 11, color: C.green,
+                        background: `${C.green}10`, padding: "1px 5px", borderRadius: 4,
+                        fontWeight: 600, whiteSpace: "nowrap", textDecoration: "none",
+                      }}>{channel} ↗</a>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* PANEL 3: The Wanamaker cocktail */}
+          <div style={{
+            background: "rgba(255,255,255,0.97)", borderRadius: 4, overflow: "hidden",
+            border: `2px solid ${C.dark}`, boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
+            display: "flex", flexDirection: "column",
+          }}>
+            <div style={{ background: C.dark, padding: "8px 16px", textAlign: "center" }}>
+              <h4 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 15,
+                color: C.yellow, margin: 0 }}>🥃 The Wanamaker</h4>
+            </div>
+            <div style={{ padding: "18px 18px", flex: 1 }}>
+              <div style={{ textAlign: "center", marginBottom: 12 }}>
+                <svg width="80" height="100" viewBox="0 0 80 100" style={{ display: "inline-block" }}>
+                  <rect x="22" y="20" width="36" height="50" fill="none" stroke="#1a2744" strokeWidth="2" rx="2"/>
+                  <rect x="25" y="25" width="30" height="42" fill="url(#wanaGrad)" opacity="0.85" rx="1"/>
+                  <defs>
+                    <linearGradient id="wanaGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#d4a35a"/>
+                      <stop offset="100%" stopColor="#a86a1c"/>
+                    </linearGradient>
+                  </defs>
+                  <rect x="32" y="32" width="16" height="16" fill="rgba(255,255,255,0.4)" stroke="#fff" strokeWidth="0.5" rx="1"/>
+                  <circle cx="50" cy="28" r="6" fill="#f4d03f" stroke="#d4ac0d" strokeWidth="1"/>
+                  <line x1="50" y1="22" x2="50" y2="34" stroke="#d4ac0d" strokeWidth="0.5"/>
+                  <line x1="44" y1="28" x2="56" y2="28" stroke="#d4ac0d" strokeWidth="0.5"/>
+                  <circle cx="34" cy="55" r="1.5" fill="rgba(255,255,255,0.6)"/>
+                  <circle cx="42" cy="60" r="1" fill="rgba(255,255,255,0.5)"/>
+                  <circle cx="46" cy="50" r="1" fill="rgba(255,255,255,0.4)"/>
+                  <ellipse cx="40" cy="72" rx="20" ry="3" fill="rgba(0,0,0,0.15)"/>
+                </svg>
+              </div>
+              <p style={{
+                fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 15,
+                color: C.dark, fontStyle: "italic", lineHeight: 1.5,
+                margin: "0 0 14px", textAlign: "center",
+              }}>The Championship cocktail</p>
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                {[
+                  ["🥃", "2 oz Bourbon (Penn rye works too)"],
+                  ["🍯", "½ oz Honey syrup"],
+                  ["🍋", "¾ oz Fresh lemon juice"],
+                  ["🫚", "Top with ginger beer"],
+                  ["🧊", "Big ice cube · lemon wheel"],
+                ].map(([icon, text], i) => (
+                  <div key={i} style={{
+                    display: "flex", alignItems: "center", gap: 8,
+                    padding: "5px 10px", borderRadius: 6,
+                    background: i % 2 === 0 ? `${C.green}08` : "transparent",
+                  }}>
+                    <span style={{ fontSize: 18 }}>{icon}</span>
+                    <span style={{ fontFamily: "Georgia,serif", fontSize: 15, color: "#333" }}>{text}</span>
+                  </div>
+                ))}
+              </div>
+              <div style={{
+                marginTop: 14, padding: "10px 12px", borderRadius: 6,
+                background: `${C.green}08`, border: `1px solid ${C.green}20`,
+              }}>
+                <p style={{ fontFamily: "Georgia,serif", fontSize: 15, color: C.dark,
+                  margin: 0, lineHeight: 1.4 }}>
+                  <strong>Build in glass:</strong> Bourbon, honey, lemon over ice. Top with ginger beer. Stir gently. 🏆
+                </p>
+              </div>
+            </div>
+            <div style={{ padding: "6px 16px", background: "#fafaf7", borderTop: `1px solid ${C.sand}` }}>
+              <p style={{ fontFamily: "Georgia,serif", fontSize: 10, color: "#999",
+                textAlign: "center", fontStyle: "italic", margin: 0 }}>Heavy as the trophy. Lift with care.</p>
+            </div>
+          </div>
+
+          {/* PANEL 4: Aronimink history */}
+          <div style={{
+            background: "rgba(255,255,255,0.97)", borderRadius: 4, overflow: "hidden",
+            border: `2px solid ${C.dark}`, boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
+          }}>
+            <div style={{ background: C.dark, padding: "8px 16px", textAlign: "center" }}>
+              <h4 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 15,
+                color: C.yellow, margin: 0 }}>⛳ Aronimink Golf Club</h4>
+            </div>
+            <div style={{ padding: "14px 18px" }}>
+              <p style={{ fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 15,
+                color: C.dark, fontStyle: "italic", lineHeight: 1.5,
+                margin: "0 0 12px", textAlign: "center",
+              }}>A Donald Ross masterpiece</p>
+              {[
+                ["📐", "Donald Ross design, 1928"],
+                ["🏛️", "\"I intended to make this my masterpiece\""],
+                ["🔨", "Gil Hanse restoration, 2017"],
+                ["📏", "Par 70, 7,394 yards"],
+                ["🏖️", "174 bunkers — bring your sand wedge"],
+                ["📍", "Newtown Square, PA (Philly suburb)"],
+                ["🏆", "Last hosted PGA in 1962 (Gary Player W)"],
+                ["⛳", "Hosted 2018 BMW, 2020 Women's PGA"],
+                ["🎯", "Severe greens, run-offs, demanding approaches"],
+              ].map(([icon, fact], i) => (
+                <div key={i} style={{
+                  display: "flex", alignItems: "center", gap: 8,
+                  padding: "5px 8px", borderRadius: 6,
+                  background: i % 2 === 0 ? `${C.green}06` : "transparent",
+                }}>
+                  <span style={{ fontSize: 14, flexShrink: 0 }}>{icon}</span>
+                  <span style={{ fontFamily: "Georgia,serif", fontSize: 13, color: "#333" }}>{fact}</span>
+                </div>
+              ))}
+            </div>
+            <div style={{ padding: "6px 16px", background: "#fafaf7", borderTop: `1px solid ${C.sand}` }}>
+              <p style={{ fontFamily: "Georgia,serif", fontSize: 10, color: "#999",
+                textAlign: "center", fontStyle: "italic", margin: 0 }}>Bombers will be tested. Iron play wins this week.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function TournamentLive() {
   const [golfers, setGolfers] = useState([]);
   const [tourneyStatus, setTourneyStatus] = useState("");
@@ -1876,7 +2370,7 @@ function TournamentLive() {
 
   const fetchScores = useCallback(async () => {
     try {
-      const res = await fetch(`${SCRIPT_URL}?mode=scores`);
+      const res = await fetch(`${SCRIPT_URL}?mode=scores&tournament=${T.sheetTab}`);
       const data = await res.json();
       if (data.success) {
         setGolfers(data.golfers || []);
@@ -1906,7 +2400,7 @@ function TournamentLive() {
           <h2 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 28, color: C.green, margin: "0 0 4px" }}>
             ⛳ Live Tournament</h2>
           <p style={{ fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 16, color: "#8b7355",
-            letterSpacing: "0.08em", textTransform: "uppercase" }}>{T.year} {T.name} — Augusta National</p>
+            letterSpacing: "0.08em", textTransform: "uppercase" }}>{T.year} {T.name} — {T.venue}</p>
           {tourneyStatus && (
             <p style={{ fontFamily: "Georgia,serif", fontSize: 12, color: C.green, marginTop: 4 }}>
               {tourneyStatus}{round > 0 ? ` · Round ${round}` : ""}</p>
@@ -1921,39 +2415,62 @@ function TournamentLive() {
           <h3 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 18,
             color: C.yellow, margin: "0 0 10px" }}>📺 Watch Live</h3>
           <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" }}>
-            <a href="https://www.masters.com/en_US/live/index.html" target="_blank" rel="noopener" style={{
-              padding: "8px 18px", borderRadius: 8, background: C.yellow, color: C.dark,
-              fontFamily: "'Playfair Display',Georgia,serif", fontSize: 15, fontWeight: 700,
-              textDecoration: "none",
-            }}>▶ Masters.com</a>
-            <a href="https://www.youtube.com/@themasters/streams" target="_blank" rel="noopener" style={{
-              padding: "8px 18px", borderRadius: 8, background: "rgba(255,255,255,0.15)",
-              border: "1px solid rgba(255,255,255,0.3)", color: "#fff",
-              fontFamily: "Georgia,serif", fontSize: 13, textDecoration: "none",
-            }}>📹 YouTube</a>
-            <a href="https://www.espn.com/watch/" target="_blank" rel="noopener" style={{
-              padding: "8px 18px", borderRadius: 8, background: "rgba(255,255,255,0.15)",
-              border: "1px solid rgba(255,255,255,0.3)", color: "#fff",
-              fontFamily: "Georgia,serif", fontSize: 13, textDecoration: "none",
-            }}>ESPN+</a>
+            {MODE === "pga" ? (
+              <>
+                <a href="https://www.pgachampionship.com" target="_blank" rel="noopener" style={{
+                  padding: "8px 18px", borderRadius: 8, background: C.yellow, color: C.dark,
+                  fontFamily: "'Playfair Display',Georgia,serif", fontSize: 15, fontWeight: 700,
+                  textDecoration: "none",
+                }}>▶ PGAChampionship.com</a>
+                <a href="https://www.espn.com/watch/" target="_blank" rel="noopener" style={{
+                  padding: "8px 18px", borderRadius: 8, background: "rgba(255,255,255,0.15)",
+                  border: "1px solid rgba(255,255,255,0.3)", color: "#fff",
+                  fontFamily: "Georgia,serif", fontSize: 13, textDecoration: "none",
+                }}>ESPN / ESPN+</a>
+                <a href="https://www.cbs.com" target="_blank" rel="noopener" style={{
+                  padding: "8px 18px", borderRadius: 8, background: "rgba(255,255,255,0.15)",
+                  border: "1px solid rgba(255,255,255,0.3)", color: "#fff",
+                  fontFamily: "Georgia,serif", fontSize: 13, textDecoration: "none",
+                }}>CBS (Sat–Sun)</a>
+              </>
+            ) : (
+              <>
+                <a href="https://www.masters.com/en_US/live/index.html" target="_blank" rel="noopener" style={{
+                  padding: "8px 18px", borderRadius: 8, background: C.yellow, color: C.dark,
+                  fontFamily: "'Playfair Display',Georgia,serif", fontSize: 15, fontWeight: 700,
+                  textDecoration: "none",
+                }}>▶ Masters.com</a>
+                <a href="https://www.youtube.com/@themasters/streams" target="_blank" rel="noopener" style={{
+                  padding: "8px 18px", borderRadius: 8, background: "rgba(255,255,255,0.15)",
+                  border: "1px solid rgba(255,255,255,0.3)", color: "#fff",
+                  fontFamily: "Georgia,serif", fontSize: 13, textDecoration: "none",
+                }}>📹 YouTube</a>
+                <a href="https://www.espn.com/watch/" target="_blank" rel="noopener" style={{
+                  padding: "8px 18px", borderRadius: 8, background: "rgba(255,255,255,0.15)",
+                  border: "1px solid rgba(255,255,255,0.3)", color: "#fff",
+                  fontFamily: "Georgia,serif", fontSize: 13, textDecoration: "none",
+                }}>ESPN+</a>
+              </>
+            )}
           </div>
         </div>
 
-        {/* YouTube Live Embed */}
-        <div style={{
-          background: "#000", borderRadius: 12, overflow: "hidden",
-          boxShadow: "0 4px 16px rgba(0,0,0,0.2)",
-          marginBottom: 16, position: "relative", paddingTop: "56.25%",
-        }}>
-          <iframe
-            src="https://www.youtube.com/embed/OApSh_daggc?autoplay=0&rel=0"
-            style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", border: "none" }}
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-            title="Masters Live Stream"
-          />
-        </div>
-
+        {/* YouTube Live Embed — Masters has a free YouTube stream; PGA doesn't */}
+        {MODE === "masters" && (
+          <div style={{
+            background: "#000", borderRadius: 12, overflow: "hidden",
+            boxShadow: "0 4px 16px rgba(0,0,0,0.2)",
+            marginBottom: 16, position: "relative", paddingTop: "56.25%",
+          }}>
+            <iframe
+              src="https://www.youtube.com/embed/OApSh_daggc?autoplay=0&rel=0"
+              style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", border: "none" }}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              title="Masters Live Stream"
+            />
+          </div>
+        )}
         {/* Live Leaderboard */}
         <div style={{
           background: "#fff", borderRadius: 12, overflow: "hidden",
@@ -1965,7 +2482,7 @@ function TournamentLive() {
             display: "flex", justifyContent: "space-between", alignItems: "center",
           }}>
             <span style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 16,
-              fontWeight: 700, color: C.yellow }}>Masters Leaderboard</span>
+              fontWeight: 700, color: C.yellow }}>{T.name} Leaderboard</span>
             <span style={{ fontFamily: "Georgia,serif", fontSize: 13, color: "#c4d9c4" }}>
               {lastUpdated ? `Updated ${lastUpdated}` : "Loading..."}
             </span>
@@ -2036,11 +2553,15 @@ function TournamentLive() {
 
         {/* Quick links */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
-          {[
+          {(MODE === "pga" ? [
+            ["🏌️", "PGAChampionship", "Official Site", "https://www.pgachampionship.com"],
+            ["📊", "ESPN", "Coverage", "https://www.espn.com/golf/leaderboard/_/tournamentId/" + T.espnId],
+            ["🗺️", "Aronimink", "Course Site", "https://www.aronimink.org"],
+          ] : [
             ["🏌️", "Masters.com", "Official Site", "https://www.masters.com"],
             ["📊", "ESPN", "Coverage", "https://www.espn.com/golf/leaderboard/_/tournamentId/" + T.espnId],
             ["🗺️", "Course Map", "Augusta", "https://www.masters.com/en_US/course/index.html"],
-          ].map(([icon, title, sub, url], i) => (
+          ]).map(([icon, title, sub, url], i) => (
             <a key={i} href={url} target="_blank" rel="noopener" style={{
               background: "#fff", borderRadius: 10, padding: "12px",
               textAlign: "center", textDecoration: "none",
@@ -2398,7 +2919,7 @@ export default function App() {
   useEffect(() => {
     const fetchEntries = async () => {
       try {
-        const res = await fetch(SCRIPT_URL);
+        const res = await fetch(`${SCRIPT_URL}?tournament=${T.sheetTab}`);
         const data = await res.json();
         if (data.success && data.entries) {
           setEntries(data.entries.map(e => ({
@@ -2419,7 +2940,7 @@ export default function App() {
       } catch (err) {
         console.warn("Sheet fetch failed, falling back to localStorage:", err);
         try {
-          const raw = localStorage.getItem("pool-entries");
+          const raw = localStorage.getItem(`pool-entries-${T.sheetTab}`);
           if (raw) {
             const parsed = JSON.parse(raw);
             setEntries(parsed.map(e => ({
@@ -2440,7 +2961,7 @@ export default function App() {
     if (!isLocked) return;
     const fetchScores = async () => {
       try {
-        const res = await fetch(`${SCRIPT_URL}?mode=scores`);
+        const res = await fetch(`${SCRIPT_URL}?mode=scores&tournament=${T.sheetTab}`);
         const data = await res.json();
         if (data.success && data.golfers) {
           setEspnGolfers(data.golfers);
@@ -2469,7 +2990,7 @@ export default function App() {
     if (view === "leaderboard") {
       (async () => {
         try {
-          const res = await fetch(SCRIPT_URL);
+          const res = await fetch(`${SCRIPT_URL}?tournament=${T.sheetTab}`);
           const data = await res.json();
           if (data.success && data.entries) {
             setEntries(data.entries.map(e => ({
@@ -2501,7 +3022,7 @@ export default function App() {
     // Refetch from sheet quickly to get ground truth
     setTimeout(async () => {
       try {
-        const res = await fetch(SCRIPT_URL);
+        const res = await fetch(`${SCRIPT_URL}?tournament=${T.sheetTab}`);
         const d = await res.json();
         if (d.success && d.entries) {
           setEntries(d.entries.map(e => ({
@@ -2514,14 +3035,20 @@ export default function App() {
   };
 
   const [showGreeting, setShowGreeting] = useState(() => {
-    return !localStorage.getItem("ceremony-cason-wins");
+    // Ceremony overlay only shows for tournaments where a winner has been declared
+    if (!T.winnerDeclared) return false;
+    // Back-compat: honor the original Masters key so prior visitors don't re-see it
+    if (MODE === "masters" && localStorage.getItem("ceremony-cason-wins")) return false;
+    return !localStorage.getItem(`ceremony-seen-${T.sheetTab}`);
   });
   const [greetingTapped, setGreetingTapped] = useState(false);
 
   const handleGreetingTap = useCallback(() => {
     if (!greetingTapped) {
       setGreetingTapped(true);
-      localStorage.setItem("ceremony-cason-wins", "1");
+      localStorage.setItem(`ceremony-seen-${T.sheetTab}`, "1");
+      // Also set the legacy key on Masters so an older app build wouldn't re-show it
+      if (MODE === "masters") localStorage.setItem("ceremony-cason-wins", "1");
       try {
         const base = import.meta.env.BASE_URL || "/";
         const audio = new Audio(`${base}masters-greeting.mp3`);
@@ -2752,7 +3279,8 @@ export default function App() {
             </div>
           </div>
 
-          <MastersExperience />
+          {MODE === "masters" && <MastersExperience />}
+          {MODE === "pga" && <PGAExperience />}
 
           {/* Past Champions & Champions Dinner — side by side */}
           <div style={{
@@ -2775,13 +3303,18 @@ export default function App() {
                 className="masters-panels">
                 {/* LEFT: Champions list + 2026 card */}
                 <div style={{ flex: 1, minWidth: 280, maxWidth: 420 }}>
-                  {[
+                  {(MODE === "pga" ? [
+                    { year: 2025, team: "Divot Daddy", name: "Ben Liddil" },
+                    { year: 2024, team: "Big Boss Rides Again", name: "Chris Frick" },
+                    { year: 2023, team: "Two Os in Gooch", name: "Richard Lee Hauschild" },
+                    { year: 2022, team: "Zomething Different", name: "Davis McFarlane" },
+                  ] : [
                     { year: 2026, team: "Cason", name: "Cason Collins" },
                     { year: 2025, team: "Lizards All the Way", name: "Jacks Gray" },
                     { year: 2024, team: "Handsome Stranger", name: "Brandon Winkler" },
                     { year: 2023, team: "Hank the Tank", name: "Chris Frick" },
                     { year: 2022, team: "WillaJean76", name: "Carol Miller" },
-                  ].map((champ, i) => (
+                  ]).map((champ, i) => (
                     <div key={i} style={{
                       display: "flex", alignItems: "center", gap: 16,
                       padding: "16px 20px", marginBottom: 12,
@@ -2815,10 +3348,10 @@ export default function App() {
                     </div>
                   ))}
 
-                  {/* 2027 awaiting */}
+                  {/* Awaiting champion card */}
                   <div style={{
                     marginTop: 8,
-                    background: `linear-gradient(135deg, ${C.green}, #004d35)`,
+                    background: `linear-gradient(135deg, ${C.green}, ${C.dark})`,
                     borderRadius: 12, padding: "20px",
                     border: `2px solid ${C.yellow}`,
                     boxShadow: `0 0 30px rgba(242,201,76,0.15)`,
@@ -2828,7 +3361,7 @@ export default function App() {
                       <span style={{
                         fontFamily: "'Playfair Display',Georgia,serif",
                         fontSize: 28, fontWeight: 900, color: C.yellow,
-                      }}>2027</span>
+                      }}>{T.winnerDeclared ? T.year + 1 : T.year}</span>
                       <span style={{
                         fontFamily: "Georgia,serif", fontSize: 16,
                         color: C.yellow, opacity: 0.5,
@@ -2841,7 +3374,8 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* RIGHT: Champions Dinner menu */}
+                {/* RIGHT: Champions Dinner menu — Masters-only tradition */}
+                {MODE === "masters" && (
                 <div style={{ flex: 1, minWidth: 280, maxWidth: 380 }}>
                   <div style={{
                     background: "#fff", borderRadius: 4, overflow: "hidden",
@@ -2904,6 +3438,7 @@ export default function App() {
                     </div>
                   </div>
                 </div>
+                )}
               </div>
             </div>
           </div>
@@ -2916,7 +3451,7 @@ export default function App() {
         onLeaderboard={() => setView("leaderboard")} onEdit={() => setView("picks")} />}
       {view === "leaderboard" && <Leaderboard entries={scoredEntries} isLocked={isLocked} loading={loadingEntries} potInfo={potInfo} />}
       {view === "tournament" && <TournamentLive />}
-      {view === "jpjm" && (() => {
+      {view === "jpjm" && MODE === "masters" && (() => {
         const familyEntries = (scoredEntries.length > 0 ? scoredEntries : entries).filter(e => e.family);
         // Re-rank family entries
         const ranked = [...familyEntries].sort((a, b) => {
@@ -3026,13 +3561,16 @@ export default function App() {
         background: C.dark, padding: "18px 16px", textAlign: "center",
         borderTop: `3px solid ${C.green}`,
       }}>
-        <p style={{ fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 12, color: "#5a8a5a" }}>
-          ⛳ {MODE === "valero" ? "🧪 Test Pool" : "Masters Pool"} {T.year}
+        <p style={{ fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 12, color: MODE === "pga" ? "#7a8a9e" : "#5a8a5a" }}>
+          ⛳ {MODE === "valero" ? "🧪 Test Pool"
+              : MODE === "pga"   ? "PGA Championship Pool"
+              : "Masters Pool"} {T.year}
           {MODE === "masters" && <span> · Made with </span>}
           {MODE === "masters" && <span onClick={() => setView("jpjm")} style={{ cursor: "default", fontSize: 18, verticalAlign: "middle" }}>🧀</span>}
           {MODE === "masters" && <span> pimento cheese energy</span>}
+          {MODE === "pga" && <span> · Aronimink · Newtown Square, PA</span>}
         </p>
-        <a href="mailto:andescherf@gmail.com?subject=Masters%20Pool%20Feedback&body=Bug%20or%20idea%3A%20" 
+        <a href={`mailto:andescherf@gmail.com?subject=${encodeURIComponent(T.name + " Pool Feedback")}&body=Bug%20or%20idea%3A%20`}
           style={{
             fontFamily: "Georgia,serif", fontSize: 12, color: C.yellow,
             textDecoration: "none", opacity: 0.7,
