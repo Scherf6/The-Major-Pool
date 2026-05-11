@@ -2915,6 +2915,11 @@ export default function App() {
   const [potInfo, setPotInfo] = useState({ totalPot: 0, payouts: { first: 0, second: 0, third: 0 } });
   const { remaining, isLocked } = useCountdown(T.lockTime);
 
+  // Set browser tab title to match the active tournament
+  useEffect(() => {
+    document.title = `${T.name} Pool ${T.year}`;
+  }, []);
+
   // Fetch entries from Google Sheet on load and every 60 seconds
   useEffect(() => {
     const fetchEntries = async () => {
