@@ -3840,7 +3840,11 @@ export default function App() {
                 className="masters-panels">
                 {/* LEFT: Champions list + 2026 card */}
                 <div style={{ flex: 1, minWidth: 280, maxWidth: 420 }}>
-                  {(MODE === "usopen" ? [] : MODE === "pga" ? [
+                  {(MODE === "usopen" ? [
+                    { year: 2024, team: "Handsome Stranger", name: "Brandon Winkler" },
+                    { year: 2023, team: "MKSMIMI", name: "Mary Stutelberg" },
+                    { year: 2022, team: "Take My $", name: "Michael Cadieux" },
+                  ] : MODE === "pga" ? [
                     { year: 2025, team: "Divot Daddy", name: "Ben Liddil" },
                     { year: 2024, team: "Big Boss Rides Again", name: "Chris Frick" },
                     { year: 2023, team: "Two Os in Gooch", name: "Richard Lee Hauschild" },
