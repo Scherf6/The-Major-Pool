@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 /*─────────────────────────────────────────────
   CONFIG
 ─────────────────────────────────────────────*/
-const MODE = "pga"; // "masters" | "pga" | "valero"
+const MODE = "usopen"; // "masters" | "pga" | "usopen" | "valero"
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzGzrcdc-V90CmcOHVejftmFmTAb9TEUL3iSzePe6bZjkQJZQjaYP_B2HZlUqRzk7as_g/exec";
 
 const TOURNAMENTS = {
@@ -29,6 +29,17 @@ const TOURNAMENTS = {
     winnerDeclared: false, // flip to true Sunday night + fill winner overlay
     sheetTab: "pga",
   },
+  usopen: {
+    name: "U.S. Open", year: 2026,
+    tagline: "Golf's Ultimate Test",
+    venue: "Shinnecock Hills Golf Club", location: "Southampton, NY",
+    espnId: "401811952",
+    lockTime: "2026-06-18T06:44:00-04:00", // ⚠️ placeholder — set to 1 min before earliest tee once Tue tee sheet drops
+    par: 70,
+    trophyLabel: "U.S. Open Trophy",
+    winnerDeclared: false, // flip true Sunday night + fill winner overlay
+    sheetTab: "usopen",
+  },
   valero: {
     name: "Valero Texas Open", year: 2026,
     tagline: "Test Pool — Validating Scoring Before Masters Week",
@@ -45,7 +56,11 @@ const T = TOURNAMENTS[MODE];
 
 // Color palette — values shift by tournament; key names stay legacy so the
 // 3000-line component tree doesn't need a global rename. (PGA = navy/gold.)
-const C = MODE === "pga"
+const C = MODE === "usopen"
+  ? { green: "#13357b", dark: "#0a2150", yellow: "#c9a227",
+      cream: "#f3f6fc", sand: "#cdd7e8", pink: "#b31942",
+      magenta: "#8e1631", dogwood: "#fbfcff" }
+  : MODE === "pga"
   ? { green: "#1a2744", dark: "#0d1522", yellow: "#c9b037",
       cream: "#f5f4ef", sand: "#d6d3c4", pink: "#c9b037",
       magenta: "#8a7a28", dogwood: "#fefdf8" }
@@ -339,8 +354,123 @@ const VALERO_TIERS = {
   ]},
 };
 
+// U.S. Open 2026 @ Shinnecock Hills — odds from DraftKings, current as of 6/15/26
+const USOPEN_TIERS = {
+  "Tier 1 — Favorites": {
+    pick: 1, color: "#E3EAF5",
+    golfers: [
+      { name: "Scottie Scheffler", odds: "+460", note: "World #1 — career Grand Slam bid ⭐" },
+      { name: "Rory McIlroy", odds: "+950", note: "Back-to-back Masters champ" },
+      { name: "Jon Rahm", odds: "+1025", note: "LIV — 2021 U.S. Open champ" },
+      { name: "Xander Schauffele", odds: "+1850", note: "Mr. Automatic in majors" },
+      { name: "Cameron Young", odds: "+2000", note: "New Yorker, hot form" },
+      { name: "Matt Fitzpatrick", odds: "+2150", note: "2022 U.S. Open champ" },
+      { name: "Tommy Fleetwood", odds: "+2500", note: "Chasing major #1" },
+      { name: "Ludvig Aberg", odds: "+2600" },
+      { name: "Bryson DeChambeau", odds: "+2700", note: "LIV — 2x U.S. Open champ" },
+      { name: "Brooks Koepka", odds: "+3300", note: "Won here in 2018" },
+    ]
+  },
+  "Tier 2 — Contenders": {
+    pick: 1, color: "#C9D5E8",
+    golfers: [
+      { name: "Collin Morikawa", odds: "+3500" },
+      { name: "Wyndham Clark", odds: "+3700", note: "2023 U.S. Open champ" },
+      { name: "Russell Henley", odds: "+3700" },
+      { name: "Sam Burns", odds: "+3800" },
+      { name: "Si Woo Kim", odds: "+3900" },
+      { name: "Chris Gotterup", odds: "+4400" },
+      { name: "Justin Thomas", odds: "+4400" },
+      { name: "Tyrrell Hatton", odds: "+4600", note: "LIV" },
+      { name: "Patrick Cantlay", odds: "+4600" },
+      { name: "Patrick Reed", odds: "+4900", note: "LIV" },
+    ]
+  },
+  "Tier 3 — Dark Horses": {
+    pick: 1, color: "#AEC0DD",
+    golfers: [
+      { name: "Justin Rose", odds: "+5200" },
+      { name: "Viktor Hovland", odds: "+5400" },
+      { name: "J.J. Spaun", odds: "+6100", note: "Defending champ 🏆" },
+      { name: "Hideki Matsuyama", odds: "+6500" },
+      { name: "Robert MacIntyre", odds: "+6600", note: "Runner-up in '25" },
+      { name: "Jordan Spieth", odds: "+6900", note: "Career Slam watch ⭐" },
+      { name: "Joaquin Niemann", odds: "+6900", note: "LIV" },
+      { name: "Min Woo Lee", odds: "+7200" },
+      { name: "Ben Griffin", odds: "+7400" },
+      { name: "Maverick McNealy", odds: "+7600" },
+    ]
+  },
+  "Tier 4 — Long Shots": {
+    pick: 1, color: "#94ACCB",
+    golfers: [
+      { name: "Adam Scott", odds: "+7600", note: "100th consecutive major" },
+      { name: "Kurt Kitayama", odds: "+7800" },
+      { name: "Shane Lowry", odds: "+8200", note: "2019 Open champ" },
+      { name: "Harris English", odds: "+8800" },
+      { name: "Jake Knapp", odds: "+9400" },
+      { name: "Bud Cauley", odds: "+9600" },
+      { name: "David Puig", odds: "+9600", note: "LIV" },
+      { name: "Sepp Straka", odds: "+10500" },
+      { name: "Aaron Rai", odds: "+11000", note: "2026 PGA champ ⭐" },
+      { name: "Rickie Fowler", odds: "+11000" },
+    ]
+  },
+  "The Field — Pick 2": {
+    pick: 2, color: "#FFF3E0",
+    golfers: [
+      { name: "Alex Fitzpatrick", odds: "+11000" },
+      { name: "Ryan Gerard", odds: "+11000" },
+      { name: "Kristoffer Reitan", odds: "+11500" },
+      { name: "J.T. Poston", odds: "+11500" },
+      { name: "Gary Woodland", odds: "+11500", note: "2019 U.S. Open champ" },
+      { name: "Jacob Bridgeman", odds: "+13000" },
+      { name: "Jason Day", odds: "+13000", note: "Former World #1" },
+      { name: "Nicolai Hojgaard", odds: "+13000" },
+      { name: "Sudarshan Yellamaraju", odds: "+13500", note: "Qualifier" },
+      { name: "Akshay Bhatia", odds: "+14000" },
+      { name: "Keegan Bradley", odds: "+14500", note: "Ryder Cup captain" },
+      { name: "Keith Mitchell", odds: "+14500" },
+      { name: "Alex Noren", odds: "+15000" },
+      { name: "Cameron Smith", odds: "+15000", note: "LIV — 2022 Open champ" },
+      { name: "Jackson Koivun", odds: "+16000", note: "Amateur" },
+      { name: "Dustin Johnson", odds: "+17000", note: "LIV — 2016 U.S. Open champ" },
+      { name: "Sahith Theegala", odds: "+17000" },
+      { name: "Harry Hall", odds: "+18000" },
+      { name: "Tom Kim", odds: "+18500" },
+      { name: "Pierceson Coody", odds: "+19000" },
+      { name: "Ryan Fox", odds: "+19000" },
+      { name: "Daniel Berger", odds: "+21000" },
+      { name: "Corey Conners", odds: "+21000", note: "Elite ball-striker" },
+      { name: "Sungjae Im", odds: "+21000" },
+      { name: "Brian Harman", odds: "+23000", note: "2023 Open champ" },
+      { name: "Nick Taylor", odds: "+23000" },
+      { name: "Davis Thompson", odds: "+24000" },
+      { name: "Ryo Hisatsune", odds: "+24000" },
+      { name: "Sam Stevens", odds: "+28000" },
+      { name: "Matt McCarty", odds: "+29000" },
+      { name: "Carlos Ortiz", odds: "+29000", note: "LIV" },
+      { name: "Max Greyserman", odds: "+30000" },
+      { name: "Mason Howell", odds: "+30000", note: "Amateur — drawn with Scheffler & Spaun 👀" },
+      { name: "Andrew Novak", odds: "+31000" },
+      { name: "Michael Kim", odds: "+32000" },
+      { name: "Benjamin James", odds: "+33000", note: "Amateur" },
+      { name: "Andrew Putnam", odds: "+34000" },
+      { name: "Preston Stout", odds: "+44000", note: "NCAA champ" },
+      { name: "Chris Kirk", odds: "+50000" },
+      { name: "Emiliano Grillo", odds: "+52500" },
+      { name: "Billy Horschel", odds: "+57500" },
+      { name: "Neal Shipley", odds: "+67500", note: "Amateur" },
+      { name: "Cole Hammer", odds: "+140000" },
+      { name: "Padraig Harrington", odds: "+160000", note: "🇮🇪 3x major champ" },
+      { name: "Graeme McDowell", odds: "+325000", note: "LIV — 2010 U.S. Open champ" },
+    ]
+  },
+};
+
 const TIERS = MODE === "masters" ? MASTERS_TIERS
             : MODE === "pga"     ? PGA_TIERS
+            : MODE === "usopen"  ? USOPEN_TIERS
             : VALERO_TIERS;
 
 const DEMO_ENTRIES = [];
@@ -385,6 +515,7 @@ function Nav({ view, setView, isLocked, remaining }) {
         <span style={{ fontSize: 20 }}>⛳</span>
         <span style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 17, fontWeight: 700, color: C.yellow }}>
           {MODE === "valero" ? "🧪 Test Pool"
+            : MODE === "usopen" ? "U.S. Open '26"
             : MODE === "pga"   ? "PGA Champ '26"
             : "Masters Pool '26"}
         </span>
@@ -445,6 +576,15 @@ function Hero({ onStart, setView }) {
             border: `1px solid ${C.yellow}40`,
           }}>🏆 The Wanamaker Awaits</div>
         )}
+        {MODE === "usopen" && (
+          <div style={{
+            background: "rgba(201,162,39,0.15)", color: C.yellow, display: "inline-block",
+            padding: "5px 16px", borderRadius: 20, fontSize: 12,
+            fontFamily: "Georgia,serif", fontWeight: 700, marginBottom: 14,
+            letterSpacing: "0.2em", textTransform: "uppercase",
+            border: `1px solid ${C.yellow}40`,
+          }}>🏆 Golf's Ultimate Test</div>
+        )}
         <div style={{
           fontFamily: "'Cormorant Garamond',Georgia,serif",
           fontSize: 13, letterSpacing: "0.3em", textTransform: "uppercase",
@@ -454,7 +594,7 @@ function Hero({ onStart, setView }) {
           fontFamily: "'Playfair Display',Georgia,serif",
           fontSize: 48, fontWeight: 700, color: "#fff",
           lineHeight: 1.1, margin: "0 0 16px",
-        }}>{T.year} {MODE === "masters" ? "Masters" : MODE === "pga" ? "PGA Championship" : "Valero"}<br />Golf Pool</h1>
+        }}>{T.year} {MODE === "masters" ? "Masters" : MODE === "pga" ? "PGA Championship" : MODE === "usopen" ? "U.S. Open" : "Valero"}<br />Golf Pool</h1>
         {MODE === "pga" && (
           <p style={{
             fontFamily: "'Cormorant Garamond',Georgia,serif",
@@ -462,13 +602,25 @@ function Hero({ onStart, setView }) {
             letterSpacing: "0.05em",
           }}>Aronimink Golf Club · May 14–17 · Newtown Square, PA</p>
         )}
+        {MODE === "usopen" && (
+          <p style={{
+            fontFamily: "'Cormorant Garamond',Georgia,serif",
+            fontSize: 16, color: "#aebfd6", lineHeight: 1.4, margin: "0 0 10px",
+            letterSpacing: "0.05em",
+          }}>Shinnecock Hills · June 18–21 · Southampton, NY</p>
+        )}
         <p style={{
           fontFamily: "'Cormorant Garamond',Georgia,serif",
-          fontSize: 19, color: MODE === "pga" ? "#a8b5c5" : "#c4d9c4", lineHeight: 1.5, margin: "0 0 20px",
+          fontSize: 19, color: (MODE === "pga" || MODE === "usopen") ? "#a8b5c5" : "#c4d9c4", lineHeight: 1.5, margin: "0 0 20px",
         }}>Pick 6 golfers — 1 from each of 4 tiers + 2 from the field.
         Best 4 scores count. Lowest total wins.</p>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, marginBottom: 24 }}>
-          {(MODE === "pga" ? [
+          {(MODE === "usopen" ? [
+            "156 players — low 60 + ties make the cut",
+            "Shinnecock Hills · par 70 · 7,440 yards of brutal links",
+            "Scheffler chasing the career Grand Slam ⭐",
+            "Edit picks anytime before Thursday's first tee",
+          ] : MODE === "pga" ? [
             "Strongest field in golf — 156 players, top 70 + ties make cut",
             "Donald Ross masterpiece, par 70, 7,394 yards",
             "Tiger & Phil sitting this one out — legend picks available 🐅🫡",
@@ -479,7 +631,7 @@ function Hero({ onStart, setView }) {
             "Tiger & Phil available as legend picks 🐅🫡",
             "Edit picks anytime before the first tee",
           ]).map((t, i) => (
-            <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, color: MODE === "pga" ? "#a8b5c5" : "#a8d5a8" }}>
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, color: (MODE === "pga" || MODE === "usopen") ? "#a8b5c5" : "#a8d5a8" }}>
               <span style={{ color: C.yellow }}>✓</span>
               <span style={{ fontFamily: "Georgia,serif", fontSize: 15 }}>{t}</span>
             </div>
@@ -513,9 +665,7 @@ function Hero({ onStart, setView }) {
         {/* Share button */}
         <button onClick={() => {
           const url = window.location.href;
-          const text = MODE === "pga"
-            ? `Join the PGA Championship Pool! Pick 6 golfers, best 4 scores win. ${url}`
-            : `Join my Masters Pool! Pick 6 golfers, best 4 scores win. ${url}`;
+          const text = `Join the ${T.name} Pool! Pick 6 golfers, best 4 scores win. ${url}`;
           if (navigator.share) {
             navigator.share({ title: `${T.name} Pool ${T.year}`, text, url }).catch(() => {});
           } else {
@@ -538,7 +688,7 @@ function PicksFlow({ onComplete, isLocked, existingEntry, allEntries }) {
   const [firstName, setFirstName] = useState(existingEntry?.firstName || "");
   const [lastName, setLastName] = useState(existingEntry?.lastName || "");
   const [teamName, setTeamName] = useState(existingEntry?.teamName || "");
-  const [winScore, setWinScore] = useState(existingEntry?.winScore ?? (MODE === "pga" ? -8 : -12));
+  const [winScore, setWinScore] = useState(existingEntry?.winScore ?? (MODE === "usopen" ? -4 : MODE === "pga" ? -8 : -12));
   const [picks, setPicks] = useState({});
 
   const loadPicksFromNames = (pickNames) => {
@@ -643,7 +793,12 @@ function PicksFlow({ onComplete, isLocked, existingEntry, allEntries }) {
     const PGA_PREFIXES = ["Aronimink","Wanamaker","Philly","Liberty Bell","Donald Ross","Ben Franklin",
       "Cheesesteak","Schuylkill","Brotherly","Independence","South Street","Rocky","Eagles",
       "Birdie","Eagle","Bogey","Bunker","Strokes","Fairway","Bombers","Bombs","Iron","Wedge"];
-    const prefixes = MODE === "pga" ? PGA_PREFIXES : MASTERS_PREFIXES;
+    const USOPEN_PREFIXES = ["Shinnecock","Southampton","Hamptons","Fescue","Flynn","Redan",
+      "Long Island","Montauk","Poa","Links","Atlantic","National Open","USGA","Open",
+      "Birdie","Eagle","Bogey","Bunker","Fairway","Iron","Wedge","Sandy"];
+    const USOPEN_FOOD = ["Lobster Roll","Clam Bake","Montauk Pearl","Hamptons Rosé","Transfusion"];
+    const USOPEN_GOLFERS = ["Scottie's","Rory's","Bryson's","Spaun's","Xander's","Rahm's"];
+    const prefixes = MODE === "pga" ? PGA_PREFIXES : MODE === "usopen" ? USOPEN_PREFIXES : MASTERS_PREFIXES;
 
     const suffixes = ["Aces","Assassins","Bandits","Crushers","Legends","Maniacs","Monsters",
       "Pounders","Pushers","Swingers","Warriors","Wizards","Chasers","Hunters","Squad","Crew",
@@ -651,11 +806,11 @@ function PicksFlow({ onComplete, isLocked, existingEntry, allEntries }) {
 
     const MASTERS_FOOD = ["Pimento Cheese","Egg Salad","Azalea Cocktail","Turkey Sandwich","BBQ"];
     const PGA_FOOD = ["Cheesesteak","Soft Pretzel","Wawa Hoagie","Tastykake","Yuengling","Wit-Wiz"];
-    const food = MODE === "pga" ? PGA_FOOD : MASTERS_FOOD;
+    const food = MODE === "pga" ? PGA_FOOD : MODE === "usopen" ? USOPEN_FOOD : MASTERS_FOOD;
 
     const MASTERS_GOLFERS = ["Tiger's","Arnie's","Jack's","Rory's","Scottie's","Freddie's","Phil's","Bubba's"];
     const PGA_GOLFERS = ["Scottie's","Rory's","Cam's","Bryson's","Brooks'","Xander's","Rahm's","Ludvig's"];
-    const golfers = MODE === "pga" ? PGA_GOLFERS : MASTERS_GOLFERS;
+    const golfers = MODE === "pga" ? PGA_GOLFERS : MODE === "usopen" ? USOPEN_GOLFERS : MASTERS_GOLFERS;
 
     const results = [];
     const used = new Set();
@@ -679,6 +834,13 @@ function PicksFlow({ onComplete, isLocked, existingEntry, allEntries }) {
           addUnique(`Philly ${W}s`);
           addUnique(`${W} & Cheesesteak`);
           addUnique(`Wanamaker ${W}s`);
+        } else if (MODE === "usopen") {
+          addUnique(`Shinnecock ${W}s`);
+          addUnique(`${W} at the Open`);
+          addUnique(`Fescue ${W}s`);
+          addUnique(`Hamptons ${W}s`);
+          addUnique(`${W} & Lobster`);
+          addUnique(`Montauk ${W}s`);
         } else {
           addUnique(`Augusta ${W}s`);
           addUnique(`The ${W} Masters`);
@@ -893,7 +1055,7 @@ function PicksFlow({ onComplete, isLocked, existingEntry, allEntries }) {
                       setLastName(ue.lastName || "");
                       setTeamName(ue.teamName || "");
                       setOriginalTeamName(ue.teamName || "");
-                      setWinScore(ue.winningScore != null ? ue.winningScore : (MODE === "pga" ? -8 : -12));
+                      setWinScore(ue.winningScore != null ? ue.winningScore : (MODE === "usopen" ? -4 : MODE === "pga" ? -8 : -12));
                       if (ue.picks) loadPicksFromNames(ue.picks);
                       setLookupMsg("✅ Found your entry! Edit it or create a 2nd with a new team name.");
                       setTimeout(() => setStep(2), 800);
@@ -923,7 +1085,7 @@ function PicksFlow({ onComplete, isLocked, existingEntry, allEntries }) {
                       <button key={idx} onClick={() => {
                         setTeamName(ue.teamName || "");
                         setOriginalTeamName(ue.teamName || "");
-                        setWinScore(ue.winningScore != null ? ue.winningScore : (MODE === "pga" ? -8 : -12));
+                        setWinScore(ue.winningScore != null ? ue.winningScore : (MODE === "usopen" ? -4 : MODE === "pga" ? -8 : -12));
                         if (ue.picks) loadPicksFromNames(ue.picks);
                         setFoundEntries([]);
                         setLookupMsg(`✅ Editing "${ue.teamName}"`);
@@ -1026,7 +1188,7 @@ function PicksFlow({ onComplete, isLocked, existingEntry, allEntries }) {
                 letterSpacing: "0.14em", textTransform: "uppercase", color: "#8b7355" }}>
                 Winning Score Prediction (Tiebreaker)</label>
               <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 6 }}>
-                <input type="range" min={MODE === "pga" ? -20 : -25} max={MODE === "pga" ? 5 : 0} value={winScore}
+                <input type="range" min={MODE === "usopen" ? -14 : MODE === "pga" ? -20 : -25} max={MODE === "usopen" ? 8 : MODE === "pga" ? 5 : 0} value={winScore}
                   onChange={e => setWinScore(Number(e.target.value))}
                   style={{ flex: 1, accentColor: C.green }} />
                 <div style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 24,
@@ -1037,6 +1199,12 @@ function PicksFlow({ onComplete, isLocked, existingEntry, allEntries }) {
                 <p style={{ fontFamily: "Georgia,serif", fontSize: 12, color: "#8b7355",
                   margin: "4px 0 0", fontStyle: "italic" }}>
                   Aronimink plays as a par 70 — winners usually finish 6 to 14 under.
+                </p>
+              )}
+              {MODE === "usopen" && (
+                <p style={{ fontFamily: "Georgia,serif", fontSize: 12, color: "#8b7355",
+                  margin: "4px 0 0", fontStyle: "italic" }}>
+                  Shinnecock is a par-70 brute — U.S. Open winners here often finish around even par.
                 </p>
               )}
             </div>
@@ -1252,9 +1420,9 @@ function Confirmation({ entry, onLeaderboard, onEdit }) {
         {/* Share with friends */}
         <button onClick={() => {
           const url = window.location.href;
-          const text = `I just joined the Masters Pool 2026! Join before Thursday and pick your team: ${url}`;
+          const text = `I just joined the ${T.name} Pool ${T.year}! Join before Thursday and pick your team: ${url}`;
           if (navigator.share) {
-            navigator.share({ title: "Masters Pool 2026", text, url }).catch(() => {});
+            navigator.share({ title: `${T.name} Pool ${T.year}`, text, url }).catch(() => {});
           } else {
             navigator.clipboard.writeText(text).then(() => alert("Link copied! Paste it in a text."));
           }
@@ -2415,7 +2583,25 @@ function TournamentLive() {
           <h3 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 18,
             color: C.yellow, margin: "0 0 10px" }}>📺 Watch Live</h3>
           <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" }}>
-            {MODE === "pga" ? (
+            {MODE === "usopen" ? (
+              <>
+                <a href="https://www.usopen.com" target="_blank" rel="noopener" style={{
+                  padding: "8px 18px", borderRadius: 8, background: C.yellow, color: C.dark,
+                  fontFamily: "'Playfair Display',Georgia,serif", fontSize: 15, fontWeight: 700,
+                  textDecoration: "none",
+                }}>▶ USOpen.com</a>
+                <a href="https://www.peacocktv.com" target="_blank" rel="noopener" style={{
+                  padding: "8px 18px", borderRadius: 8, background: "rgba(255,255,255,0.15)",
+                  border: "1px solid rgba(255,255,255,0.3)", color: "#fff",
+                  fontFamily: "Georgia,serif", fontSize: 13, textDecoration: "none",
+                }}>Peacock</a>
+                <a href="https://www.usanetwork.com" target="_blank" rel="noopener" style={{
+                  padding: "8px 18px", borderRadius: 8, background: "rgba(255,255,255,0.15)",
+                  border: "1px solid rgba(255,255,255,0.3)", color: "#fff",
+                  fontFamily: "Georgia,serif", fontSize: 13, textDecoration: "none",
+                }}>USA / NBC</a>
+              </>
+            ) : MODE === "pga" ? (
               <>
                 <a href="https://www.pgachampionship.com" target="_blank" rel="noopener" style={{
                   padding: "8px 18px", borderRadius: 8, background: C.yellow, color: C.dark,
@@ -2553,7 +2739,11 @@ function TournamentLive() {
 
         {/* Quick links */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
-          {(MODE === "pga" ? [
+          {(MODE === "usopen" ? [
+            ["🏌️", "USOpen.com", "Official Site", "https://www.usopen.com"],
+            ["📊", "ESPN", "Coverage", "https://www.espn.com/golf/leaderboard/_/tournamentId/" + T.espnId],
+            ["🗺️", "Shinnecock", "Course Site", "https://www.shinnecockhills.com"],
+          ] : MODE === "pga" ? [
             ["🏌️", "PGAChampionship", "Official Site", "https://www.pgachampionship.com"],
             ["📊", "ESPN", "Coverage", "https://www.espn.com/golf/leaderboard/_/tournamentId/" + T.espnId],
             ["🗺️", "Aronimink", "Course Site", "https://www.aronimink.org"],
@@ -2893,6 +3083,276 @@ function JpjmChat() {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function USOpenExperience() {
+  const eats = [
+    ["Lobster Roll", "Hamptons staple, butter not mayo"],
+    ["Cherrystone Clams", "On the half shell"],
+    ["Montauk Pearl Oysters", "Local Long Island catch"],
+    ["Clam Chowder", "New England, no debate"],
+    ["Corn on the Cob", "Off the grill"],
+    ["Black & White Cookie", "NY classic"],
+  ];
+  const drinks = [
+    ["The Transfusion", "The golfer's drink — see recipe"],
+    ["Montauk Driftwood Ale", "Long Island brewed"],
+    ["Gin & Tonic", "Links-side classic"],
+    ["Arnold Palmer", "Half iced tea, half lemonade"],
+  ];
+
+  const channelUrls = {
+    "USA Network": "https://www.usanetwork.com",
+    "NBC": "https://www.nbc.com",
+    "Peacock": "https://www.peacocktv.com",
+    "NBCSN": "https://www.nbcsports.com",
+    "USGA": "https://www.usopen.com",
+  };
+
+  const schedule = [
+    { day: "THU 6/18 — Round 1", link: "https://www.usopen.com", events: [
+      ["Early Coverage", "6:30 AM–5 PM", "USA Network"],
+      ["Featured / Prime", "5–8 PM", "Peacock"],
+    ]},
+    { day: "FRI 6/19 — Round 2", link: "https://www.usopen.com", events: [
+      ["Early Stream", "6:30–7:30 AM", "Peacock"],
+      ["Morning Window", "6:30 AM–1:30 PM", "NBCSN"],
+      ["Afternoon", "1:30–7:30 PM", "NBC"],
+    ]},
+    { day: "SAT 6/20 — Round 3", link: "https://www.usopen.com", events: [
+      ["Early Window", "10 AM–12 PM", "USA Network"],
+      ["Saturday Coverage", "12–8 PM", "NBC"],
+    ]},
+    { day: "SUN 6/21 — Final Round", link: "https://www.usopen.com", events: [
+      ["Early Window", "9 AM–12 PM", "USA Network"],
+      ["Final Round", "12–7 PM", "NBC"],
+      ["Trophy Presentation", "~6:45 PM", "NBC"],
+    ]},
+  ];
+
+  const Section = ({ title, items }) => (
+    <div style={{ marginBottom: 14 }}>
+      <h4 style={{
+        fontFamily: "'Playfair Display',Georgia,serif", fontSize: 15,
+        fontStyle: "italic", color: C.dark, textAlign: "center",
+        borderBottom: "1px solid #999", paddingBottom: 4, marginBottom: 5,
+      }}>{title}</h4>
+      {items.map(([name, note], i) => (
+        <div key={i} style={{
+          display: "flex", justifyContent: "space-between", padding: "3px 0",
+          fontFamily: "Georgia,serif", fontSize: 14, color: "#333", gap: 8,
+        }}>
+          <span style={{ fontWeight: 600 }}>{name}</span>
+          <span style={{ color: "#8b7355", fontStyle: "italic", textAlign: "right" }}>{note}</span>
+        </div>
+      ))}
+    </div>
+  );
+
+  return (
+    <div style={{
+      position: "relative", overflow: "hidden",
+      borderTop: `4px solid ${C.yellow}`,
+      background: `linear-gradient(135deg, ${C.dark} 0%, ${C.green} 50%, #081d47 100%)`,
+      padding: "48px 16px",
+    }}>
+      {/* Fescue/sand dots */}
+      <div style={{
+        position: "absolute", top: 0, left: 0, right: 0, bottom: 0,
+        opacity: 0.05, pointerEvents: "none",
+        backgroundImage: `
+          radial-gradient(circle at 20% 30%, #c9a227 2px, transparent 3px),
+          radial-gradient(circle at 70% 20%, #b31942 1.5px, transparent 2px),
+          radial-gradient(circle at 40% 70%, #fff 2.5px, transparent 3px),
+          radial-gradient(circle at 80% 80%, #c9a227 2px, transparent 2.5px),
+          radial-gradient(circle at 15% 85%, #b31942 1.5px, transparent 2px)
+        `,
+        backgroundSize: "180px 180px",
+      }} />
+
+      <div style={{ position: "relative", zIndex: 1, maxWidth: 1100, margin: "0 auto" }}>
+        <h3 style={{
+          fontFamily: "'Playfair Display',Georgia,serif", fontSize: 30,
+          color: C.yellow, textAlign: "center", margin: "0 0 4px",
+        }}>The U.S. Open at Home</h3>
+        <p style={{
+          fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 14,
+          color: "#aebfd6", textAlign: "center", margin: "0 0 28px",
+          letterSpacing: "0.15em", textTransform: "uppercase",
+        }}>Hamptons watch-party essentials</p>
+
+        <div style={{
+          display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16,
+        }} className="masters-panels">
+          {/* PANEL 1: Eats & Drinks */}
+          <div style={{
+            background: "rgba(255,255,255,0.97)", borderRadius: 4, overflow: "hidden",
+            border: `2px solid ${C.dark}`, boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
+          }}>
+            <div style={{ background: C.dark, padding: "8px 16px", textAlign: "center" }}>
+              <h4 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 15,
+                color: C.yellow, margin: 0 }}>🦞 Long Island Eats</h4>
+            </div>
+            <div style={{ padding: "14px 18px" }}>
+              <Section title="Eats" items={eats} />
+              <Section title="Drinks" items={drinks} />
+            </div>
+            <div style={{ padding: "6px 16px", background: "#fafaf7", borderTop: `1px solid ${C.sand}` }}>
+              <p style={{ fontFamily: "Georgia,serif", fontSize: 10, color: "#999",
+                textAlign: "center", fontStyle: "italic", margin: 0 }}>Butter, not mayo. We're not animals.</p>
+            </div>
+          </div>
+
+          {/* PANEL 2: TV Schedule */}
+          <div style={{
+            background: "rgba(255,255,255,0.97)", borderRadius: 4, overflow: "hidden",
+            border: `2px solid ${C.dark}`, boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
+          }}>
+            <div style={{ background: C.dark, padding: "8px 16px", textAlign: "center" }}>
+              <h4 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 15,
+                color: C.yellow, margin: 0 }}>📅 TV Schedule (ET)</h4>
+            </div>
+            <div style={{ padding: "12px 14px", maxHeight: 480, overflowY: "auto" }}>
+              {schedule.map((day, di) => (
+                <div key={di} style={{ marginBottom: 12 }}>
+                  <a href={day.link} target="_blank" rel="noopener" style={{
+                    fontFamily: "'Playfair Display',Georgia,serif", fontSize: 13,
+                    fontWeight: 700, color: C.green, marginBottom: 4,
+                    borderBottom: `1px solid ${C.sand}`, paddingBottom: 3,
+                    display: "block", textDecoration: "none",
+                  }}>{day.day} ↗</a>
+                  {day.events.map(([name, time, channel], ei) => (
+                    <div key={ei} style={{
+                      display: "flex", justifyContent: "space-between", alignItems: "center",
+                      padding: "3px 0", gap: 4,
+                    }}>
+                      <span style={{ fontFamily: "Georgia,serif", fontSize: 15, color: "#333", flex: 1 }}>{name}</span>
+                      <span style={{ fontFamily: "Georgia,serif", fontSize: 12, color: "#8b7355", whiteSpace: "nowrap" }}>{time}</span>
+                      <a href={channelUrls[channel] || "#"} target="_blank" rel="noopener" style={{
+                        fontFamily: "Georgia,serif", fontSize: 11, color: C.green,
+                        background: `${C.green}10`, padding: "1px 5px", borderRadius: 4,
+                        fontWeight: 600, whiteSpace: "nowrap", textDecoration: "none",
+                      }}>{channel} ↗</a>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* PANEL 3: The Transfusion cocktail */}
+          <div style={{
+            background: "rgba(255,255,255,0.97)", borderRadius: 4, overflow: "hidden",
+            border: `2px solid ${C.dark}`, boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
+            display: "flex", flexDirection: "column",
+          }}>
+            <div style={{ background: C.dark, padding: "8px 16px", textAlign: "center" }}>
+              <h4 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 15,
+                color: C.yellow, margin: 0 }}>🍇 The Transfusion</h4>
+            </div>
+            <div style={{ padding: "18px 18px", flex: 1 }}>
+              <div style={{ textAlign: "center", marginBottom: 12 }}>
+                <svg width="80" height="100" viewBox="0 0 80 100" style={{ display: "inline-block" }}>
+                  <rect x="26" y="18" width="28" height="56" fill="none" stroke="#13357b" strokeWidth="2" rx="3"/>
+                  <rect x="29" y="34" width="22" height="38" fill="url(#transGrad)" opacity="0.85" rx="2"/>
+                  <defs>
+                    <linearGradient id="transGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#8e3b8e"/>
+                      <stop offset="100%" stopColor="#5a1d5a"/>
+                    </linearGradient>
+                  </defs>
+                  <rect x="31" y="24" width="18" height="8" fill="rgba(255,255,255,0.5)" rx="2"/>
+                  <circle cx="36" cy="50" r="1.5" fill="rgba(255,255,255,0.6)"/>
+                  <circle cx="44" cy="56" r="1" fill="rgba(255,255,255,0.5)"/>
+                  <circle cx="40" cy="46" r="1" fill="rgba(255,255,255,0.4)"/>
+                  {/* lime wedge */}
+                  <path d="M50,30 a6,6 0 0 1 6,6" fill="none" stroke="#3a9d3a" strokeWidth="3" strokeLinecap="round"/>
+                  <ellipse cx="40" cy="76" rx="16" ry="3" fill="rgba(0,0,0,0.12)"/>
+                </svg>
+              </div>
+              <p style={{
+                fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 15,
+                color: C.dark, fontStyle: "italic", lineHeight: 1.5,
+                margin: "0 0 14px", textAlign: "center",
+              }}>The drink of the back nine</p>
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                {[
+                  ["🥃", "2 oz Vodka"],
+                  ["🍇", "1½ oz Concord grape juice"],
+                  ["🫧", "4 oz Ginger ale"],
+                  ["🍋", "Squeeze of fresh lime"],
+                  ["🧊", "Tall glass over ice · lime wheel"],
+                ].map(([icon, text], i) => (
+                  <div key={i} style={{
+                    display: "flex", alignItems: "center", gap: 8,
+                    padding: "5px 10px", borderRadius: 6,
+                    background: i % 2 === 0 ? `${C.green}08` : "transparent",
+                  }}>
+                    <span style={{ fontSize: 18 }}>{icon}</span>
+                    <span style={{ fontFamily: "Georgia,serif", fontSize: 15, color: "#333" }}>{text}</span>
+                  </div>
+                ))}
+              </div>
+              <div style={{
+                marginTop: 14, padding: "10px 12px", borderRadius: 6,
+                background: `${C.green}08`, border: `1px solid ${C.green}20`,
+              }}>
+                <p style={{ fontFamily: "Georgia,serif", fontSize: 15, color: C.dark,
+                  margin: 0, lineHeight: 1.4 }}>
+                  <strong>Build in glass:</strong> Vodka + grape juice over ice, top with ginger ale, squeeze the lime. Stir once. ⛳
+                </p>
+              </div>
+            </div>
+            <div style={{ padding: "6px 16px", background: "#fafaf7", borderTop: `1px solid ${C.sand}` }}>
+              <p style={{ fontFamily: "Georgia,serif", fontSize: 10, color: "#999",
+                textAlign: "center", fontStyle: "italic", margin: 0 }}>Arnold Palmer's other invention.</p>
+            </div>
+          </div>
+
+          {/* PANEL 4: Shinnecock history */}
+          <div style={{
+            background: "rgba(255,255,255,0.97)", borderRadius: 4, overflow: "hidden",
+            border: `2px solid ${C.dark}`, boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
+          }}>
+            <div style={{ background: C.dark, padding: "8px 16px", textAlign: "center" }}>
+              <h4 style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 15,
+                color: C.yellow, margin: 0 }}>⛳ Shinnecock Hills</h4>
+            </div>
+            <div style={{ padding: "14px 18px" }}>
+              <p style={{ fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 15,
+                color: C.dark, fontStyle: "italic", lineHeight: 1.5,
+                margin: "0 0 12px", textAlign: "center",
+              }}>America's first great links</p>
+              {[
+                ["🏛️", "One of 5 founding USGA clubs (1894)"],
+                ["📐", "William Flynn redesign, early 1930s"],
+                ["🔨", "Coore & Crenshaw restoration, 2012"],
+                ["📏", "Par 70, ~7,440 yards"],
+                ["🌾", "Thick fescue rough — 5 inches of trouble"],
+                ["🟢", "Fast, firm poa annua greens"],
+                ["🌊", "Atlantic wind decides everything"],
+                ["🏆", "6th U.S. Open here (back again in 2036)"],
+                ["💪", "Koepka won at +1 in '18 — last over-par major champ"],
+              ].map(([icon, fact], i) => (
+                <div key={i} style={{
+                  display: "flex", alignItems: "center", gap: 8,
+                  padding: "5px 8px", borderRadius: 6,
+                  background: i % 2 === 0 ? `${C.green}06` : "transparent",
+                }}>
+                  <span style={{ fontSize: 14, flexShrink: 0 }}>{icon}</span>
+                  <span style={{ fontFamily: "Georgia,serif", fontSize: 13, color: "#333" }}>{fact}</span>
+                </div>
+              ))}
+            </div>
+            <div style={{ padding: "6px 16px", background: "#fafaf7", borderTop: `1px solid ${C.sand}` }}>
+              <p style={{ fontFamily: "Georgia,serif", fontSize: 10, color: "#999",
+                textAlign: "center", fontStyle: "italic", margin: 0 }}>Par is a good score. Pick grinders, not bombers.</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
@@ -3286,6 +3746,7 @@ export default function App() {
 
           {MODE === "masters" && <MastersExperience />}
           {MODE === "pga" && <PGAExperience />}
+          {MODE === "usopen" && <USOpenExperience />}
 
           {/* Past Champions & Champions Dinner — side by side */}
           <div style={{
@@ -3302,13 +3763,13 @@ export default function App() {
                 fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 14,
                 color: "#a8d5a8", margin: "0 0 32px",
                 letterSpacing: "0.15em", textTransform: "uppercase",
-              }}>Green Jacket Winners</p>
+              }}>{MODE === "pga" ? "Wanamaker Pool Champions" : MODE === "usopen" ? "U.S. Open Pool Champions" : "Green Jacket Winners"}</p>
 
               <div style={{ display: "flex", gap: 32, alignItems: "flex-start", justifyContent: "center" }}
                 className="masters-panels">
                 {/* LEFT: Champions list + 2026 card */}
                 <div style={{ flex: 1, minWidth: 280, maxWidth: 420 }}>
-                  {(MODE === "pga" ? [
+                  {(MODE === "usopen" ? [] : MODE === "pga" ? [
                     { year: 2025, team: "Divot Daddy", name: "Ben Liddil" },
                     { year: 2024, team: "Big Boss Rides Again", name: "Chris Frick" },
                     { year: 2023, team: "Two Os in Gooch", name: "Richard Lee Hauschild" },
@@ -3566,14 +4027,16 @@ export default function App() {
         background: C.dark, padding: "18px 16px", textAlign: "center",
         borderTop: `3px solid ${C.green}`,
       }}>
-        <p style={{ fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 12, color: MODE === "pga" ? "#7a8a9e" : "#5a8a5a" }}>
+        <p style={{ fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: 12, color: (MODE === "pga" || MODE === "usopen") ? "#7a8a9e" : "#5a8a5a" }}>
           ⛳ {MODE === "valero" ? "🧪 Test Pool"
+              : MODE === "usopen" ? "U.S. Open Pool"
               : MODE === "pga"   ? "PGA Championship Pool"
               : "Masters Pool"} {T.year}
           {MODE === "masters" && <span> · Made with </span>}
           {MODE === "masters" && <span onClick={() => setView("jpjm")} style={{ cursor: "default", fontSize: 18, verticalAlign: "middle" }}>🧀</span>}
           {MODE === "masters" && <span> pimento cheese energy</span>}
           {MODE === "pga" && <span> · Aronimink · Newtown Square, PA</span>}
+          {MODE === "usopen" && <span> · Shinnecock Hills · Southampton, NY</span>}
         </p>
         <a href={`mailto:andescherf@gmail.com?subject=${encodeURIComponent(T.name + " Pool Feedback")}&body=Bug%20or%20idea%3A%20`}
           style={{
